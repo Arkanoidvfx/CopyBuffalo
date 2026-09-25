@@ -1,0 +1,8 @@
+bin/
+obj/
+.vs/
+*.user
+publish/
+.tmp/
+.codex-delegate/
+.codex-delegate-enabled
