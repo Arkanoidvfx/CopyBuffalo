@@ -36,7 +36,7 @@ public sealed class ClipItem : INotifyPropertyChanged
         get
         {
             var t = LastUsedAt.ToLocalTime();
-            return (DateTime.Today - t.Date).Days switch { 0 => t.ToString("HH:mm"), 1 => "вчера", _ => t.ToString("dd.MM") };
+            return (DateTime.Today - t.Date).Days switch { 0 => t.ToString("HH:mm"), 1 => UiText.T("вчера"), _ => t.ToString("dd.MM") };
         }
     }
 
@@ -128,7 +128,7 @@ public sealed class ClipItem : INotifyPropertyChanged
             PropertyChanged?.Invoke(this, new(nameof(HasTileColor)));
         }
     }
-    public static readonly string[] TileColorNames = ["Красный", "Оранжевый", "Жёлтый", "Зелёный", "Бирюзовый", "Синий", "Фиолетовый"];
+    public static readonly string[] TileColorNames = [UiText.T("Красный"), UiText.T("Оранжевый"), UiText.T("Жёлтый"), UiText.T("Зелёный"), UiText.T("Бирюзовый"), UiText.T("Синий"), UiText.T("Фиолетовый")];
     static readonly Color[] TileColors = [
         Color.FromRgb(232, 100, 105), Color.FromRgb(239, 151, 87), Color.FromRgb(225, 187, 81),
         Color.FromRgb(110, 190, 123), Color.FromRgb(77, 191, 185), Color.FromRgb(103, 156, 233),
@@ -165,10 +165,10 @@ public sealed class ClipItem : INotifyPropertyChanged
 
     (string kind, string title, string sub) DescribeText()
     {
-        if (IsNodeGraph) return ("graph", GraphLabel, "Граф нод");
-        if (IsFolder) return ("media", FileName ?? "Папка", Text);
+        if (IsNodeGraph) return ("graph", GraphLabel, UiText.T("Граф нод"));
+        if (IsFolder) return ("media", FileName ?? UiText.T("Папка"), Text);
         if (IsMedia) return ("media", FileName ?? "", MediaMeta);
-        if (IsImage) return ("image", IsGif ? "GIF" : "Изображение", $"{ImageWidth} × {ImageHeight}");
+        if (IsImage) return ("image", IsGif ? "GIF" : UiText.T("Изображение"), $"{ImageWidth} × {ImageHeight}");
         var s = Text.Trim();
         if (!s.Contains('\n'))
         {
@@ -189,13 +189,13 @@ public sealed class ClipItem : INotifyPropertyChanged
                     ? ("path", trimmed[(cut + 1)..], trimmed[..cut])
                     : ("path", trimmed, "");
             }
-            if (HexColor.IsMatch(s)) return ("color", s.ToUpperInvariant(), "Цвет");
+            if (HexColor.IsMatch(s)) return ("color", s.ToUpperInvariant(), UiText.T("Цвет"));
         }
         var preview = Preview;
         int newline = preview.IndexOf('\n');
         string first = (newline < 0 ? preview : preview[..newline]).Trim();
         string restText = newline < 0 ? "" : string.Join(" ", preview[(newline + 1)..].Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries));
-        if (restText.Length == 0) restText = $"Текст, {Text.Length:N0} симв.";
+        if (restText.Length == 0) restText = UiText.F($"Текст, {Text.Length:N0} симв.");
         return (IsMono ? "code" : "text", first, restText);
     }
 
@@ -228,29 +228,29 @@ public sealed class ClipItem : INotifyPropertyChanged
             || l.TrimEnd() is var t && (t.EndsWith(';') || t.EndsWith('{') || t.EndsWith('}') || t.EndsWith(')')));
         return lines.Count >= 2 && code * 2 >= lines.Count;
     }
-    [JsonIgnore] public string GraphLabel => IsUnityGraph ? "Ноды Unity Shader Graph" : "Ноды Unreal Engine";
+    [JsonIgnore] public string GraphLabel => IsUnityGraph ? UiText.T("Ноды Unity Shader Graph") : UiText.T("Ноды Unreal Engine");
     /// <summary>Живёт 1 день и вставляется файлом.</summary>
     [JsonIgnore] public bool IsShortLived => IsGif || IsMedia && !IsFolder;
     /// <summary>Плитке показывать картинку, а не текст.</summary>
     [JsonIgnore] public bool ShowTileImage => IsImage || HasThumb;
-    [JsonIgnore] public string? Badge => IsGif ? "GIF" : MediaKind switch { "video" => "Видео", "audio" => "Аудио", "text" => "Текстовый файл", "files" => "Файлы", "folder" => "Папка", _ => null };
+    [JsonIgnore] public string? Badge => IsGif ? "GIF" : MediaKind switch { "video" => UiText.T("Видео"), "audio" => UiText.T("Аудио"), "text" => UiText.T("Текстовый файл"), "files" => UiText.T("Файлы"), "folder" => UiText.T("Папка"), _ => null };
     [JsonIgnore] public bool HasBadge => Badge != null;
     [JsonIgnore] public string Glyph => MediaKind switch { "audio" => "\uE8D6", "text" => "\uE8A5", "files" => "\uE8B7", "folder" => "\uE8B7", _ => "\uE714" };
-    [JsonIgnore] public string FileCountMeta => MediaKind == "files" ? $" · {FileCount} шт." : "";
-    [JsonIgnore] public string MediaMeta => IsFolder ? "Папка · ссылка на оригинал"
+    [JsonIgnore] public string FileCountMeta => MediaKind == "files" ? UiText.F($" · {FileCount} шт.") : "";
+    [JsonIgnore] public string MediaMeta => IsFolder ? UiText.T("Папка · ссылка на оригинал")
         : MediaKind == "text" && FileSize < 1024
-        ? $"{Badge} · {FileSize} Б"
+        ? UiText.F($"{Badge} · {FileSize} Б")
         : MediaKind == "text" && FileSize < 1048576
-        ? $"{Badge} · {FileSize / 1024.0:0.#} КБ"
-        : $"{Badge}{FileCountMeta} · {FileSize / 1048576.0:0.#} МБ";
+        ? UiText.F($"{Badge} · {FileSize / 1024.0:0.#} КБ")
+        : UiText.F($"{Badge}{FileCountMeta} · {FileSize / 1048576.0:0.#} МБ");
 
     /// <summary>Текст для карточки: без хвостовых пробелов, не длиннее пары экранов.</summary>
     [JsonIgnore]
     public string Preview => IsMedia ? FileName ?? ""
-        : IsImage ? $"{(IsGif ? "GIF" : "Изображение")} {ImageWidth} × {ImageHeight}"
+        : IsImage ? $"{(IsGif ? "GIF" : UiText.T("Изображение"))} {ImageWidth} × {ImageHeight}"
         : IsNodeGraph ? GraphLabel
         : MapLink.TryDescribe(Text, out var mapTitle, out var mapDetail)
-            ? $"{mapTitle}\n{(mapTitle.EndsWith("маршрут", StringComparison.Ordinal) ? mapDetail.Replace(" → ", "\n→ ") : mapDetail)}"
+            ? $"{mapTitle}\n{(mapTitle.EndsWith(UiText.T("маршрут"), StringComparison.Ordinal) ? mapDetail.Replace(" → ", "\n→ ") : mapDetail)}"
         : (Text.Length > 600 ? Text[..600] : Text).Replace('\t', ' ').Trim();
 
     [JsonIgnore] internal string? ImageDir { get; set; }
@@ -451,10 +451,10 @@ public sealed class HistoryStore
     public void UpdateText(ClipItem item, string text)
     {
         ArgumentNullException.ThrowIfNull(text);
-        if (!Items.Contains(item)) throw new InvalidOperationException("Запись уже удалена из истории. Скопируйте текст перед закрытием окна.");
-        if (item.IsImage || item.IsMedia) throw new InvalidOperationException("Редактировать можно только текстовые записи.");
+        if (!Items.Contains(item)) throw new InvalidOperationException(UiText.T("Запись уже удалена из истории. Скопируйте текст перед закрытием окна."));
+        if (item.IsImage || item.IsMedia) throw new InvalidOperationException(UiText.T("Редактировать можно только текстовые записи."));
         if (item.Text == text) return;
-        if (text.Length > Storage.MaxChars) throw new InvalidOperationException($"Лимит текста в настройках: {Storage.MaxChars:N0} символов. Сократите текст или увеличьте лимит.");
+        if (text.Length > Storage.MaxChars) throw new InvalidOperationException(UiText.F($"Лимит текста в настройках: {Storage.MaxChars:N0} символов. Сократите текст или увеличьте лимит."));
         item.ReplaceText(text);
         Changed?.Invoke();
     }
@@ -572,7 +572,7 @@ public sealed class HistoryStore
     {
         for (int number = 1; ; number++)
         {
-            string name = $"Группа {number}";
+            string name = UiText.F($"Группа {number}");
             if (Groups.All(g => !string.Equals(g.Name, name, StringComparison.CurrentCultureIgnoreCase))) return name;
         }
     }
@@ -894,17 +894,21 @@ public sealed class HistoryStore
                 "плитка закреплённого: ссылка, путь в кавычках, цвет, текст");
             var mapRoute = "https://www.google.com/maps/dir/%D0%A8%D0%B8%D0%BB%D0%B5%D1%80%D0%BE%D0%B2%D0%B0+42,+%D0%91%D0%B5%D0%BE%D0%B3%D1%80%D0%B0%D0%B4/Vizim+doctors+1500+Tulip/@44.8246915,20.3870547,14z/data=!4m14?entry=ttu";
             var mapItem = new ClipItem { Text = mapRoute };
-            Check(mapItem is { Kind: "url", TileTitle: "Google Карты · маршрут", TileSub: "Шилерова 42, Београд → Vizim doctors 1500 Tulip" }
-                && mapItem.IsMapLink && mapItem.Preview == "Google Карты · маршрут\nШилерова 42, Београд\n→ Vizim doctors 1500 Tulip"
+            string googleRouteTitle = UiText.T("Google Карты") + UiText.T(" · маршрут");
+            string googlePlaceTitle = UiText.T("Google Карты") + UiText.T(" · место");
+            string yandexRouteTitle = UiText.T("Яндекс Карты") + UiText.T(" · маршрут");
+            string yandexPlaceTitle = UiText.T("Яндекс Карты") + UiText.T(" · место");
+            Check(mapItem is { Kind: "url", TileSub: "Шилерова 42, Београд → Vizim doctors 1500 Tulip" } && mapItem.TileTitle == googleRouteTitle
+                && mapItem.IsMapLink && mapItem.Preview == googleRouteTitle + "\nШилерова 42, Београд\n→ Vizim doctors 1500 Tulip"
                 && mapItem.Text == mapRoute,
                 "Google: длинный маршрут читается в истории, исходный URL сохранён");
-            Check(new ClipItem { Text = $"[{mapRoute}]({mapRoute.Replace("&", "\\&")})" } is { Kind: "url", TileTitle: "Google Карты · маршрут" }
+            Check(new ClipItem { Text = $"[{mapRoute}]({mapRoute.Replace("&", "\\&")})" } is { Kind: "url", TileTitle: var markdownTitle } && markdownTitle == googleRouteTitle
                 && new ClipItem { Text = "https://www.google.com/maps/dir/?api=1&origin=Belgrade+Center&destination=Airport" } is { TileSub: "Belgrade Center → Airport" }
-                && new ClipItem { Text = "https://www.google.com/maps/place/%D0%A8%D0%B8%D0%BB%D0%B5%D1%80%D0%BE%D0%B2%D0%B0+42/" } is { TileTitle: "Google Карты · место", TileSub: "Шилерова 42" },
+                && new ClipItem { Text = "https://www.google.com/maps/place/%D0%A8%D0%B8%D0%BB%D0%B5%D1%80%D0%BE%D0%B2%D0%B0+42/" } is { TileTitle: var placeTitle, TileSub: "Шилерова 42" } && placeTitle == googlePlaceTitle,
                 "Google: Markdown, маршрут с параметрами и адрес");
-            Check(new ClipItem { Text = "https://yandex.ru/maps/?rtext=%D0%9C%D0%BE%D1%81%D0%BA%D0%B2%D0%B0~%D0%A2%D0%B2%D0%B5%D1%80%D1%8C&rtt=auto" } is { TileTitle: "Яндекс Карты · маршрут", TileSub: "Москва → Тверь" }
+            Check(new ClipItem { Text = "https://yandex.ru/maps/?rtext=%D0%9C%D0%BE%D1%81%D0%BA%D0%B2%D0%B0~%D0%A2%D0%B2%D0%B5%D1%80%D1%8C&rtt=auto" } is { TileTitle: var yandexTitle, TileSub: "Москва → Тверь" } && yandexTitle == yandexRouteTitle
                 && new ClipItem { Text = "https://yandex.ru/maps/213/moscow/?rtext=55.586561%2C37.674627~55.583744%2C37.674338" } is { TileSub: "55.586561,37.674627 → 55.583744,37.674338" }
-                && new ClipItem { Text = "https://yandex.ru/maps/213/moscow/org/%D1%82%D1%83%D0%BB%D1%8C%D1%81%D0%BA%D0%B8%D0%B9_%D0%B4%D0%BE%D0%BC/12345/" } is { TileTitle: "Яндекс Карты · место", TileSub: "тульский дом" },
+                && new ClipItem { Text = "https://yandex.ru/maps/213/moscow/org/%D1%82%D1%83%D0%BB%D1%8C%D1%81%D0%BA%D0%B8%D0%B9_%D0%B4%D0%BE%D0%BC/12345/" } is { TileTitle: var yandexPlace, TileSub: "тульский дом" } && yandexPlace == yandexPlaceTitle,
                 "Яндекс: маршрут по названиям или координатам и место");
             Check(PromptCompressor.Clean("<think>\nx\n</think>\n<prompt>\nсжато <prompt> внутри\n</prompt>\n", []) == "сжато <prompt> внутри",
                 "сжатый промпт: вырезаны размышления и обёртка, теги внутри текста целы");
@@ -988,7 +992,7 @@ public sealed class HistoryStore
 
             ImageFiles.WriteMedia(s.ImagesDir, "MP3TEST", [1, 2, 3], null);
             s.AddMedia("MP3TEST", "audio", "song.mp3", 3, false, t0.AddDays(10).AddMinutes(8));
-            Check(s.Items[0] is { IsMedia: true, IsImage: false, Badge: "Аудио", Preview: "song.mp3" }, "аудио — медиа-запись, не картинка");
+            Check(s.Items[0] is { IsMedia: true, IsImage: false, Preview: "song.mp3" } && s.Items[0].Badge == UiText.T("Аудио"), "аудио — медиа-запись, не картинка");
             Check(!File.Exists(Path.Combine(s.ImagesDir, "MP3TEST.thumb.dat")), "у аудио без миниатюры нет файла миниатюры");
             s.Prune(t0.AddDays(10).AddMinutes(8).AddHours(25));
             Check(!s.Items.Any(i => i.IsMedia) && !File.Exists(Path.Combine(s.ImagesDir, "MP3TEST.dat")), "аудио живёт 1 день");
@@ -1020,7 +1024,7 @@ public sealed class HistoryStore
             fileStore.Save();
             var fileStore2 = new HistoryStore(Path.Combine(dir, "files", "history.dat"));
             fileStore2.Load(t0);
-            Check(fileStore2.Items.Single() is { Badge: "Текстовый файл", FileName: "note.txt", IsMedia: true }
+            Check(fileStore2.Items.Single() is { FileName: "note.txt", IsMedia: true } && fileStore2.Items.Single().Badge == UiText.T("Текстовый файл")
                 && ImageFiles.ReadFull(fileStore2.ImagesDir, textHash).SequenceEqual(textBytes),
                 "текстовый файл виден после перезапуска и хранится без изменения содержимого");
 
@@ -1041,7 +1045,7 @@ public sealed class HistoryStore
             folderStore.AddFolder(folderPath, t0, "explorer");
             folderStore.AddFolder(folderPath + Path.DirectorySeparatorChar, t0.AddSeconds(1), "explorer");
             var folderItem = folderStore.Items.Single();
-            Check(folderItem is { IsFolder: true, IsImage: false, IsShortLived: false, ImageHash: null, Badge: "Папка" }
+            Check(folderItem is { IsFolder: true, IsImage: false, IsShortLived: false, ImageHash: null } && folderItem.Badge == UiText.T("Папка")
                 && folderItem.TileTitle == "Исходная папка" && !Directory.Exists(folderStore.ImagesDir),
                 "папка хранится одной ссылкой на путь без копирования содержимого");
             folderStore.Add(folderPath, null, null, t0.AddSeconds(2));
@@ -1139,7 +1143,7 @@ public sealed class HistoryStore
             bundleStore.Save();
             var bundleLoaded = new HistoryStore(Path.Combine(dir, "bundle", "history.dat"));
             bundleLoaded.Load(t0);
-            Check(bundleLoaded.Items.Single() is { FileCount: 3, SourceApp: "explorer", Badge: "Файлы" },
+            Check(bundleLoaded.Items.Single() is { FileCount: 3, SourceApp: "explorer" } && bundleLoaded.Items.Single().Badge == UiText.T("Файлы"),
                 "пакет и приложение-источник переживают перезапуск");
             var unpacked = FileBundle.Extract(ImageFiles.ReadFull(bundleLoaded.ImagesDir, bundleHash), Path.Combine(dir, "extracted"), 3);
             Check(unpacked.Select(Path.GetFileName).SequenceEqual(["same.txt", "same.txt", "пустой.bin"])
@@ -1187,8 +1191,8 @@ public sealed class HistoryStore
             var three = layout.Items.Single(i => i.Text == "three");
             var group = layout.AddGroup("Работа")!;
             Check(layout.AddGroup("работа") == null, "названия групп не дублируются");
-            Check(layout.AddGroup("")?.Name == "Группа 1" && layout.AddGroup(" ")?.Name == "Группа 2", "пустые названия получают имена по порядку");
-            Check(layout.AddGroup("Группа 2") == null && layout.NextGroupName() == "Группа 3", "автонумерация не дублирует названия");
+            Check(layout.AddGroup("")?.Name == UiText.F($"Группа {1}") && layout.AddGroup(" ")?.Name == UiText.F($"Группа {2}"), "пустые названия получают имена по порядку");
+            Check(layout.AddGroup(UiText.F($"Группа {2}")) == null && layout.NextGroupName() == UiText.F($"Группа {3}"), "автонумерация не дублирует названия");
             layout.MovePinned(two, group.Id);
             layout.MovePinned(one, group.Id, two);
             layout.MovePinned(three, group.Id, two, after: true);
@@ -1245,7 +1249,7 @@ public sealed class HistoryStore
             var sym2 = new SymbolCatalog(symPath);
             Check(sym2.Items.Take(2).Select(i => i.Char).SequenceEqual(["→", "₽"]) && sym2.Items[0].Group == SymbolCatalog.PinnedGroup,
                 "закреплённые символы сохраняются и идут первой группой");
-            Check(sym2.Items.Any(i => i.Char == "→" && i.Group == "Стрелки" && i.Pinned), "закреплённый символ остаётся и в своей группе");
+            Check(sym2.Items.Any(i => i.Char == "→" && i.Group == UiText.T("Стрелки") && i.Pinned), "закреплённый символ остаётся и в своей группе");
             var panel = new PanelWindow(s2, sym2);
             int outsideDelayChanged = 0;
             panel.OutsideHideDelayChanged += ms => outsideDelayChanged = ms;
@@ -1266,7 +1270,7 @@ public sealed class HistoryStore
             sym2.TogglePin("→");
             Check(new SymbolCatalog(symPath).Items.Count(i => i.Group == SymbolCatalog.PinnedGroup) == 1, "открепление сохраняется");
             var dash = sym2.Items.First(i => i.Char == "—");
-            Check(SymbolCatalog.Matches(dash, "2014") && SymbolCatalog.Matches(dash, "U+2014") && SymbolCatalog.Matches(dash, "пункт")
+            Check(SymbolCatalog.Matches(dash, "2014") && SymbolCatalog.Matches(dash, "U+2014") && SymbolCatalog.Matches(dash, UiText.IsEnglish ? "punct" : "пункт")
                   && !SymbolCatalog.Matches(dash, "валют"), "поиск символа по коду и группе");
 
             File.WriteAllText(s._path, "мусор");

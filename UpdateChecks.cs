@@ -108,7 +108,7 @@ internal static class UpdateChecks
             panel.OpenSettings();
             panel.Root.Opacity = 1;
             panel.Root.Measure(new Size(392, 492)); panel.Root.Arrange(new Rect(0, 0, 392, 492)); panel.Root.UpdateLayout();
-            check(panel.UpdateButton.IsEnabled && panel.UpdateButton.Content.ToString() == "Обновить и перезапустить", "ready update exposes one restart action");
+            check(panel.UpdateButton.IsEnabled && panel.UpdateButton.Content.ToString() == UiText.T("Обновить и перезапустить"), "ready update exposes one restart action");
             panel.AutoUpdate = true;
             panel.VisualSettingsView.ScrollToEnd(); panel.Root.UpdateLayout();
             panel.Dispatcher.Invoke(() => { }, System.Windows.Threading.DispatcherPriority.ContextIdle);

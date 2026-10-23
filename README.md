@@ -4,7 +4,7 @@ Clipboard history for Windows. Copy text, images, and files, then press **Win+V*
 
 **[Download for Windows](https://github.com/Arkanoidvfx/CopyBuffalo/releases/latest/download/ArkCopyBuffer-Setup.exe)** · [All downloads](https://github.com/Arkanoidvfx/CopyBuffalo/releases/latest) · [Report a bug](https://github.com/Arkanoidvfx/CopyBuffalo/issues)
 
-Windows 10 (1809+) or Windows 11 · Intel/AMD x64 · The app interface is currently in Russian.
+Windows 10 (1809+) or Windows 11 · Intel/AMD x64 · English and Russian interface.
 
 <img src="docs/images/history.png" width="392" alt="Clipboard panel with sample notes, a command, and a file path">
 
@@ -32,7 +32,7 @@ Reorder the selected entries, put paths into placeholders, and check the result 
 
 ### Choose when to update
 
-Open **⋯ → Настройки → Вид** (Settings → View), then scroll to **Обновления** (Updates). You can disable automatic updates or check manually.
+Open **⋯ → Settings → View**, then scroll to **Updates**. You can disable automatic updates or check manually. English is the default; choose English or Russian at the top of this page and restart the app to apply it.
 
 <img src="docs/images/updates.png" width="392" alt="Update settings with automatic updates enabled and the current version installed">
 

@@ -109,7 +109,7 @@ sealed class PromptCompressor : IDisposable
 
     public async Task<string> CompressAsync(string text)
     {
-        if (text.Length > MaxChars) throw new Failure($"Текст длиннее {MaxChars:N0} символов: для локальной модели слишком много.");
+        if (text.Length > MaxChars) throw new Failure(UiText.F($"Текст длиннее {MaxChars:N0} символов: для локальной модели слишком много."));
         var blocks = new List<string>();
         var prompt = Protect(text.ReplaceLineEndings("\n"), blocks);
         bool cyrillic = prompt.Count(c => c is >= '\u0400' and <= '\u04FF') > prompt.Count(char.IsAsciiLetter);
@@ -129,8 +129,8 @@ sealed class PromptCompressor : IDisposable
     internal async Task<string[]> TranslateRegionsAsync(IReadOnlyList<OcrText.Region> regions, CancellationToken cancel)
     {
         if (regions.Sum(r => (long)r.Text.Length) > MaxChars || regions.Count > 256)
-            throw new Failure("Слишком много текста для перевода. Выделите меньшую область изображения.");
-        if (regions.Count == 0) throw new Failure("Нет текста для перевода.");
+            throw new Failure(UiText.T("Слишком много текста для перевода. Выделите меньшую область изображения."));
+        if (regions.Count == 0) throw new Failure(UiText.T("Нет текста для перевода."));
         var body = new
         {
             messages = new[]
@@ -152,7 +152,7 @@ sealed class PromptCompressor : IDisposable
         var translations = doc.RootElement.GetProperty("translations").EnumerateArray().Select(v => v.GetString() ?? "").ToArray();
         if (translations.Length != expectedCount || translations.Any(t => string.IsNullOrWhiteSpace(t)
             || t.Any(c => char.IsControl(c) && !char.IsWhiteSpace(c))))
-            throw new Failure("Модель пропустила надпись или вернула некорректный перевод. Картинка не изменена.");
+            throw new Failure(UiText.T("Модель пропустила надпись или вернула некорректный перевод. Картинка не изменена."));
         return translations.Select(t => t.ReplaceLineEndings(" ").Trim()).ToArray();
     }
 
@@ -171,14 +171,14 @@ sealed class PromptCompressor : IDisposable
                 {
                     using var response = await _http.PostAsJsonAsync($"{_url}/v1/chat/completions", body, cancel);
                     json = await response.Content.ReadAsStringAsync(cancel);
-                    if (!response.IsSuccessStatusCode) throw new Failure("Модель вернула ошибку.", new HttpRequestException(json));
+                    if (!response.IsSuccessStatusCode) throw new Failure(UiText.T("Модель вернула ошибку."), new HttpRequestException(json));
                     break;
                 }
                 catch (HttpRequestException)
                 {
                     // Сам llama-server падает изредка (CUDA illegal memory access на гибридной Qwen3.5) — поднимаем и повторяем один раз.
                     if (!await ServerExitedAsync()) throw;
-                    if (attempt > 0) throw ServerFailure("llama-server упал во время обработки текста.");
+                    if (attempt > 0) throw ServerFailure(UiText.T("llama-server упал во время обработки текста."));
                     if (_server?.StartInfo.FileName == BundledServer("cuda") && File.Exists(BundledServer("cpu"))) _cpuFallback = true;
                 }
             }
@@ -196,9 +196,9 @@ sealed class PromptCompressor : IDisposable
     {
         using var doc = JsonDocument.Parse(json);
         var choice = doc.RootElement.GetProperty("choices")[0];
-        if (choice.GetProperty("finish_reason").GetString() != "stop") throw new Failure("Модель не завершила ответ. Неполный результат не сохранён.");
+        if (choice.GetProperty("finish_reason").GetString() != "stop") throw new Failure(UiText.T("Модель не завершила ответ. Неполный результат не сохранён."));
         string answer = choice.GetProperty("message").GetProperty("content").GetString() ?? "";
-        if (string.IsNullOrWhiteSpace(Think.Replace(answer, ""))) throw new Failure("Модель вернула пустой ответ.");
+        if (string.IsNullOrWhiteSpace(Think.Replace(answer, ""))) throw new Failure(UiText.T("Модель вернула пустой ответ."));
         return answer;
     }
 
@@ -272,7 +272,7 @@ sealed class PromptCompressor : IDisposable
             psi.ArgumentList.Add(arg);
 
         lock (_serverLog) _serverLog.Clear();
-        var server = Process.Start(psi) ?? throw new Failure("llama-server не запустился.");
+        var server = Process.Start(psi) ?? throw new Failure(UiText.T("llama-server не запустился."));
         try { Native.AssignToJob(_job != IntPtr.Zero ? _job : _job = Native.CreateKillOnCloseJob(), server); }
         catch { server.Kill(); server.Dispose(); throw; }
         DataReceivedEventHandler keep = (_, e) =>
@@ -291,10 +291,10 @@ sealed class PromptCompressor : IDisposable
         while (true)
         {
             cancel.ThrowIfCancellationRequested();
-            if (server.HasExited) throw ServerFailure($"llama-server завершился при загрузке модели (код {server.ExitCode}).");
+            if (server.HasExited) throw ServerFailure(UiText.F($"llama-server завершился при загрузке модели (код {server.ExitCode})."));
             try { using var health = await _http.GetAsync($"{_url}/health", cancel); if (health.IsSuccessStatusCode) return; }
             catch (HttpRequestException) { } // порт ещё не слушается; 503 — модель грузится
-            if (DateTime.UtcNow > deadline) { Stop(); throw ServerFailure("Модель не загрузилась за 2 минуты."); }
+            if (DateTime.UtcNow > deadline) { Stop(); throw ServerFailure(UiText.T("Модель не загрузилась за 2 минуты.")); }
             await Task.Delay(200, cancel);
         }
     }
@@ -321,9 +321,9 @@ sealed class PromptCompressor : IDisposable
             model = File.Exists(bundled) ? bundled : DefaultModel;
         }
         if (exe == null || !File.Exists(exe))
-            throw new Failure("Не установлен компонент локальной модели. Запустите ArkCopyBuffer-Full-Setup.exe и выберите «Сжатие промптов» (он также нужен для перевода).");
+            throw new Failure(UiText.T("Не установлен компонент локальной модели. Запустите ArkCopyBuffer-Full-Setup.exe и выберите «Сжатие промптов» (он также нужен для перевода)."));
         if (!File.Exists(model))
-            throw new Failure($@"Не найдена модель {model}. Укажите путь в HKCU\Software\ArkCopyBuffer, значение LlamaModel.");
+            throw new Failure(UiText.F($@"Не найдена модель {model}. Укажите путь в HKCU\Software\ArkCopyBuffer, значение LlamaModel."));
         return (exe, model);
     }
 

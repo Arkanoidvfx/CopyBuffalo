@@ -9,9 +9,9 @@ partial class PanelWindow
 {
     static readonly (string? Key, string Label, string Glyph)[] KindFilters =
     [
-        (null, "Все", "\uE71D"), ("text", "Текст", "\uE8A5"), ("image", "Картинки", "\uE91B"),
-        ("video", "Видео", "\uE714"), ("audio", "Аудио", "\uE8D6"), ("files", "Файлы", "\uE8B7"),
-        ("folder", "Папки", "\uE8B7"), ("graph", "Схемы", "\uE8A7"), ("other", "Другое", "\uE712")
+        (null, UiText.T("Все"), "\uE71D"), ("text", UiText.T("Текст"), "\uE8A5"), ("image", UiText.T("Картинки"), "\uE91B"),
+        ("video", UiText.T("Видео"), "\uE714"), ("audio", UiText.T("Аудио"), "\uE8D6"), ("files", UiText.T("Файлы"), "\uE8B7"),
+        ("folder", UiText.T("Папки"), "\uE8B7"), ("graph", UiText.T("Схемы"), "\uE8A7"), ("other", UiText.T("Другое"), "\uE712")
     ];
     string? _kindFilter;
 
@@ -32,7 +32,7 @@ partial class PanelWindow
         var menu = new ContextMenu { PlacementTarget = KindButton, Placement = PlacementMode.MousePoint };
         foreach (var kind in KindFilters)
         {
-            var entry = Entry(kind.Key == null ? "Все — без фильтра" : kind.Label, kind.Glyph, () => SetKindFilter(kind.Key));
+            var entry = Entry(kind.Key == null ? UiText.T("Все — без фильтра") : kind.Label, kind.Glyph, () => SetKindFilter(kind.Key));
             entry.IsChecked = _kindFilter == kind.Key;
             menu.Items.Add(entry);
         }
@@ -42,12 +42,12 @@ partial class PanelWindow
 
     void SetKindFilter(string? kind)
     {
-        if (!KindFilters.Any(option => option.Key == kind)) throw new ArgumentException("Неизвестный вид записи.", nameof(kind));
+        if (!KindFilters.Any(option => option.Key == kind)) throw new ArgumentException(UiText.T("Неизвестный вид записи."), nameof(kind));
         _kindFilter = kind;
         string label = KindFilters.First(option => option.Key == kind).Label;
-        KindButton.Content = (kind == null ? "Виды" : label) + " ▾";
-        KindButton.ToolTip = kind == null ? "Вид записи: все, без фильтра" : "Вид записи: " + label;
-        AutomationProperties.SetName(KindButton, "Вид записи: " + label);
+        KindButton.Content = (kind == null ? UiText.T("Виды") : label) + " ▾";
+        KindButton.ToolTip = kind == null ? UiText.T("Вид записи: все, без фильтра") : UiText.T("Вид записи: ") + label;
+        AutomationProperties.SetName(KindButton, UiText.T("Вид записи: ") + label);
         RefreshViews();
     }
 

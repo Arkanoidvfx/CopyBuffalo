@@ -26,10 +26,10 @@ public partial class App
                 _autoUpdateFailed = false;
                 _updateHiddenSince = DateTime.UtcNow;
             }
-            catch (Exception ex) { Notify(InfoKind.Caution, "Настройка не сохранена.", ex.Message); }
+            catch (Exception ex) { Notify(InfoKind.Caution, UiText.T("Настройка не сохранена."), ex.Message); }
         };
         _updater.Changed += () => _panel.SetUpdateStatus(
-            (_autoUpdateFailed ? "Автоустановка приостановлена после ошибки. " : "") + _updater.Status,
+            (_autoUpdateFailed ? UiText.T("Автоустановка приостановлена после ошибки. ") : "") + _updater.Status,
             _updater.Ready != null, _updater.Busy || _installingUpdate);
         _panel.UpdateRequested += async () =>
         {
@@ -48,7 +48,7 @@ public partial class App
         if (File.Exists(error))
         {
             _autoUpdateFailed = true;
-            _panel.SetUpdateStatus("Предыдущее обновление не установилось. Проверьте вручную; подробности в updates/install-error.txt.", false, false);
+            _panel.SetUpdateStatus(UiText.T("Предыдущее обновление не установилось. Проверьте вручную; подробности в updates/install-error.txt."), false, false);
         }
         _updateTimer.Start();
         _updateIdleTimer.Start();
@@ -66,7 +66,7 @@ public partial class App
         if (_installingUpdate || _updater == null || _updater.Busy || _updater.Ready == null) return;
         if (UpdateOperationActive)
         {
-            if (!automatic) Notify(InfoKind.Info, "Завершите текущую операцию.", "Затем нажмите «Обновить и перезапустить» ещё раз.");
+            if (!automatic) Notify(InfoKind.Info, UiText.T("Завершите текущую операцию."), UiText.T("Затем нажмите «Обновить и перезапустить» ещё раз."));
             return;
         }
         _installingUpdate = true;
@@ -89,7 +89,7 @@ public partial class App
         catch (Exception ex)
         {
             _autoUpdateFailed = true;
-            Notify(InfoKind.Caution, "Обновление не установлено.", ex.Message);
+            Notify(InfoKind.Caution, UiText.T("Обновление не установлено."), ex.Message);
         }
         finally
         {

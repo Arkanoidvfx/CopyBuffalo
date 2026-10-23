@@ -80,7 +80,7 @@ partial class TextMergeWindow : Window
         _ready = false; UseSlots.IsChecked = _model.SubstitutePaths; _ready = true;
         _model.Refresh(); Result.Text = _model.Build();
         Result.FontFamily = (FontFamily)FindResource(_model.Slots.Count > 0 && _model.SubstitutePaths ? "MonoFont" : "TextFont");
-        ResultCount.Text = $"{_model.Parts.Count} записей · {Result.Text.Length:N0} символов";
+        ResultCount.Text = UiText.F($"{_model.Parts.Count} записей · {Result.Text.Length:N0} символов");
         NoSlots.Visibility = _model.Slots.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
         AssignOrderButton.IsEnabled = _model.SubstitutePaths && _model.Slots.Count > 0 && _model.Parts.Any(p => p.IsPath);
         UndoButton.IsEnabled = _undo.Count > 0; RedoButton.IsEnabled = _redo.Count > 0;
@@ -104,27 +104,27 @@ partial class TextMergeWindow : Window
     void Undo_Click(object sender, RoutedEventArgs e)
     {
         if (_saving || _undo.Count == 0) return;
-        _redo.Push(_model.Capture()); _model.Restore(_undo.Pop()); UpdateResult(); SetStatus("Изменение отменено."); Motion.Enter(Result, dy: 3);
+        _redo.Push(_model.Capture()); _model.Restore(_undo.Pop()); UpdateResult(); SetStatus(UiText.T("Изменение отменено.")); Motion.Enter(Result, dy: 3);
     }
     void Redo_Click(object sender, RoutedEventArgs e)
     {
         if (_saving || _redo.Count == 0) return;
-        _undo.Push(_model.Capture()); _model.Restore(_redo.Pop()); UpdateResult(); SetStatus("Изменение повторено."); Motion.Enter(Result, dy: 3);
+        _undo.Push(_model.Capture()); _model.Restore(_redo.Pop()); UpdateResult(); SetStatus(UiText.T("Изменение повторено.")); Motion.Enter(Result, dy: 3);
     }
     void Mode_Changed(object sender, RoutedEventArgs e)
-    { if (_ready) Change(() => _model.SubstitutePaths = UseSlots.IsChecked == true, UseSlots.IsChecked == true ? "Пути подставляются в назначенные слоты." : "Все записи объединяются отдельными строками."); }
-    void AssignOrder_Click(object sender, RoutedEventArgs e) => Change(_model.AssignInOrder, "Пути назначены по порядку карточек. Любое назначение можно изменить.");
+    { if (_ready) Change(() => _model.SubstitutePaths = UseSlots.IsChecked == true, UseSlots.IsChecked == true ? UiText.T("Пути подставляются в назначенные слоты.") : UiText.T("Все записи объединяются отдельными строками.")); }
+    void AssignOrder_Click(object sender, RoutedEventArgs e) => Change(_model.AssignInOrder, UiText.T("Пути назначены по порядку карточек. Любое назначение можно изменить."));
     void Assign_Click(object sender, RoutedEventArgs e)
     {
         if ((sender as FrameworkElement)?.DataContext is not MergeSlot slot) return;
         if (Sources.SelectedItem is not MergePart { IsPath: true } path)
-        { SetStatus("Выберите путь слева, затем нажмите нужный слот. Можно также перетащить путь."); return; }
-        if (Change(() => _model.Assign(path, slot), "Путь подставлен. Предпросмотр обновлён.")) Motion.Pop((UIElement)sender, 1.025, 1);
+        { SetStatus(UiText.T("Выберите путь слева, затем нажмите нужный слот. Можно также перетащить путь.")); return; }
+        if (Change(() => _model.Assign(path, slot), UiText.T("Путь подставлен. Предпросмотр обновлён."))) Motion.Pop((UIElement)sender, 1.025, 1);
     }
     void Clear_Click(object sender, RoutedEventArgs e)
-    { if ((sender as FrameworkElement)?.DataContext is MergeSlot slot) Change(() => _model.Clear(slot), "Слот освобождён. Путь вернулся отдельной строкой."); }
+    { if ((sender as FrameworkElement)?.DataContext is MergeSlot slot) Change(() => _model.Clear(slot), UiText.T("Слот освобождён. Путь вернулся отдельной строкой.")); }
     void Remove_Click(object sender, RoutedEventArgs e)
-    { if ((sender as FrameworkElement)?.DataContext is MergePart part) Change(() => _model.Remove(part), "Запись убрана из объединения. В истории она осталась."); }
+    { if ((sender as FrameworkElement)?.DataContext is MergePart part) Change(() => _model.Remove(part), UiText.T("Запись убрана из объединения. В истории она осталась.")); }
     void Up_Click(object sender, RoutedEventArgs e) => MoveSelected(-1);
     void Down_Click(object sender, RoutedEventArgs e) => MoveSelected(1);
     void MoveSelected(int delta)
@@ -139,7 +139,7 @@ partial class TextMergeWindow : Window
         var positions = _model.Parts.Select(p => (Part: p, Card: Sources.ItemContainerGenerator.ContainerFromItem(p) as ListBoxItem))
             .Where(p => p.Card != null && PresentationSource.FromVisual(p.Card) != null)
             .ToDictionary(p => p.Part, p => p.Card!.TranslatePoint(new(), Sources).Y);
-        if (!Change(() => _model.Move(part, index), "Порядок изменён.")) return;
+        if (!Change(() => _model.Move(part, index), UiText.T("Порядок изменён."))) return;
         Sources.UpdateLayout();
         foreach (var (item, before) in positions)
             if (Sources.ItemContainerGenerator.ContainerFromItem(item) is ListBoxItem card)
@@ -195,7 +195,7 @@ partial class TextMergeWindow : Window
             if (!Equals(card.Tag, tag)) card.Tag = tag;
         }
         else ClearOrderTarget();
-        e.Effects = DragDropEffects.Move; GhostHint.Text = "Отпустите — изменить порядок";
+        e.Effects = DragDropEffects.Move; GhostHint.Text = UiText.T("Отпустите — изменить порядок");
         DragSupport.ScrollEdge(Sources, e.GetPosition(Sources), ref _lastDragScroll);
     }
     void Order_DragLeave(object sender, DragEventArgs e) => ClearOrderTarget();
@@ -215,20 +215,20 @@ partial class TextMergeWindow : Window
         bool valid = part != null && border.DataContext is MergeSlot slot && _model.CanAssign(part, slot);
         e.Effects = valid ? DragDropEffects.Link : DragDropEffects.None; e.Handled = true;
         border.SetResourceReference(Border.BorderBrushProperty, valid ? "Accent" : "CardStroke");
-        GhostHint.Text = valid ? "Отпустите — подставить путь" : "Здесь нужен путь с подходящими кавычками";
+        GhostHint.Text = valid ? UiText.T("Отпустите — подставить путь") : UiText.T("Здесь нужен путь с подходящими кавычками");
     }
     void Slot_DragLeave(object sender, DragEventArgs e) => ((Border)sender).SetResourceReference(Border.BorderBrushProperty, "CardStroke");
     void Slot_Drop(object sender, DragEventArgs e)
     {
         var border = (Border)sender; var part = Dropped(e); e.Handled = true; e.Effects = DragDropEffects.None;
-        if (part != null && border.DataContext is MergeSlot slot && Change(() => _model.Assign(part, slot), "Путь подставлен. Предпросмотр обновлён."))
+        if (part != null && border.DataContext is MergeSlot slot && Change(() => _model.Assign(part, slot), UiText.T("Путь подставлен. Предпросмотр обновлён.")))
         { LandGhost(border); e.Effects = DragDropEffects.Link; }
         border.SetResourceReference(Border.BorderBrushProperty, "CardStroke");
     }
 
     void BeginGhost(MergePart part)
     {
-        EndGhost(restore: false); GhostText.Text = part.Title; GhostHint.Text = "Выберите порядок или слот";
+        EndGhost(restore: false); GhostText.Text = part.Title; GhostHint.Text = UiText.T("Выберите порядок или слот");
         GhostText.FontFamily = (FontFamily)FindResource(part.IsMono ? "MonoFont" : "TextFont");
         _ghostShift.BeginAnimation(TranslateTransform.XProperty, null); _ghostShift.BeginAnimation(TranslateTransform.YProperty, null);
         _ghostShift.X = _ghostShift.Y = 0; PositionGhost(); Ghost.IsOpen = true;
@@ -263,16 +263,16 @@ partial class TextMergeWindow : Window
     {
         if (_saving) return false;
         string text = _model.Build();
-        if (string.IsNullOrWhiteSpace(text)) { SetStatus("Добавьте хотя бы один непустой текст.", true); return false; }
-        if (text.Length > _store.Storage.MaxChars) { SetStatus($"Результат длиннее лимита {_store.Storage.MaxChars:N0} символов. Уберите записи или увеличьте лимит в настройках.", true); return false; }
-        _saving = true; Sheet.IsEnabled = false; SetStatus("Сохраняется…");
+        if (string.IsNullOrWhiteSpace(text)) { SetStatus(UiText.T("Добавьте хотя бы один непустой текст."), true); return false; }
+        if (text.Length > _store.Storage.MaxChars) { SetStatus(UiText.F($"Результат длиннее лимита {_store.Storage.MaxChars:N0} символов. Уберите записи или увеличьте лимит в настройках."), true); return false; }
+        _saving = true; Sheet.IsEnabled = false; SetStatus(UiText.T("Сохраняется…"));
         try
         {
             _store.Add(text, null, null, DateTime.UtcNow, "ArkCopyBuffer"); await _store.SaveAsync();
             if (copy) Paster.CopyText(text);
-            SetStatus(copy ? "Результат сохранён и скопирован." : "Результат сохранён."); return true;
+            SetStatus(copy ? UiText.T("Результат сохранён и скопирован.") : UiText.T("Результат сохранён.")); return true;
         }
-        catch (Exception ex) { App.Log(ex); SetStatus("Не удалось завершить. " + ex.Message + " Результат остаётся здесь; можно повторить.", true); return false; }
+        catch (Exception ex) { App.Log(ex); SetStatus(UiText.T("Не удалось завершить. ") + ex.Message + UiText.T(" Результат остаётся здесь; можно повторить."), true); return false; }
         finally { _saving = false; Sheet.IsEnabled = true; UpdateResult(); }
     }
     async void Merge_Click(object sender, RoutedEventArgs e)
@@ -301,7 +301,7 @@ partial class TextMergeWindow : Window
             check(loaded.Items.Any(i => i.Text == window.Result.Text), "merge окно: результат переживает загрузку зашифрованной истории");
             store.Storage = new StorageSettings(TextThousands: 10);
             var large = new TextMergeWindow(store, [new string('x', 10001), "y"]);
-            try { var task = large.SaveResultAsync(false); check(!task.Result && store.Items.Count == 3 && large.Status.Text.Contains("лимита"), "merge окно: превышение лимита отвергается до записи без обрезания"); }
+            try { var task = large.SaveResultAsync(false); check(!task.Result && store.Items.Count == 3 && large.Status.Text == UiText.F($"Результат длиннее лимита {store.Storage.MaxChars:N0} символов. Уберите записи или увеличьте лимит в настройках."), "merge окно: превышение лимита отвергается до записи без обрезания"); }
             finally { large.Close(); }
             var empty = new TextMergeWindow(store, ["", ""]);
             try { check(!empty.SaveResultAsync(false).Result && !empty.MergeButton.IsEnabled, "merge окно: пустой результат не сохраняется"); }
@@ -313,7 +313,7 @@ partial class TextMergeWindow : Window
         try
         {
             var task = failed.SaveResultAsync(false); TextEditorWindow.PumpUntil(() => task.IsCompleted);
-            check(!task.Result && !closed && failed.Result.Text == "a" + Environment.NewLine + "b" && failed.MergeButton.IsEnabled && failed.Status.Text.Contains("можно повторить"),
+            check(!task.Result && !closed && failed.Result.Text == "a" + Environment.NewLine + "b" && failed.MergeButton.IsEnabled && failed.Status.Text.Contains(UiText.T(" Результат остаётся здесь; можно повторить.")),
                 "merge окно: ошибка диска сохраняет предпросмотр и возможность повторить");
             var source = new Border { Opacity = 0.38 }; failed._lifted = source; failed._pointer.Start(); failed.EndGhost();
             check(source.Opacity == 1 && !failed._pointer.IsEnabled && !failed.Ghost.IsOpen, "merge drag: отмена восстанавливает карточку и останавливает таймер");
@@ -333,7 +333,7 @@ partial class TextMergeWindow : Window
             var bitmap = new System.Windows.Media.Imaging.RenderTargetBitmap(1132, 584, 96, 96, PixelFormats.Pbgra32); bitmap.Render(preview.Sheet);
             var encoder = new System.Windows.Media.Imaging.PngBitmapEncoder(); encoder.Frames.Add(System.Windows.Media.Imaging.BitmapFrame.Create(bitmap));
             using var file = System.IO.File.Create(System.IO.Path.Combine(AppContext.BaseDirectory, "merge-preview.png")); encoder.Save(file);
-            check(preview.Sources.ItemContainerGenerator.ContainerFromIndex(0) != null && preview.Result.ActualWidth > 250 && preview.MergeButton.ActualWidth > 180,
+            check(preview.Sources.ItemContainerGenerator.ContainerFromIndex(0) != null && preview.Result.ActualWidth > 250 && preview.MergeButton.ActualWidth > 120,
                 "merge layout: три колонки и кнопка помещаются; offscreen PNG создан без фокуса и управления");
         }
         finally { preview.Close(); }

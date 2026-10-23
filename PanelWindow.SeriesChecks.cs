@@ -125,7 +125,7 @@ partial class PanelWindow
             panel.SetSourceFilter(null);
             panel.PasteNextSeries(); ticket!.Value.Complete(true); ticket.Value.Complete(true);
             check(images[0].SeriesInserted && panel.NextSeriesItem == images[1] && panel.List.SelectedItem == images[1]
-                && panel.SeriesStatus.Text == "Вставлено 1 из 5", "серия: только успешная вставка один раз продвигает счётчик и выделение");
+                && panel.SeriesStatus.Text == UiText.F($"Вставлено {1} из {5}"), "серия: только успешная вставка один раз продвигает счётчик и выделение");
             panel.RenderSeriesPreview("image-series-progress.png", check);
             var manual = panel.BeginSeriesPaste(images[4]);
             check(manual != null && manual.Value.Current(), "Alt+выбор: обычная вставка отмеченной картинки работает и вне очереди");

@@ -20,7 +20,7 @@ internal sealed class AppUpdater : IDisposable
     readonly string _directory;
     internal Package? Ready { get; private set; }
     internal bool Busy { get; private set; }
-    internal string Status { get; private set; } = "Проверка при запуске и каждые 15 минут.";
+    internal string Status { get; private set; } = UiText.T("Проверка при запуске и каждые 15 минут.");
     internal event Action? Changed;
     string Installer => Path.Combine(_directory, "setup.exe");
 
@@ -46,17 +46,17 @@ internal sealed class AppUpdater : IDisposable
                 !url.AbsoluteUri.StartsWith(Repository + "/releases/download/", StringComparison.Ordinal) ||
                 !digest.StartsWith("sha256:", StringComparison.Ordinal) || digest.Length != 71 ||
                 !digest[7..].All(Uri.IsHexDigit) || size is <= 0 or > 1_073_741_824)
-                throw new InvalidDataException("Некорректный пакет обновления.");
+                throw new InvalidDataException(UiText.T("Некорректный пакет обновления."));
             return new(version, url, size, digest[7..]);
         }
-        throw new InvalidDataException("В релизе нет установщика ArkCopyBuffer-Setup.exe.");
+        throw new InvalidDataException(UiText.T("В релизе нет установщика ArkCopyBuffer-Setup.exe."));
     }
 
     internal static async Task VerifyAsync(string path, Package package, CancellationToken token)
     {
         await using var file = File.OpenRead(path);
         if (file.Length != package.Size || !Convert.ToHexString(await SHA256.HashDataAsync(file, token)).Equals(package.Hash, StringComparison.OrdinalIgnoreCase))
-            throw new InvalidDataException("Проверка SHA-256 обновления не пройдена.");
+            throw new InvalidDataException(UiText.T("Проверка SHA-256 обновления не пройдена."));
     }
 
     void SetStatus(string value) { Status = value; Changed?.Invoke(); }
@@ -65,7 +65,7 @@ internal sealed class AppUpdater : IDisposable
     {
         if (Busy) return;
         Busy = true;
-        SetStatus("Проверяем обновления…");
+        SetStatus(UiText.T("Проверяем обновления…"));
         string partial = Installer + ".partial";
         try
         {
@@ -73,17 +73,17 @@ internal sealed class AppUpdater : IDisposable
             timeout.CancelAfter(TimeSpan.FromMinutes(15));
             var token = timeout.Token;
             using var response = await _http.GetAsync("https://api.github.com/repos/Arkanoidvfx/CopyBuffalo/releases/latest", token);
-            if (response.StatusCode == HttpStatusCode.NotFound) { Ready = null; SetStatus("У вас последняя версия."); return; }
+            if (response.StatusCode == HttpStatusCode.NotFound) { Ready = null; SetStatus(UiText.T("У вас последняя версия.")); return; }
             response.EnsureSuccessStatusCode();
             using var json = JsonDocument.Parse(await response.Content.ReadAsStringAsync(token));
             var package = ParseRelease(json.RootElement, CurrentVersion);
-            if (package == null) { Ready = null; SetStatus("У вас последняя версия."); return; }
-            if (Ready == package) { SetStatus($"Версия {package.Version} готова к установке."); return; }
+            if (package == null) { Ready = null; SetStatus(UiText.T("У вас последняя версия.")); return; }
+            if (Ready == package) { SetStatus(UiText.F($"Версия {package.Version} готова к установке.")); return; }
             Ready = null;
             Directory.CreateDirectory(_directory);
             if (new DriveInfo(Path.GetPathRoot(_directory)!).AvailableFreeSpace < package.Size + 512L * 1024 * 1024)
-                throw new IOException("Недостаточно места для обновления: нужно ещё 512 МБ сверх размера пакета.");
-            SetStatus($"Скачиваем {package.Version} в фоне…");
+                throw new IOException(UiText.T("Недостаточно места для обновления: нужно ещё 512 МБ сверх размера пакета."));
+            SetStatus(UiText.F($"Скачиваем {package.Version} в фоне…"));
             using var download = await _http.GetAsync(package.Url, HttpCompletionOption.ResponseHeadersRead, token);
             download.EnsureSuccessStatusCode();
             await using (var input = await download.Content.ReadAsStreamAsync(token))
@@ -95,17 +95,17 @@ internal sealed class AppUpdater : IDisposable
                 while ((count = await input.ReadAsync(buffer, token)) != 0)
                 {
                     total += count;
-                    if (total > package.Size) throw new InvalidDataException("Размер обновления превышает заявленный.");
+                    if (total > package.Size) throw new InvalidDataException(UiText.T("Размер обновления превышает заявленный."));
                     await output.WriteAsync(buffer.AsMemory(0, count), token);
                 }
             }
             await VerifyAsync(partial, package, token);
             File.Move(partial, Installer, overwrite: true);
             Ready = package;
-            SetStatus($"Версия {package.Version} готова к установке.");
+            SetStatus(UiText.F($"Версия {package.Version} готова к установке."));
         }
         catch (OperationCanceledException) when (_stop.IsCancellationRequested) { }
-        catch (Exception ex) { SetStatus(Ready == null ? $"Не удалось проверить обновления: {ex.Message}" : $"Обновление {Ready.Version} готово. Нет связи с сервером."); }
+        catch (Exception ex) { SetStatus(Ready == null ? UiText.F($"Не удалось проверить обновления: {ex.Message}") : UiText.F($"Обновление {Ready.Version} готово. Нет связи с сервером.")); }
         finally
         {
             try { File.Delete(partial); } catch (Exception ex) when (ex is IOException or UnauthorizedAccessException) { }
@@ -116,15 +116,15 @@ internal sealed class AppUpdater : IDisposable
 
     internal async Task PrepareInstallAsync()
     {
-        if (Busy || Ready == null) throw new InvalidOperationException("Обновление ещё не готово.");
+        if (Busy || Ready == null) throw new InvalidOperationException(UiText.T("Обновление ещё не готово."));
         try { await VerifyAsync(Installer, Ready, _stop.Token); }
-        catch { Ready = null; SetStatus("Скачанный пакет повреждён. Проверьте обновления ещё раз."); throw; }
+        catch { Ready = null; SetStatus(UiText.T("Скачанный пакет повреждён. Проверьте обновления ещё раз.")); throw; }
     }
 
     // A separate Windows PowerShell process waits for a clean save/exit before Inno replaces files.
     internal async Task<Process> StartInstallerAsync()
     {
-        var package = Ready ?? throw new InvalidOperationException("Обновление не найдено.");
+        var package = Ready ?? throw new InvalidOperationException(UiText.T("Обновление не найдено."));
         string ready = Path.Combine(_directory, Guid.NewGuid().ToString("N") + ".ready");
         string script = BuildInstallScript(Installer, AppContext.BaseDirectory.TrimEnd(Path.DirectorySeparatorChar),
             Environment.ProcessPath!, Environment.ProcessId, package.Hash, Path.Combine(_directory, "install-error.txt"));
@@ -132,7 +132,7 @@ internal sealed class AppUpdater : IDisposable
         var start = new ProcessStartInfo(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.System), @"WindowsPowerShell\v1.0\powershell.exe"))
         { UseShellExecute = false, CreateNoWindow = true, WindowStyle = ProcessWindowStyle.Hidden };
         foreach (string argument in new[] { "-NoProfile", "-NonInteractive", "-EncodedCommand", Convert.ToBase64String(Encoding.Unicode.GetBytes(script)) }) start.ArgumentList.Add(argument);
-        var process = Process.Start(start) ?? throw new IOException("Не удалось запустить обновление.");
+        var process = Process.Start(start) ?? throw new IOException(UiText.T("Не удалось запустить обновление."));
         try
         {
             for (int attempt = 0; attempt < 50 && !process.HasExited; attempt++)
@@ -140,7 +140,7 @@ internal sealed class AppUpdater : IDisposable
                 if (File.Exists(ready)) return process;
                 await Task.Delay(100, _stop.Token);
             }
-            throw new IOException("Помощник обновления не запустился. Приложение продолжает работать.");
+            throw new IOException(UiText.T("Помощник обновления не запустился. Приложение продолжает работать."));
         }
         catch { if (!process.HasExited) process.Kill(); process.Dispose(); throw; }
         finally { if (File.Exists(ready)) File.Delete(ready); }

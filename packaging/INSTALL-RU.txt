@@ -1,4 +1,7 @@
-ArkCopyBuffer 0.2.0 — Windows 10 / Windows 11, Intel/AMD x64
+ArkCopyBuffer 0.2.1 — Windows 10 / Windows 11, Intel/AMD x64
+
+По умолчанию интерфейс английский. Русский можно выбрать в Settings → View →
+Language; перезапустите приложение, чтобы применить выбор.
 
 На второй компьютер перенесите ArkCopyBuffer-Full-Setup.exe.
 Этот единственный установщик включает все функции и модель для сжатия.

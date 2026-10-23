@@ -10,18 +10,18 @@ static class FolderArchive
     public static string Create(string source, string destination, CancellationToken cancel, Action<string>? progress = null)
     {
         var root = new DirectoryInfo(source);
-        if (!root.Exists) throw new DirectoryNotFoundException("Исходная папка перемещена, удалена или недоступна.");
+        if (!root.Exists) throw new DirectoryNotFoundException(UiText.T("Исходная папка перемещена, удалена или недоступна."));
         RejectLink(root);
         destination = Path.GetFullPath(destination);
         var prefix = Path.EndsInDirectorySeparator(root.FullName) ? root.FullName : root.FullName + Path.DirectorySeparatorChar;
         if (destination.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
-            throw new IOException("Нельзя создать временный ZIP внутри самой архивируемой папки.");
+            throw new IOException(UiText.T("Нельзя создать временный ZIP внутри самой архивируемой папки."));
         cancel.ThrowIfCancellationRequested();
         var drive = new DriveInfo(Path.GetPathRoot(destination)!);
         void CheckSpace()
         {
             if (drive.AvailableFreeSpace < 64L * 1024 * 1024)
-                throw new IOException("На диске временных файлов недостаточно места для ZIP.");
+                throw new IOException(UiText.T("На диске временных файлов недостаточно места для ZIP."));
         }
         CheckSpace();
         var partial = destination + ".partial";
@@ -32,7 +32,7 @@ static class FolderArchive
         void Report(bool force = false)
         {
             if (!force && clock.ElapsedMilliseconds < 150) return;
-            progress?.Invoke($"Файлов: {files:N0} · {bytes / 1048576.0:0.#}\u00A0МБ");
+            progress?.Invoke(UiText.F($"Файлов: {files:N0} · {bytes / 1048576.0:0.#}\u00A0МБ"));
             clock.Restart();
         }
         try
@@ -42,7 +42,7 @@ static class FolderArchive
                 created = true;
                 using var zip = new ZipArchive(output, ZipArchiveMode.Create, leaveOpen: true);
                 var baseName = Path.GetFileName(Path.TrimEndingDirectorySeparator(root.FullName));
-                if (baseName.Length == 0) baseName = "Папка";
+                if (baseName.Length == 0) baseName = UiText.T("Папка");
                 zip.CreateEntry(baseName + "/");
                 var options = new EnumerationOptions { RecurseSubdirectories = true, AttributesToSkip = 0, IgnoreInaccessible = false };
                 var buffer = new byte[81920];
@@ -87,6 +87,6 @@ static class FolderArchive
     static void RejectLink(FileSystemInfo item)
     {
         if ((item.Attributes & FileAttributes.ReparsePoint) != 0)
-            throw new IOException($"В папке есть ссылка или облачный файл: {item.Name}. Подготовьте обычную локальную копию.");
+            throw new IOException(UiText.F($"В папке есть ссылка или облачный файл: {item.Name}. Подготовьте обычную локальную копию."));
     }
 }

@@ -31,10 +31,10 @@ partial class TextEditorWindow : Window
         Sources.ItemsSource = _sources;
         store.Changed += RefreshSources;
         Editor.FontFamily = (System.Windows.Media.FontFamily)FindResource(item.IsMono || item.IsNodeGraph ? "MonoFont" : "TextFont");
-        Origin.Text = $"{item.SourceApp ?? "Буфер обмена"} · {item.CreatedAt.ToLocalTime():dd.MM.yyyy, HH:mm}";
+        Origin.Text = $"{item.SourceApp ?? UiText.T("Буфер обмена")} · {item.CreatedAt.ToLocalTime():dd.MM.yyyy, HH:mm}";
         _ready = true;
         UpdateTools();
-        SetStatus("Сохранено", "\uE73E", "SuccessIcon");
+        SetStatus(UiText.T("Сохранено"), "\uE73E", "SuccessIcon");
         _debounce.Tick += async (_, _) => { _debounce.Stop(); await SaveChangesAsync(); };
         SourceInitialized += (_, _) => { if (App.IsDarkTheme) Native.UseDarkTitleBar(new WindowInteropHelper(this).Handle); };
         Loaded += (_, _) => { ConstrainBounds(); Editor.Focus(); Motion.Enter(Sheet, dy: 6); };
@@ -68,14 +68,14 @@ partial class TextEditorWindow : Window
         if (!_ready) return;
         _debounce.Stop();
         UpdateTools();
-        SetStatus("Ожидает сохранения…", "\uE823", "TextSecondary");
+        SetStatus(UiText.T("Ожидает сохранения…"), "\uE823", "TextSecondary");
         _debounce.Start();
     }
 
     void Editor_SelectionChanged(object sender, RoutedEventArgs e) { if (_ready) UpdateTools(); }
     void UpdateTools()
     {
-        Count.Text = $"{Editor.Text.Length:N0} симв.";
+        Count.Text = UiText.F($"{Editor.Text.Length:N0} симв.");
         UndoButton.IsEnabled = Editor.CanUndo;
         RedoButton.IsEnabled = Editor.CanRedo;
         UpdateSourceActions();
@@ -91,9 +91,9 @@ partial class TextEditorWindow : Window
         var source = Sources.SelectedItem as ClipItem;
         InsertButton.IsEnabled = !_closing && source != null;
         ReplacePathButton.IsEnabled = !_closing && source != null && FindPathReplacement(Editor.Text, source.Text) != null;
-        PathHint.Text = source == null ? "Выберите запись из истории"
-            : ReplacePathButton.IsEnabled ? "Один путь или маркер — можно заменить автоматически"
-            : "Для других фрагментов используйте выделение и вставку";
+        PathHint.Text = source == null ? UiText.T("Выберите запись из истории")
+            : ReplacePathButton.IsEnabled ? UiText.T("Один путь или маркер — можно заменить автоматически")
+            : UiText.T("Для других фрагментов используйте выделение и вставку");
     }
     void Insert_Click(object sender, RoutedEventArgs e)
     {
@@ -143,14 +143,14 @@ partial class TextEditorWindow : Window
     {
         string text = Editor.Text;
         int version = ++_saveVersion;
-        SetStatus("Сохраняется…", "\uE895", "TextSecondary");
+        SetStatus(UiText.T("Сохраняется…"), "\uE895", "TextSecondary");
         try
         {
             _store.UpdateText(_item, text);
             await _store.SaveAsync();
             if (version == _saveVersion)
             {
-                if (Editor.Text == text) SetStatus("Сохранено", "\uE73E", "SuccessIcon");
+                if (Editor.Text == text) SetStatus(UiText.T("Сохранено"), "\uE73E", "SuccessIcon");
             }
             return true;
         }
@@ -158,7 +158,7 @@ partial class TextEditorWindow : Window
         {
             App.Log(ex);
             if (version == _saveVersion)
-                SetStatus("Не сохранено. " + ex.Message, "\uEA39", "CriticalText");
+                SetStatus(UiText.T("Не сохранено. ") + ex.Message, "\uEA39", "CriticalText");
             return false;
         }
     }
@@ -213,8 +213,8 @@ partial class TextEditorWindow : Window
             editor.ReplacePath_Click(editor, new RoutedEventArgs());
             string expected = command.Replace("D:/путь/к/клипу.mp4", path);
             check(editor.Editor.Text == expected && item.Text == command, "подстановка меняет только путь и ждёт паузу");
-            PumpUntil(() => item.Text == expected && editor.Status.Text == "Сохранено");
-            check(item.Text == expected && editor.Status.Text == "Сохранено", "пауза 1 сек сохраняет редактор на диск");
+            PumpUntil(() => item.Text == expected && editor.Status.Text == UiText.T("Сохранено"));
+            check(item.Text == expected && editor.Status.Text == UiText.T("Сохранено"), "пауза 1 сек сохраняет редактор на диск");
             var restored = new HistoryStore(System.IO.Path.Combine(directory, "editor", "history.dat"));
             restored.Load(now);
             check(restored.Items.Single(i => i.Id == item.Id).Text == expected, "автосохранение переживает загрузку истории");
@@ -243,8 +243,8 @@ partial class TextEditorWindow : Window
             pause.Restart();
             PumpUntil(() => pause.ElapsedMilliseconds >= 650);
             check(item.Text == expected, "новый ввод сбрасывает секунду ожидания автосохранения");
-            PumpUntil(() => item.Text == "второй черновик" && editor.Status.Text == "Сохранено");
-            check(item.Text == "второй черновик" && editor.Status.Text == "Сохранено", "сохраняется последний черновик после полной паузы");
+            PumpUntil(() => item.Text == "второй черновик" && editor.Status.Text == UiText.T("Сохранено"));
+            check(item.Text == "второй черновик" && editor.Status.Text == UiText.T("Сохранено"), "сохраняется последний черновик после полной паузы");
             editor.Editor.Text = "финальная правка без паузы";
             editor.Close();
             PumpUntil(() => closed);
@@ -276,7 +276,7 @@ partial class TextEditorWindow : Window
         {
             failedEditor.Editor.Text = "важная несохранённая правка";
             failedEditor.Close();
-            PumpUntil(() => failedEditor.Status.Text.StartsWith("Не сохранено.", StringComparison.Ordinal));
+            PumpUntil(() => failedEditor.Status.Text.StartsWith(UiText.T("Не сохранено. "), StringComparison.Ordinal));
             check(!failedClosed && !failedEditor.Editor.IsReadOnly && failedEditor.Editor.Text == "важная несохранённая правка",
                 "при ошибке диска окно остаётся открытым и сохраняет введённый текст");
         }

@@ -1,4 +1,4 @@
-﻿using System.Windows;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Documents;
@@ -26,7 +26,7 @@ partial class PanelWindow
     internal sealed record ValuePreview(TextSubstitution.Change Change, string Caption, string Before, string Inserted, string After)
     {
         public bool CanApply => Change.CanApply;
-        public string Description => Caption + ". Итог: " + Before + Inserted + After;
+        public string Description => Caption + UiText.T(". Итог: ") + Before + Inserted + After;
     }
 
     internal static ValuePreview PreviewChange(string original, TextSubstitution.Change change, int number = 0)
@@ -45,7 +45,7 @@ partial class PanelWindow
         if (original.Length - end > 80) after += "…";
         // Only the view is shortened; the drop always applies the complete Change.
         if (inserted.Length > 240) inserted = inserted[..112] + "…" + inserted[^112..];
-        string label = change.Label.Length == 0 ? "Пустые кавычки" : "Заменить «" + Short(change.Label) + "»";
+        string label = change.Label.Length == 0 ? UiText.T("Пустые кавычки") : UiText.T("Заменить «") + Short(change.Label) + "»";
         return new(change, (number > 0 ? number + " · " : "") + label, Flat(before), Flat(inserted), Flat(after));
 
         static string Flat(string text) => text.Replace('\r', ' ').Replace('\n', ' ').Replace('\t', ' ');
@@ -104,11 +104,11 @@ partial class PanelWindow
     {
         var slots = changes.Where(c => c.Priority < 3).ToArray();
         _automaticValue = chooseAll || slots.Length > 1 ? null : TextSubstitution.Automatic(changes);
-        string value = TextSubstitution.IsPath(source) ? "путь" : "значение";
-        ValueDropTitle.Text = _automaticValue != null ? "Так будет после замены" : $"Куда вставить {value}?";
+        string value = TextSubstitution.IsPath(source) ? UiText.T("путь") : UiText.T("значение");
+        ValueDropTitle.Text = _automaticValue != null ? UiText.T("Так будет после замены") : UiText.F($"Куда вставить {value}?");
         ValueDropHint.Text = _automaticValue != null
-            ? "Зелёным — вставка. Отпустите на карточке. Shift — другие места."
-            : fromPaste ? "Выберите результат. Зелёным — вставка." : $"Перенесите {value} на нужный результат. Зелёным — вставка.";
+            ? UiText.T("Зелёным — вставка. Отпустите на карточке. Shift — другие места.")
+            : fromPaste ? UiText.T("Выберите результат. Зелёным — вставка.") : UiText.F($"Перенесите {value} на нужный результат. Зелёным — вставка.");
         var choices = _automaticValue != null ? new[] { _automaticValue } : !chooseAll && slots.Length > 0 ? slots : changes.ToArray();
         ValueChoices.ItemsSource = choices.Select((c, i) => PreviewChange(original, c, choices.Length > 1 ? i + 1 : 0)).ToArray();
         ValueScroll.ScrollToTop();
@@ -193,7 +193,7 @@ partial class PanelWindow
         if (_valueSaving || item == null || before == null) return;
         if (item.Text != before || !_store.Items.Contains(item))
         {
-            ShowInfo(InfoKind.Caution, "Запись изменилась", "Перетащите значение ещё раз.");
+            ShowInfo(InfoKind.Caution, UiText.T("Запись изменилась"), UiText.T("Перетащите значение ещё раз."));
             return;
         }
         try
@@ -209,9 +209,9 @@ partial class PanelWindow
             {
                 if (IsShown && Active.ItemContainerGenerator.ContainerFromItem(item) is ListBoxItem card) AnimateValueInsertion(card);
             });
-            await SaveValueAsync("Значение заменено", CopyValue(after));
+            await SaveValueAsync(UiText.T("Значение заменено"), CopyValue(after));
         }
-        catch (Exception ex) { App.Log(ex); ShowInfo(InfoKind.Critical, "Замена не выполнена", ex.Message); }
+        catch (Exception ex) { App.Log(ex); ShowInfo(InfoKind.Critical, UiText.T("Замена не выполнена"), ex.Message); }
     }
 
     void AnimateValueInsertion(ListBoxItem card)
@@ -236,7 +236,7 @@ partial class PanelWindow
     {
         _transient = copyError == null
             ? new Info(InfoKind.Success, title, "", Closable: false, Compact: true)
-            : new Info(InfoKind.Caution, title, "Не удалось скопировать в буфер. " + copyError, ("Скопировать", RetryValueCopy));
+            : new Info(InfoKind.Caution, title, UiText.T("Не удалось скопировать в буфер. ") + copyError, (UiText.T("Скопировать"), RetryValueCopy));
         RefreshInfo();
     }
 
@@ -244,10 +244,10 @@ partial class PanelWindow
     {
         if (_valueUndo is not { } undo || !_store.Items.Contains(undo.Item) || undo.Item.Text != undo.After)
         {
-            ShowInfo(InfoKind.Caution, "Запись изменилась", "Скопируйте её заново из истории.");
+            ShowInfo(InfoKind.Caution, UiText.T("Запись изменилась"), UiText.T("Скопируйте её заново из истории."));
             return;
         }
-        ShowValueResult("Значение заменено", CopyValue(undo.After));
+        ShowValueResult(UiText.T("Значение заменено"), CopyValue(undo.After));
     }
 
     async Task SaveValueAsync(string title, string? copyError = null)
@@ -262,8 +262,8 @@ partial class PanelWindow
         catch (Exception ex)
         {
             App.Log(ex);
-            _transient = new Info(InfoKind.Critical, "Не сохранено на диск", ex.Message,
-                ("Повторить", async () => await SaveValueAsync(title, copyError)), _valueUndo != null ? ("Отменить", UndoValue) : null);
+            _transient = new Info(InfoKind.Critical, UiText.T("Не сохранено на диск"), ex.Message,
+                (UiText.T("Повторить"), async () => await SaveValueAsync(title, copyError)), _valueUndo != null ? (UiText.T("Отменить"), UndoValue) : null);
         }
         finally { _valueSaving = false; RefreshInfo(); }
     }
@@ -274,7 +274,7 @@ partial class PanelWindow
         if (!_store.Items.Contains(undo.Item) || undo.Item.Text != undo.After)
         {
             _valueUndo = null;
-            ShowInfo(InfoKind.Caution, "Отмена недоступна", "Запись уже изменена или удалена.");
+            ShowInfo(InfoKind.Caution, UiText.T("Отмена недоступна"), UiText.T("Запись уже изменена или удалена."));
             return;
         }
         try
@@ -283,9 +283,9 @@ partial class PanelWindow
             undo.Item.Rtf = undo.Rtf;
             undo.Item.Html = undo.Html;
             _valueUndo = null;
-            await SaveValueAsync("Замена отменена");
+            await SaveValueAsync(UiText.T("Замена отменена"));
         }
-        catch (Exception ex) { App.Log(ex); ShowInfo(InfoKind.Critical, "Отмена не выполнена", ex.Message); }
+        catch (Exception ex) { App.Log(ex); ShowInfo(InfoKind.Critical, UiText.T("Отмена не выполнена"), ex.Message); }
     }
 
     void PasteValue()
@@ -301,9 +301,9 @@ partial class PanelWindow
                 if (_automaticValue != null) CommitValue(_automaticValue);
                 else Dispatcher.BeginInvoke(DispatcherPriority.Input, () => ValueDropCard.MoveFocus(new(FocusNavigationDirection.First)));
             }
-            else ShowInfo(InfoKind.Info, "Не найдено значение для замены", "Используйте маркер <значение>, {{значение}} или аргумент команды. Можно открыть редактор: Ctrl+E.");
+            else ShowInfo(InfoKind.Info, UiText.T("Не найдено значение для замены"), UiText.T("Используйте маркер <значение>, {{значение}} или аргумент команды. Можно открыть редактор: Ctrl+E."));
         }
-        catch (Exception ex) { App.Log(ex); ShowInfo(InfoKind.Critical, "Не удалось прочитать буфер", ex.Message); }
+        catch (Exception ex) { App.Log(ex); ShowInfo(InfoKind.Critical, UiText.T("Не удалось прочитать буфер"), ex.Message); }
     }
 
     void ScrollDrag(ListBox list, DragEventArgs e)
@@ -422,11 +422,11 @@ partial class PanelWindow
             panel.CommitValue(TextSubstitution.Automatic(TextSubstitution.Find(original, path))!);
             string changed = "mpv \"" + path + "\"";
             check(copied == changed, "подстановка сразу копирует итог до ожидания записи на диск");
-            TextEditorWindow.PumpUntil(() => panel._transient?.Title == "Значение заменено");
+            TextEditorWindow.PumpUntil(() => panel._transient?.Title == UiText.T("Значение заменено"));
             panel.InfoBar.Measure(new Size(330, double.PositiveInfinity));
             panel.InfoBar.Arrange(new Rect(0, 0, 330, panel.InfoBar.DesiredSize.Height));
             panel.InfoBar.UpdateLayout();
-            TextEditorWindow.PumpUntil(() => panel.InfoTitle.Text.Contains("Значение заменено"));
+            TextEditorWindow.PumpUntil(() => panel.InfoTitle.Text.Contains(UiText.T("Значение заменено")));
             check(panel._transient is { Compact: true, Closable: false, Primary: null, Secondary: null }
                 && panel.InfoActions.Visibility == Visibility.Collapsed && panel.InfoBar.ActualHeight <= 32
                 && panel._infoTimer.IsEnabled && panel._infoTimer.Interval == TimeSpan.FromSeconds(2),
@@ -465,19 +465,19 @@ partial class PanelWindow
             restored.Load(now);
             check(restored.Items.Single(i => i.Id == item.Id).Text == changed, "прямая подстановка сохранена на диск");
             panel.UndoValue();
-            TextEditorWindow.PumpUntil(() => panel._transient?.Title == "Замена отменена");
+            TextEditorWindow.PumpUntil(() => panel._transient?.Title == UiText.T("Замена отменена"));
             check(item.Text == original && item.Rtf == "rtf" && item.Html == "html", "отмена восстанавливает текст и форматирование");
             panel._valueItem = item; panel._valueOriginal = original;
             store.UpdateText(item, "другая правка");
             panel.CommitValue(TextSubstitution.Automatic(TextSubstitution.Find(original, path))!);
-            check(item.Text == "другая правка" && panel._transient?.Title == "Запись изменилась", "устаревшее перетаскивание не затирает новую правку");
+            check(item.Text == "другая правка" && panel._transient?.Title == UiText.T("Запись изменилась"), "устаревшее перетаскивание не затирает новую правку");
             check(copied == changed && !panel._infoTimer.IsEnabled, "устаревшая подстановка не меняет буфер и останавливает таймер успеха");
             const string twoSlots = "mpv \"\" \"\"";
             store.UpdateText(item, twoSlots);
             panel._valueItem = item; panel._valueOriginal = twoSlots;
             var second = PreviewChange(twoSlots, TextSubstitution.Find(twoSlots, path)[1]);
             panel.ValueChoice_Click(new Button { DataContext = second }, new RoutedEventArgs());
-            TextEditorWindow.PumpUntil(() => panel._transient?.Title == "Значение заменено");
+            TextEditorWindow.PumpUntil(() => panel._transient?.Title == UiText.T("Значение заменено"));
             check(item.Text == "mpv \"\" \"" + path + "\"" && copied == item.Text, "preview: выбор второй карточки заменяет вторую пару кавычек и копирует итог");
             var elapsed = System.Diagnostics.Stopwatch.StartNew();
             TextEditorWindow.PumpUntil(() => panel._transient == null);
@@ -488,7 +488,7 @@ partial class PanelWindow
             panel._valueItem = item; panel._valueOriginal = retryOriginal;
             panel.CommitValue(TextSubstitution.Find(retryOriginal, @"D:\other.mp4").Last());
             TextEditorWindow.PumpUntil(() => panel._transient?.Kind == InfoKind.Caution);
-            check(panel._transient?.Primary?.Text == "Скопировать" && !panel._infoTimer.IsEnabled && item.Text.Contains(@"D:\other.mp4"),
+            check(panel._transient?.Primary?.Text == UiText.T("Скопировать") && !panel._infoTimer.IsEnabled && item.Text.Contains(@"D:\other.mp4"),
                 "занятый буфер не отменяет правку: сообщение с повтором копирования не исчезает автоматически");
             panel._copyValue = text => copied = text;
             panel.RetryValueCopy();
@@ -508,9 +508,9 @@ partial class PanelWindow
         {
             failedPanel._valueItem = failedItem; failedPanel._valueOriginal = original;
             failedPanel.CommitValue(TextSubstitution.Automatic(TextSubstitution.Find(original, path))!);
-            TextEditorWindow.PumpUntil(() => failedPanel._transient?.Title == "Не сохранено на диск");
-            check(failedPanel._transient?.Title == "Не сохранено на диск" && failedPanel._valueUndo != null
-                && failedPanel._transient.Primary?.Text == "Повторить" && failedPanel._transient.Secondary?.Text == "Отменить",
+            TextEditorWindow.PumpUntil(() => failedPanel._transient?.Title == UiText.T("Не сохранено на диск"));
+            check(failedPanel._transient?.Title == UiText.T("Не сохранено на диск") && failedPanel._valueUndo != null
+                && failedPanel._transient.Primary?.Text == UiText.T("Повторить") && failedPanel._transient.Secondary?.Text == UiText.T("Отменить"),
                 "ошибка диска оставляет подстановку в памяти с повтором записи и отменой");
         }
         finally { failedPanel.CloseValueDrop(); failedPanel.Close(); }

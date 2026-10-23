@@ -16,11 +16,11 @@ partial class PanelWindow
     internal void SetUpdateStatus(string status, bool ready, bool busy)
     {
         UpdateStatus.Text = status;
-        UpdateButton.Content = ready ? "Обновить и перезапустить" : "Проверить обновления";
+        UpdateButton.Content = ready ? UiText.T("Обновить и перезапустить") : UiText.T("Проверить обновления");
         UpdateButton.IsEnabled = !busy;
         UpdateVersion.Text = $"ArkCopyBuffer {AppUpdater.VersionText}";
-        _updateInfo = ready ? new Info(InfoKind.Info, "Доступно обновление.", status,
-            ("Обновить и перезапустить", () => UpdateRequested?.Invoke())) : null;
+        _updateInfo = ready ? new Info(InfoKind.Info, UiText.T("Доступно обновление."), status,
+            (UiText.T("Обновить и перезапустить"), () => UpdateRequested?.Invoke())) : null;
         RefreshInfo();
     }
     void AutoUpdateToggle_Changed(object sender, RoutedEventArgs e) => AutoUpdateChanged?.Invoke(AutoUpdate);

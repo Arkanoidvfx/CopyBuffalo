@@ -1,6 +1,7 @@
 <Application x:Class="ArkCopyBuffer.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:ArkCopyBuffer"
              ShutdownMode="OnExplicitShutdown">
     <!--
         Цвета — токены Windows 11 (Fluent 2). Кисти с этими ключами создаёт App.ApplyTheme
@@ -148,7 +149,7 @@
                                               HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden"/>
                                 <Button x:Name="PART_Clear" Grid.Column="1" Style="{StaticResource SubtleIconButton}" Width="22" Height="22"
                                         Margin="4,0,4,0" FontSize="10" Content="&#xE711;"
-                                        ToolTip="Очистить поиск (Esc)" AutomationProperties.Name="Очистить поиск"/>
+                                        ToolTip="{local:Loc Key=SE9455A15B5E24913}" AutomationProperties.Name="{local:Loc Key=S6E1F7BAA472FCFBB}"/>
                                 <TextBlock Grid.Column="2" Text="&#xE721;" FontFamily="{StaticResource IconFont}" FontSize="12"
                                            VerticalAlignment="Center" Foreground="{DynamicResource TextSecondary}" IsHitTestVisible="False"/>
                             </Grid>
@@ -297,13 +298,13 @@
                             <DataTrigger Binding="{Binding InSeries}" Value="True">
                                 <Setter TargetName="SeriesBadge" Property="Visibility" Value="Visible"/>
                                 <Setter TargetName="SeriesBadge" Property="BorderBrush" Value="{DynamicResource AccentRing}"/>
-                                <Setter Property="AutomationProperties.ItemStatus" Value="Выбрано для вставки"/>
+                                <Setter Property="AutomationProperties.ItemStatus" Value="{local:Loc Key=S7148F1C5E86E4F94}"/>
                                 <Setter TargetName="Bd" Property="Padding" Value="36,6,6,6"/>
                                 <Setter TargetName="Bd" Property="BorderBrush" Value="{DynamicResource AccentRing}"/>
                             </DataTrigger>
                             <DataTrigger Binding="{Binding SeriesInserted}" Value="True">
                                 <Setter TargetName="Bd" Property="Opacity" Value="0.45"/>
-                                <Setter Property="AutomationProperties.ItemStatus" Value="Вставлено"/>
+                                <Setter Property="AutomationProperties.ItemStatus" Value="{local:Loc Key=SC06B7F21C448FEF7}"/>
                             </DataTrigger>
                             <DataTrigger Binding="{Binding Working}" Value="True">
                                 <Setter TargetName="Busy" Property="Visibility" Value="Visible"/>
@@ -428,11 +429,11 @@
                         <ControlTemplate.Triggers>
                             <DataTrigger Binding="{Binding InSeries}" Value="True">
                                 <Setter TargetName="SeriesBadge" Property="Visibility" Value="Visible"/>
-                                <Setter Property="AutomationProperties.ItemStatus" Value="Выбрано для вставки"/>
+                                <Setter Property="AutomationProperties.ItemStatus" Value="{local:Loc Key=S7148F1C5E86E4F94}"/>
                             </DataTrigger>
                             <DataTrigger Binding="{Binding SeriesInserted}" Value="True">
                                 <Setter TargetName="Bd" Property="Opacity" Value="0.45"/>
-                                <Setter Property="AutomationProperties.ItemStatus" Value="Вставлено"/>
+                                <Setter Property="AutomationProperties.ItemStatus" Value="{local:Loc Key=SC06B7F21C448FEF7}"/>
                             </DataTrigger>
                             <DataTrigger Binding="{Binding Working}" Value="True">
                                 <Setter TargetName="Busy" Property="Visibility" Value="Visible"/>
@@ -537,11 +538,11 @@
                         <ControlTemplate.Triggers>
                             <DataTrigger Binding="{Binding InSeries}" Value="True">
                                 <Setter TargetName="SeriesBadge" Property="Visibility" Value="Visible"/>
-                                <Setter Property="AutomationProperties.ItemStatus" Value="Выбрано для вставки"/>
+                                <Setter Property="AutomationProperties.ItemStatus" Value="{local:Loc Key=S7148F1C5E86E4F94}"/>
                             </DataTrigger>
                             <DataTrigger Binding="{Binding SeriesInserted}" Value="True">
                                 <Setter TargetName="Bd" Property="Opacity" Value="0.45"/>
-                                <Setter Property="AutomationProperties.ItemStatus" Value="Вставлено"/>
+                                <Setter Property="AutomationProperties.ItemStatus" Value="{local:Loc Key=SC06B7F21C448FEF7}"/>
                             </DataTrigger>
                             <DataTrigger Binding="{Binding Working}" Value="True">
                                 <Setter TargetName="Busy" Property="Visibility" Value="Visible"/>

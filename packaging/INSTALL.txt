@@ -1,4 +1,4 @@
-ArkCopyBuffer 0.2.0
+ArkCopyBuffer 0.2.1
 Windows 10 (1809+) / Windows 11, Intel/AMD x64
 
 DOWNLOAD
@@ -18,8 +18,9 @@ and CPU/NVIDIA runtime for prompt compression and image translation.
 
 USE
 Copy normally, then press Win+V to find and paste a saved entry.
-The app interface is currently Russian. Settings, pause, and exit
-are available from the tray menu and the panel's three-dot menu.
+English is the default. Change English/Russian in Settings > View,
+then restart to apply. Settings, pause, and exit are available
+from the tray menu and the panel's three-dot menu.
 Exiting restores the normal Windows Win+V shortcut.
 
 UPDATES

@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.IO;
@@ -127,7 +127,7 @@ partial class PanelWindow : Window
     string? _sourceFilter;
     readonly ICollectionView _view;       // вкладка «Буфер обмена»: всё
     readonly ObservableCollection<object> _pinned = new();
-    readonly PinnedGroup _ungrouped = new() { Id = Guid.Empty, Name = "Без группы" };
+    readonly PinnedGroup _ungrouped = new() { Id = Guid.Empty, Name = UiText.T("Без группы") };
     Point? _dragStart;
     ClipItem? _dragItem;
     ListBoxItem? _dropTarget;
@@ -160,6 +160,7 @@ partial class PanelWindow : Window
     public PanelWindow(HistoryStore store, SymbolCatalog symbols)
     {
         InitializeComponent();
+        InitializeLanguage();
         InitializeDragVisual();
         _infoTimer.Tick += (_, _) =>
         {
@@ -309,9 +310,9 @@ partial class PanelWindow : Window
         PinnedList.ItemsPanel = (ItemsPanelTemplate)FindResource(_pinnedAsList ? "PinRowPanel" : "PinTilePanel");
         PinnedList.Margin = _pinnedAsList ? new Thickness(0, -3, 0, 0) : new Thickness(-3, -3, 0, 0);
         ViewButton.Content = _pinnedAsList ? "\uF0E2" : "\uE8FD";
-        string hint = _pinnedAsList ? "Показать плитками" : "Показать списком";
+        string hint = _pinnedAsList ? UiText.T("Показать плитками") : UiText.T("Показать списком");
         ViewButton.ToolTip = hint;
-        AutomationProperties.SetName(ViewButton, hint + " закреплённые");
+        AutomationProperties.SetName(ViewButton, hint + UiText.T(" закреплённые"));
     }
 
     void View_Click(object sender, RoutedEventArgs e)
@@ -663,10 +664,10 @@ partial class PanelWindow : Window
         bool searching = Search.Text.Length > 0 || _sourceFilter != null || _kindFilter != null;
         (EmptyTitle.Text, EmptyHint.Text) = (searching, PinnedTab) switch
         {
-            (true, _) when SymbolsTab => ("Ничего не найдено", "Ищите по символу, коду (2014) или группе («валют»)."),
-            (true, _) => ("Ничего не найдено", "Измените поиск, приложение или вид записей."),
-            (false, true) => ("Закреплённых пока нет", "Нажмите на булавку у записи или Ctrl+P, и она появится здесь."),
-            _ => ("Здесь пока пусто", "Скопируйте текст или картинку, и они появятся в этом списке."),
+            (true, _) when SymbolsTab => (UiText.T("Ничего не найдено"), UiText.T("Ищите по символу, коду (2014) или группе («валют»).")),
+            (true, _) => (UiText.T("Ничего не найдено"), UiText.T("Измените поиск, приложение или вид записей.")),
+            (false, true) => (UiText.T("Закреплённых пока нет"), UiText.T("Нажмите на булавку у записи или Ctrl+P, и она появится здесь.")),
+            _ => (UiText.T("Здесь пока пусто"), UiText.T("Скопируйте текст или картинку, и они появятся в этом списке.")),
         };
     }
 
@@ -679,13 +680,13 @@ partial class PanelWindow : Window
     void Source_Click(object sender, RoutedEventArgs e)
     {
         var menu = new ContextMenu { PlacementTarget = SourceButton, Placement = PlacementMode.MousePoint };
-        var all = Entry("Все приложения", "\uE71D", () => SetSourceFilter(null));
+        var all = Entry(UiText.T("Все приложения"), "\uE71D", () => SetSourceFilter(null));
         all.IsChecked = _sourceFilter == null;
         menu.Items.Add(all);
         var groups = _store.Items.Where(i => !string.IsNullOrWhiteSpace(i.SourceApp))
             .GroupBy(i => i.SourceApp!, StringComparer.OrdinalIgnoreCase)
             .OrderBy(g => g.Key, StringComparer.CurrentCultureIgnoreCase).ToList();
-        if (groups.Count == 0) menu.Items.Add(new MenuItem { Header = "Новые записи покажут приложение", IsEnabled = false });
+        if (groups.Count == 0) menu.Items.Add(new MenuItem { Header = UiText.T("Новые записи покажут приложение"), IsEnabled = false });
         foreach (var group in groups)
         {
             string app = group.Key;
@@ -700,9 +701,9 @@ partial class PanelWindow : Window
     internal void SetSourceFilter(string? source)
     {
         _sourceFilter = source;
-        SourceButton.Content = (source is { Length: > 8 } ? source[..7] + "…" : source ?? "Все") + " ▾";
-        SourceButton.ToolTip = source == null ? "Фильтр по приложению" : $"Приложение: {source}";
-        AutomationProperties.SetName(SourceButton, $"Приложение: {source ?? "все"}");
+        SourceButton.Content = (source is { Length: > 8 } ? source[..7] + "…" : source ?? UiText.T("Все")) + " ▾";
+        SourceButton.ToolTip = source == null ? UiText.T("Фильтр по приложению") : UiText.F($"Приложение: {source}");
+        AutomationProperties.SetName(SourceButton, UiText.F($"Приложение: {source ?? UiText.T("все")}"));
         RefreshViews();
     }
 
@@ -908,10 +909,10 @@ partial class PanelWindow : Window
     void ShowSymbolMenu(SymbolItem s, UIElement target, PlacementMode placement = PlacementMode.MousePoint)
     {
         var menu = new ContextMenu { PlacementTarget = target, Placement = placement };
-        menu.Items.Add(Entry("Вставить", "\uE77F", () => TypeRequested?.Invoke(s.Char), "Enter"));
-        menu.Items.Add(Entry("Копировать", "\uE8C8", () => Clipboard.SetText(s.Char)));
+        menu.Items.Add(Entry(UiText.T("Вставить"), "\uE77F", () => TypeRequested?.Invoke(s.Char), "Enter"));
+        menu.Items.Add(Entry(UiText.T("Копировать"), "\uE8C8", () => Clipboard.SetText(s.Char)));
         menu.Items.Add(new Separator());
-        menu.Items.Add(Entry(s.Pinned ? "Открепить" : "Закрепить", s.Pinned ? "\uE77A" : "\uE718", () => _symbols.TogglePin(s.Char), "Ctrl+P"));
+        menu.Items.Add(Entry(s.Pinned ? UiText.T("Открепить") : UiText.T("Закрепить"), s.Pinned ? "\uE77A" : "\uE718", () => _symbols.TogglePin(s.Char), "Ctrl+P"));
         menu.Closed += (_, _) => Search.Focus();
         OpenMenu(menu);
     }
@@ -920,13 +921,13 @@ partial class PanelWindow : Window
     void ShowMenu(ClipItem item, UIElement target, PlacementMode placement)
     {
         var menu = new ContextMenu { PlacementTarget = target, Placement = placement };
-        menu.Items.Add(Entry("Вставить", "\uE77F", () => RequestPaste(item, false), "Enter"));
-        if (item.IsImage) menu.Items.Add(Entry(item.InSeries ? "Снять отметку" : "Выбрать картинку", "\uE762", () => ToggleSeriesItem(item), "Ctrl+клик"));
-        if (item.ImageHash == null) menu.Items.Add(Entry(item.IsFolder ? "Вставить путь" : "Вставить как текст", "\uE8D2", () => RequestPaste(item, true), "Shift+Enter"));
+        menu.Items.Add(Entry(UiText.T("Вставить"), "\uE77F", () => RequestPaste(item, false), "Enter"));
+        if (item.IsImage) menu.Items.Add(Entry(item.InSeries ? UiText.T("Снять отметку") : UiText.T("Выбрать картинку"), "\uE762", () => ToggleSeriesItem(item), UiText.T("Ctrl+клик")));
+        if (item.ImageHash == null) menu.Items.Add(Entry(item.IsFolder ? UiText.T("Вставить путь") : UiText.T("Вставить как текст"), "\uE8D2", () => RequestPaste(item, true), "Shift+Enter"));
         if (item.ImageHash == null) menu.Items.Add(new Separator());
         if (!item.IsImage && !item.IsMedia)
-            menu.Items.Add(Entry("Редактировать текст", "\uE70F", () => EditText(item)));
-        if (item.IsNodeGraph) menu.Items.Add(Entry("Открыть граф", "\uE8A7", () => OpenGraph(item)));
+            menu.Items.Add(Entry(UiText.T("Редактировать текст"), "\uE70F", () => EditText(item)));
+        if (item.IsNodeGraph) menu.Items.Add(Entry(UiText.T("Открыть граф"), "\uE8A7", () => OpenGraph(item)));
         if (item.IsImage)
         {
             menu.Items.Add(OcrEntry(item));
@@ -934,7 +935,7 @@ partial class PanelWindow : Window
         }
         if (item.MediaKind == "video")
         {
-            var audio = Entry(item.ExtractingAudio ? "Извлекается звук…" : "Извлечь звук", "\uE8D6",
+            var audio = Entry(item.ExtractingAudio ? UiText.T("Извлекается звук…") : UiText.T("Извлечь звук"), "\uE8D6",
                 () => ChooseAudioTrack(item, menu));
             audio.StaysOpenOnClick = true;
             audio.IsEnabled = !item.ExtractingAudio;
@@ -942,19 +943,19 @@ partial class PanelWindow : Window
         }
         if (item.IsFolder)
         {
-            var archive = Entry(item.Archiving ? "Создаётся ZIP…" : "Отправить архивом .zip", "\uE7B8", () => ArchiveRequested?.Invoke(item));
+            var archive = Entry(item.Archiving ? UiText.T("Создаётся ZIP…") : UiText.T("Отправить архивом .zip"), "\uE7B8", () => ArchiveRequested?.Invoke(item));
             archive.IsEnabled = _archiveInfo == null;
-            archive.ToolTip = "Создать ZIP из текущего содержимого папки и вставить как файл";
+            archive.ToolTip = UiText.T("Создать ZIP из текущего содержимого папки и вставить как файл");
             menu.Items.Add(archive);
         }
         if (item.ImageHash == null && !item.IsMedia && !item.IsNodeGraph)
         {
-            var compress = Entry(item.Compressing ? "Сжимается…" : "Сжать промпт", "\uE73F", () => CompressRequested?.Invoke(item));
+            var compress = Entry(item.Compressing ? UiText.T("Сжимается…") : UiText.T("Сжать промпт"), "\uE73F", () => CompressRequested?.Invoke(item));
             compress.IsEnabled = !item.Compressing;
             menu.Items.Add(compress);
         }
         menu.Items.Add(new Separator());
-        menu.Items.Add(Entry(item.Pinned ? "Открепить" : "Закрепить", item.Pinned ? "\uE77A" : "\uE718", () =>
+        menu.Items.Add(Entry(item.Pinned ? UiText.T("Открепить") : UiText.T("Закрепить"), item.Pinned ? "\uE77A" : "\uE718", () =>
         {
             _store.TogglePin(item);
             if (item.Pinned) Motion.Pop(TabPinned, 1.12, 1);
@@ -962,7 +963,7 @@ partial class PanelWindow : Window
         if (item.Pinned)
         {
             var colors = new StackPanel { Orientation = Orientation.Horizontal };
-            colors.Children.Add(new TextBlock { Text = "Цвет", VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(0, 0, 6, 0) });
+            colors.Children.Add(new TextBlock { Text = UiText.T("Цвет"), VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(0, 0, 6, 0) });
             for (int color = -1; color < ClipItem.TileColorNames.Length; color++)
             {
                 int chosen = color;
@@ -974,7 +975,7 @@ partial class PanelWindow : Window
                     BorderBrush = color == item.TileColor ? (Brush)FindResource("TextPrimary") : Brushes.Transparent,
                     BorderThickness = new Thickness(color == item.TileColor ? 2 : 0),
                     Content = color < 0 ? "×" : null,
-                    ToolTip = color < 0 ? "Без цвета" : ClipItem.TileColorNames[color]
+                    ToolTip = color < 0 ? UiText.T("Без цвета") : ClipItem.TileColorNames[color]
                 };
                 AutomationProperties.SetName(swatch, (string)swatch.ToolTip);
                 swatch.Click += (_, _) => { _store.SetTileColor(item, chosen); menu.IsOpen = false; };
@@ -983,24 +984,24 @@ partial class PanelWindow : Window
             menu.Items.Add(new MenuItem { Header = colors, Tag = "\uE790", StaysOpenOnClick = true });
         }
         menu.Items.Add(new Separator());
-        menu.Items.Add(Entry("Удалить", "\uE74D", () => RemoveAnimated(item), "Del"));
+        menu.Items.Add(Entry(UiText.T("Удалить"), "\uE74D", () => RemoveAnimated(item), "Del"));
         menu.Closed += (_, _) => { if (_textEditor == null) Search.Focus(); };
         OpenMenu(menu);
     }
 
     internal MenuItem OcrEntry(ClipItem item)
     {
-        var entry = Entry(item.Recognizing ? "Распознаётся текст…" : "Распознать текст", "\uE8D2", () => OcrRequested?.Invoke(item));
+        var entry = Entry(item.Recognizing ? UiText.T("Распознаётся текст…") : UiText.T("Распознать текст"), "\uE8D2", () => OcrRequested?.Invoke(item));
         entry.IsEnabled = !item.Recognizing;
-        entry.ToolTip = "Распознать русский и английский текст локально. Результат появится в истории и будет скопирован, если буфер не изменился.";
+        entry.ToolTip = UiText.T("Распознать русский и английский текст локально. Результат появится в истории и будет скопирован, если буфер не изменился.");
         return entry;
     }
 
     internal MenuItem TranslateImageEntry(ClipItem item)
     {
-        var entry = Entry("Перевести текст на русский", "\uE8C1", () => TranslateImageRequested?.Invoke(item));
+        var entry = Entry(UiText.T("Перевести текст на русский"), "\uE8C1", () => TranslateImageRequested?.Invoke(item));
         entry.IsEnabled = !item.Recognizing;
-        entry.ToolTip = "Перевести надписи прямо на картинке. Новое изображение сохранится в истории и скопируется в буфер.";
+        entry.ToolTip = UiText.T("Перевести надписи прямо на картинке. Новое изображение сохранится в истории и скопируется в буфер.");
         return entry;
     }
 
@@ -1011,7 +1012,7 @@ partial class PanelWindow : Window
         var cancel = new CancellationTokenSource();
         var token = cancel.Token;
         menu.Items.Clear();
-        menu.Items.Add(new MenuItem { Header = "Чтение звуковых дорожек…", IsEnabled = false });
+        menu.Items.Add(new MenuItem { Header = UiText.T("Чтение звуковых дорожек…"), IsEnabled = false });
         menu.Closed += (_, _) => { cancel.Cancel(); cancel.Dispose(); };
         AudioExtractor.Track[] tracks;
         try
@@ -1025,7 +1026,7 @@ partial class PanelWindow : Window
         {
             menu.IsOpen = false;
             App.Log(ex);
-            ShowInfo(InfoKind.Caution, "Не удалось прочитать звуковые дорожки.", ex.Message);
+            ShowInfo(InfoKind.Caution, UiText.T("Не удалось прочитать звуковые дорожки."), ex.Message);
             return;
         }
         finally { item.ExtractingAudio = false; }
@@ -1033,7 +1034,7 @@ partial class PanelWindow : Window
         if (tracks.Length == 0)
         {
             menu.IsOpen = false;
-            ShowInfo(InfoKind.Info, "В видео нет звука.", "Звуковые дорожки не найдены.");
+            ShowInfo(InfoKind.Info, UiText.T("В видео нет звука."), UiText.T("Звуковые дорожки не найдены."));
         }
         else if (tracks.Length == 1)
         {
@@ -1063,12 +1064,12 @@ partial class PanelWindow : Window
     void More_HeaderClick(object sender, RoutedEventArgs e)
     {
         var menu = new ContextMenu { PlacementTarget = MoreButton };
-        var pause = Entry("Пауза записи", "", () => PauseToggleRequested?.Invoke(!_paused));
+        var pause = Entry(UiText.T("Пауза записи"), "", () => PauseToggleRequested?.Invoke(!_paused));
         pause.IsChecked = _paused;
         menu.Items.Add(pause);
-        menu.Items.Add(Entry("Настройки", "\uE713", OpenSettings));
+        menu.Items.Add(Entry(UiText.T("Настройки"), "\uE713", OpenSettings));
         menu.Items.Add(new Separator());
-        var clear = Entry("Очистить историю…", "\uE74D", AskClear);
+        var clear = Entry(UiText.T("Очистить историю…"), "\uE74D", AskClear);
         clear.IsEnabled = _store.Items.Any(i => !i.Pinned);
         menu.Items.Add(clear);
         menu.Closed += (_, _) =>
@@ -1117,17 +1118,17 @@ partial class PanelWindow : Window
     void UpdateStorageLabels()
     {
         HistoryCountValue.Text = $"{(int)HistoryCountSlider.Value}";
-        HistoryDaysValue.Text = $"{(int)HistoryDaysSlider.Value} дн.";
-        MediaDaysValue.Text = $"{(int)MediaDaysSlider.Value} дн.";
-        TextLimitValue.Text = $"{(int)TextLimitSlider.Value} тыс.";
-        ImageLimitValue.Text = $"{(int)ImageLimitSlider.Value} Мп";
+        HistoryDaysValue.Text = UiText.F($"{(int)HistoryDaysSlider.Value} дн.");
+        MediaDaysValue.Text = UiText.F($"{(int)MediaDaysSlider.Value} дн.");
+        TextLimitValue.Text = UiText.F($"{(int)TextLimitSlider.Value} тыс.");
+        ImageLimitValue.Text = UiText.F($"{(int)ImageLimitSlider.Value} Мп");
         ThumbnailValue.Text = $"{(int)ThumbnailSlider.Value} px";
-        FileSizeValue.Text = $"{(int)FileSizeSlider.Value} МБ";
+        FileSizeValue.Text = UiText.F($"{(int)FileSizeSlider.Value} МБ");
         FileCountValue.Text = $"{(int)FileCountSlider.Value}";
-        TempDaysValue.Text = $"{(int)TempDaysSlider.Value} дн.";
+        TempDaysValue.Text = UiText.F($"{(int)TempDaysSlider.Value} дн.");
         bool dirty = DraftStorage() != _storage;
         StorageApplyButton.IsEnabled = dirty;
-        StorageStatus.Text = dirty ? "Изменения не применены" : "Настройки сохранены";
+        StorageStatus.Text = dirty ? UiText.T("Изменения не применены") : UiText.T("Настройки сохранены");
     }
 
     StorageSettings DraftStorage() => new(
@@ -1146,11 +1147,11 @@ partial class PanelWindow : Window
     void ShowGroupMenu(PinnedGroup group, UIElement target)
     {
         var menu = new ContextMenu { PlacementTarget = target, Placement = PlacementMode.MousePoint };
-        menu.Items.Add(Entry("Переименовать", "\uE70F", () =>
+        menu.Items.Add(Entry(UiText.T("Переименовать"), "\uE70F", () =>
         {
-            if (PromptGroupName("Переименовать группу", group.Name) is { } name) _store.RenameGroup(group, name);
+            if (PromptGroupName(UiText.T("Переименовать группу"), group.Name) is { } name) _store.RenameGroup(group, name);
         }));
-        menu.Items.Add(Entry("Удалить группу · плитки останутся", "\uE74D", () => _store.DeleteGroup(group)));
+        menu.Items.Add(Entry(UiText.T("Удалить группу · плитки останутся"), "\uE74D", () => _store.DeleteGroup(group)));
         menu.Closed += (_, _) => { if (!_editingGroup) Search.Focus(); };
         OpenMenu(menu);
     }
@@ -1172,7 +1173,7 @@ partial class PanelWindow : Window
     void ShowEmptyMenu(UIElement target)
     {
         var menu = new ContextMenu { PlacementTarget = target, Placement = PlacementMode.MousePoint };
-        menu.Items.Add(Entry("Создать группу", "\uE710", CreateGroup));
+        menu.Items.Add(Entry(UiText.T("Создать группу"), "\uE710", CreateGroup));
         menu.Closed += (_, _) => { if (!_editingGroup) Search.Focus(); };
         OpenMenu(menu);
     }
@@ -1226,7 +1227,7 @@ partial class PanelWindow : Window
 
     void CreateGroup()
     {
-        if (PromptGroupName("Новая группа", "", allowEmpty: true) is { } name) _store.AddGroup(name);
+        if (PromptGroupName(UiText.T("Новая группа"), "", allowEmpty: true) is { } name) _store.AddGroup(name);
     }
 
     /// <summary>
@@ -1246,15 +1247,15 @@ partial class PanelWindow : Window
         };
         TextOptions.SetTextFormattingMode(dialog, TextFormattingMode.Display);
         dialog.SetResourceReference(ForegroundProperty, "TextPrimary");
-        string hint = allowEmpty ? $"Если оставить пустым, будет «{_store.NextGroupName()}»" : "До 40 символов";
+        string hint = allowEmpty ? UiText.F($"Если оставить пустым, будет «{_store.NextGroupName()}»") : UiText.T("До 40 символов");
         var heading = new TextBlock { Text = title, FontSize = 20, FontWeight = FontWeights.SemiBold, Margin = new Thickness(0, 0, 0, 14) };
-        var label = new TextBlock { Text = "Название", FontSize = 13, Margin = new Thickness(0, 0, 0, 6) };
+        var label = new TextBlock { Text = UiText.T("Название"), FontSize = 13, Margin = new Thickness(0, 0, 0, 6) };
         var box = new TextBox { Text = current, MaxLength = 40, Style = (Style)FindResource("FieldBox") };
         AutomationProperties.SetLabeledBy(box, label);
         var help = new TextBlock { Text = hint, FontSize = 12, Margin = new Thickness(0, 6, 0, 0), TextWrapping = TextWrapping.Wrap };
         help.SetResourceReference(TextBlock.ForegroundProperty, "TextSecondary");
-        var save = new Button { Content = "Сохранить", Style = (Style)FindResource("AccentButton") };
-        var cancel = new Button { Content = "Отмена", Style = (Style)FindResource("StandardButton"), Margin = new Thickness(8, 0, 0, 0) };
+        var save = new Button { Content = UiText.T("Сохранить"), Style = (Style)FindResource("AccentButton") };
+        var cancel = new Button { Content = UiText.T("Отмена"), Style = (Style)FindResource("StandardButton"), Margin = new Thickness(8, 0, 0, 0) };
         var actions = new Grid();
         actions.ColumnDefinitions.Add(new ColumnDefinition());
         actions.ColumnDefinitions.Add(new ColumnDefinition());
@@ -1303,10 +1304,10 @@ partial class PanelWindow : Window
         save.Click += (_, _) =>
         {
             var name = box.Text.Trim();
-            if (!allowEmpty && name.Length == 0) { Fail("Введите название группы"); return; }
+            if (!allowEmpty && name.Length == 0) { Fail(UiText.T("Введите название группы")); return; }
             if (_store.Groups.Any(g => g.Name.Equals(name, StringComparison.CurrentCultureIgnoreCase) && g.Name != current))
             {
-                Fail($"Группа «{name}» уже есть");
+                Fail(UiText.F($"Группа «{name}» уже есть"));
                 return;
             }
             Close(true);
@@ -1495,8 +1496,8 @@ partial class PanelWindow : Window
     void Timing_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
     {
         if (ShowTimingValue == null || HideTimingValue == null) return; // ValueChanged срабатывает во время загрузки XAML
-        ShowTimingValue.Text = $"{ShowDurationMs} мс";
-        HideTimingValue.Text = $"{HideDurationMs} мс";
+        ShowTimingValue.Text = UiText.F($"{ShowDurationMs} мс");
+        HideTimingValue.Text = UiText.F($"{HideDurationMs} мс");
         TimingsChanged?.Invoke(ShowDurationMs, HideDurationMs);
     }
 
@@ -1510,7 +1511,7 @@ partial class PanelWindow : Window
     {
         int ms = (int)((Slider)sender).Value;
         if (OutsideHideValue == null) return;
-        OutsideHideValue.Text = $"{ms / 1000.0:0.#} с";
+        OutsideHideValue.Text = UiText.F($"{ms / 1000.0:0.#} с");
         OutsideHideDelayChanged?.Invoke(ms);
     }
 
@@ -1519,7 +1520,7 @@ partial class PanelWindow : Window
         int ms = (int)((Slider)sender).Value;
         SetValue(ImageZoomDelayMsProperty, ms);
         if (ZoomDelayValue == null) return; // ValueChanged при загрузке XAML
-        ZoomDelayValue.Text = $"{ms / 1000.0:0.#} с";
+        ZoomDelayValue.Text = UiText.F($"{ms / 1000.0:0.#} с");
         ImageZoomDelayChanged?.Invoke(ms);
     }
 
@@ -1540,7 +1541,7 @@ partial class PanelWindow : Window
     void TextPeekDelay_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
     {
         if (TextPeekDelayValue == null) return; // ValueChanged при загрузке XAML
-        TextPeekDelayValue.Text = $"{TextPeekDelayMs / 1000.0:0.#} с";
+        TextPeekDelayValue.Text = UiText.F($"{TextPeekDelayMs / 1000.0:0.#} с");
         RaiseTextPeekChanged();
     }
 
@@ -1769,34 +1770,34 @@ partial class PanelWindow : Window
     public void SetArchiveProgress(string? message, Action? cancel = null)
     {
         if (_archiveInfo == null && message != null) _transient = null;
-        _archiveInfo = message == null ? null : new Info(InfoKind.Info, "Создаётся ZIP.", message,
-            ("Отменить", cancel), Closable: false);
+        _archiveInfo = message == null ? null : new Info(InfoKind.Info, UiText.T("Создаётся ZIP."), message,
+            (UiText.T("Отменить"), cancel), Closable: false);
         RefreshInfo();
     }
 
     internal void SetOcrProgress(Action? cancel, bool translating = false)
     {
         if (cancel != null) _transient = null;
-        _ocrInfo = cancel == null ? null : new Info(InfoKind.Info, translating ? "Текст переводится на русский." : "Распознаётся текст.",
-            translating ? "Перевод выполняется локальной моделью. Можно продолжать работу." : "Можно продолжать работу — изображение обрабатывается локально.", ("Отменить", cancel), Closable: false);
+        _ocrInfo = cancel == null ? null : new Info(InfoKind.Info, translating ? UiText.T("Текст переводится на русский.") : UiText.T("Распознаётся текст."),
+            translating ? UiText.T("Перевод выполняется локальной моделью. Можно продолжать работу.") : UiText.T("Можно продолжать работу — изображение обрабатывается локально."), (UiText.T("Отменить"), cancel), Closable: false);
         RefreshInfo();
     }
 
     internal void ShowTranslatedImageResult(bool copied, bool review)
     {
-        string title = copied ? "Картинка с переводом скопирована." : "Картинка с переводом в истории.";
-        if (review) title += " Проверьте надписи.";
+        string title = copied ? UiText.T("Картинка с переводом скопирована.") : UiText.T("Картинка с переводом в истории.");
+        if (review) title += UiText.T(" Проверьте надписи.");
         _transient = new Info(review || !copied ? InfoKind.Caution : InfoKind.Success, title, "", Closable: false, Compact: true);
         RefreshInfo();
     }
 
     internal void ShowOcrResult(ClipItem item, OcrText.Result result, bool copied)
     {
-        string message = result.ReviewNeeded ? "Проверьте похожие буквы и порядок строк перед вставкой." : "Русский и английский текст извлечён из изображения.";
-        if (!copied) message += " Буфер не изменён — скопируйте текст из истории.";
+        string message = result.ReviewNeeded ? UiText.T("Проверьте похожие буквы и порядок строк перед вставкой.") : UiText.T("Русский и английский текст извлечён из изображения.");
+        if (!copied) message += UiText.T(" Буфер не изменён — скопируйте текст из истории.");
         _transient = new Info(result.ReviewNeeded || !copied ? InfoKind.Caution : InfoKind.Success,
-            copied ? "Текст распознан и скопирован." : "Распознанный текст в истории.", message,
-            ("Проверить текст", () => { if (_store.Items.Contains(item)) EditText(item); }));
+            copied ? UiText.T("Текст распознан и скопирован.") : UiText.T("Распознанный текст в истории."), message,
+            (UiText.T("Проверить текст"), () => { if (_store.Items.Contains(item)) EditText(item); }));
         RefreshInfo();
     }
 
@@ -1808,7 +1809,7 @@ partial class PanelWindow : Window
     }
 
     Info? PauseInfo => _paused
-        ? new Info(InfoKind.Caution, "Запись на паузе.", "Новые копии не сохраняются.", ("Возобновить", () => PauseToggleRequested?.Invoke(false)), Closable: false)
+        ? new Info(InfoKind.Caution, UiText.T("Запись на паузе."), UiText.T("Новые копии не сохраняются."), (UiText.T("Возобновить"), () => PauseToggleRequested?.Invoke(false)), Closable: false)
         : null;
 
     /// <summary>Показать главное сообщение: разовое важнее паузы; закрыли разовое — снова видна пауза.</summary>
@@ -1885,11 +1886,11 @@ partial class PanelWindow : Window
 
     // ---------- Очистка и удаление ----------
 
-    static string Records(int n) => (n % 10, n % 100) switch
+    static string Records(int n) => UiText.IsEnglish ? (n == 1 ? "entry" : "entries") : (n % 10, n % 100) switch
     {
-        (1, not 11) => "запись",
-        (>= 2 and <= 4, not (>= 12 and <= 14)) => "записи",
-        _ => "записей",
+        (1, not 11) => UiText.T("запись"),
+        (>= 2 and <= 4, not (>= 12 and <= 14)) => UiText.T("записи"),
+        _ => UiText.T("записей"),
     };
 
     /// <summary>Очистка истории: подтверждение строкой в панели, а не системным окном. Фокус на «Отмена», как раньше «Нет».</summary>
@@ -1898,8 +1899,8 @@ partial class PanelWindow : Window
         int count = _store.Items.Count(i => !i.Pinned);
         if (count == 0) return;
         TabAll.IsChecked = true;
-        _transient = new Info(InfoKind.Neutral, $"Удалить {count} {Records(count)}?", "Закреплённые останутся.",
-            ("Очистить", new Action(ClearAnimated)), ("Отмена", null));
+        _transient = new Info(InfoKind.Neutral, UiText.F($"Удалить {count} {Records(count)}?"), UiText.T("Закреплённые останутся."),
+            (UiText.T("Очистить"), new Action(ClearAnimated)), (UiText.T("Отмена"), null));
         RefreshInfo();
         Dispatcher.BeginInvoke(DispatcherPriority.Input, () => InfoSecondary.Focus());
     }
@@ -2008,11 +2009,11 @@ partial class PanelWindow : Window
         return brush;
     }
 
-    static string LinesWord(int n) => (n % 10, n % 100) switch
+    static string LinesWord(int n) => UiText.IsEnglish ? (n == 1 ? "line" : "lines") : (n % 10, n % 100) switch
     {
-        (1, not 11) => "строка",
-        (>= 2 and <= 4, not (>= 12 and <= 14)) => "строки",
-        _ => "строк",
+        (1, not 11) => UiText.T("строка"),
+        (>= 2 and <= 4, not (>= 12 and <= 14)) => UiText.T("строки"),
+        _ => UiText.T("строк"),
     };
 
     /// <summary>
@@ -2078,8 +2079,8 @@ partial class PanelWindow : Window
         bool titled = item.Kind is "url" or "path";
         bool mono = item.Kind is "code" or "path";
         int lines = item.Text.Trim().Count(ch => ch == '\n') + 1;
-        PeekKind.Text = item.Kind switch { "code" => "Код", "url" => "Ссылка", "path" => "Путь к файлу", _ => "Текст" };
-        PeekMeta.Text = lines > 1 ? $"{item.Text.Length:N0} симв., {lines} {LinesWord(lines)}" : $"{item.Text.Length:N0} симв.";
+        PeekKind.Text = item.Kind switch { "code" => UiText.T("Код"), "url" => UiText.T("Ссылка"), "path" => UiText.T("Путь к файлу"), _ => UiText.T("Текст") };
+        PeekMeta.Text = lines > 1 ? UiText.F($"{item.Text.Length:N0} симв., {lines} {LinesWord(lines)}") : UiText.F($"{item.Text.Length:N0} симв.");
         PeekTitle.Visibility = titled ? Visibility.Visible : Visibility.Collapsed;
         PeekTitle.Text = item.TileTitle;
         var text = titled ? item.Text.Trim().Trim('"') : item.Text.Trim('\r', '\n');

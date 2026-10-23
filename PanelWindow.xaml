@@ -2,8 +2,8 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:local="clr-namespace:ArkCopyBuffer"
-        Title="Буфер обмена"
-        AutomationProperties.Name="История буфера обмена"
+        Title="{local:Loc Key=SEB31594AB4F133FA}"
+        AutomationProperties.Name="{local:Loc Key=S24626711559EDA38}"
         Width="392" Height="492"
         WindowStyle="None" AllowsTransparency="True" ResizeMode="NoResize"
         ShowInTaskbar="False" Topmost="True" ShowActivated="True"
@@ -27,7 +27,7 @@
                     </Grid.ColumnDefinitions>
                     <Button x:Name="Chevron" Style="{StaticResource SubtleIconButton}" Width="22" Height="22" Margin="-3,0,4,0" FontSize="10"
                             Content="&#xE70D;" Click="GroupChevron_Click" RenderTransformOrigin="0.5,0.5"
-                            ToolTip="Свернуть группу" AutomationProperties.Name="Свернуть группу"/>
+                            ToolTip="{local:Loc Key=S0EE457E59ADE53DE}" AutomationProperties.Name="{local:Loc Key=S0EE457E59ADE53DE}"/>
                     <TextBlock Grid.Column="1" Text="{Binding Name}" FontSize="12" FontWeight="SemiBold" VerticalAlignment="Center"/>
                     <Border Grid.Column="2" MinWidth="18" Height="16" Margin="6,0,0,0" Padding="5,0" CornerRadius="8" VerticalAlignment="Center"
                             Background="{DynamicResource SubtleHover}">
@@ -36,11 +36,11 @@
                     <Border Grid.Column="3" Height="1" Margin="8,0" VerticalAlignment="Center" Background="{DynamicResource WindowStroke}"/>
                     <Button x:Name="GroupMore" Grid.Column="4" Style="{StaticResource SubtleIconButton}" Width="24" Height="24" FontSize="12"
                             Content="&#xE712;" Click="GroupMore_Click" Opacity="0"
-                            ToolTip="Параметры группы" AutomationProperties.Name="Параметры группы"/>
+                            ToolTip="{local:Loc Key=SF0EC5D1F5F300778}" AutomationProperties.Name="{local:Loc Key=SF0EC5D1F5F300778}"/>
                 </Grid>
                 <Grid x:Name="DropZone" Height="52" Margin="0,4,0,2" Visibility="Collapsed">
                     <Rectangle RadiusX="4" RadiusY="4" Stroke="{DynamicResource ControlStrongStroke}" StrokeThickness="1" StrokeDashArray="4 3" Opacity="0.5"/>
-                    <TextBlock Text="Перетащите запись сюда" FontSize="12" Foreground="{DynamicResource TextSecondary}"
+                    <TextBlock Text="{local:Loc Key=SD18E262C4A058A89}" FontSize="12" Foreground="{DynamicResource TextSecondary}"
                                HorizontalAlignment="Center" VerticalAlignment="Center"/>
                 </Grid>
             </StackPanel>
@@ -49,8 +49,8 @@
                     <Setter TargetName="Chevron" Property="RenderTransform">
                         <Setter.Value><RotateTransform Angle="-90"/></Setter.Value>
                     </Setter>
-                    <Setter TargetName="Chevron" Property="ToolTip" Value="Развернуть группу"/>
-                    <Setter TargetName="Chevron" Property="AutomationProperties.Name" Value="Развернуть группу"/>
+                    <Setter TargetName="Chevron" Property="ToolTip" Value="{local:Loc Key=S33C9049C2998664A}"/>
+                    <Setter TargetName="Chevron" Property="AutomationProperties.Name" Value="{local:Loc Key=S33C9049C2998664A}"/>
                 </DataTrigger>
                 <DataTrigger Binding="{Binding IsEmptyGroup}" Value="True">
                     <Setter TargetName="DropZone" Property="Visibility" Value="Visible"/>
@@ -117,12 +117,12 @@
                     <StackPanel x:Name="TileActions" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top"
                                 Margin="0,4,4,0" Opacity="0">
                         <Button Style="{StaticResource TileActionButton}" Content="&#xE77A;" Click="Pin_Click"
-                                ToolTip="Открепить (Ctrl+P)" AutomationProperties.Name="Открепить"/>
+                                ToolTip="{local:Loc Key=SD6667D915584518C}" AutomationProperties.Name="{local:Loc Key=S9FB423FBC9181142}"/>
                         <StackPanel x:Name="ImageActions" Orientation="Horizontal" Visibility="Collapsed">
                             <Button Style="{StaticResource TileActionButton}" Content="&#xE8D2;" Click="Ocr_Click" Margin="2,0,0,0"
-                                    ToolTip="Распознать текст" AutomationProperties.Name="Распознать текст"/>
+                                    ToolTip="{local:Loc Key=S9B45DFE62C689B6E}" AutomationProperties.Name="{local:Loc Key=S9B45DFE62C689B6E}"/>
                             <Button Style="{StaticResource TileActionButton}" Content="&#xE8C1;" Click="TranslateImage_Click" Margin="2,0,0,0"
-                                    ToolTip="Перевести надписи на картинке (локально)" AutomationProperties.Name="Перевести надписи на картинке"/>
+                                    ToolTip="{local:Loc Key=SD675C9D5A093B6AA}" AutomationProperties.Name="{local:Loc Key=S98C1BFB8F849D1CC}"/>
                         </StackPanel>
                     </StackPanel>
                 </Grid>
@@ -210,12 +210,12 @@
                     </StackPanel>
                     <StackPanel x:Name="RowActions" Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center" Opacity="0" Margin="6,0,0,0">
                         <Button Style="{StaticResource SubtleIconButton}" Content="&#xE77A;" Click="Pin_Click"
-                                ToolTip="Открепить (Ctrl+P)" AutomationProperties.Name="Открепить"/>
+                                ToolTip="{local:Loc Key=SD6667D915584518C}" AutomationProperties.Name="{local:Loc Key=S9FB423FBC9181142}"/>
                         <StackPanel x:Name="ImageActions" Orientation="Horizontal" Visibility="Collapsed">
                             <Button Style="{StaticResource SubtleIconButton}" Content="&#xE8D2;" Click="Ocr_Click"
-                                    ToolTip="Распознать текст" AutomationProperties.Name="Распознать текст"/>
+                                    ToolTip="{local:Loc Key=S9B45DFE62C689B6E}" AutomationProperties.Name="{local:Loc Key=S9B45DFE62C689B6E}"/>
                             <Button Style="{StaticResource SubtleIconButton}" Content="&#xE8C1;" Click="TranslateImage_Click"
-                                    ToolTip="Перевести надписи на картинке (локально)" AutomationProperties.Name="Перевести надписи на картинке"/>
+                                    ToolTip="{local:Loc Key=SD675C9D5A093B6AA}" AutomationProperties.Name="{local:Loc Key=S98C1BFB8F849D1CC}"/>
                         </StackPanel>
                     </StackPanel>
                 </Grid>
@@ -292,25 +292,25 @@
             <!-- Пауза, настройки и очистка — в меню «⋯»: опасная очистка не лежит в одном клике рядом с шестерёнкой -->
             <Button x:Name="MoreButton" DockPanel.Dock="Right" Style="{StaticResource SubtleIconButton}" Focusable="True" Width="32" Height="32"
                     Content="&#xE712;" Click="More_HeaderClick" FontSize="14"
-                    ToolTip="Ещё: пауза, настройки, очистка (F6 — фокус на кнопки)"
-                    AutomationProperties.Name="Ещё: пауза записи, настройки, очистка истории"/>
+                    ToolTip="{local:Loc Key=S36BA2804E029771D}"
+                    AutomationProperties.Name="{local:Loc Key=S2734E4685D892F22}"/>
             <Button x:Name="GroupButton" DockPanel.Dock="Right" Style="{StaticResource SubtleIconButton}" Focusable="True" Width="32" Height="32"
                     Content="&#xE710;" Click="Group_Click" FontSize="14" Visibility="Collapsed"
-                    ToolTip="Новая группа" AutomationProperties.Name="Создать группу закреплённых"/>
+                    ToolTip="{local:Loc Key=SC9FD9FC0E5D2198D}" AutomationProperties.Name="{local:Loc Key=S29FBB6B36971FD46}"/>
             <Button x:Name="ViewButton" DockPanel.Dock="Right" Style="{StaticResource SubtleIconButton}" Focusable="True" Width="32" Height="32"
                     Content="&#xE8FD;" Click="View_Click" FontSize="14" Visibility="Collapsed"
-                    ToolTip="Показать списком" AutomationProperties.Name="Показать закреплённые списком"/>
+                    ToolTip="{local:Loc Key=S95333A53FC99C364}" AutomationProperties.Name="{local:Loc Key=SB80CF78B9970A398}"/>
             <Grid x:Name="TabsHost" Margin="-8,0,0,0" HorizontalAlignment="Left">
                 <StackPanel Orientation="Horizontal">
                     <RadioButton x:Name="TabAll" Style="{StaticResource HeaderTab}" GroupName="Tabs" IsChecked="True"
-                                 Content="Буфер" Checked="Tab_Checked" AutomationProperties.Name="Вкладка: буфер обмена"
-                                 ToolTip="Tab: следующая вкладка"/>
+                                 Content="{local:Loc Key=S099904B55F08001B}" Checked="Tab_Checked" AutomationProperties.Name="{local:Loc Key=SD8A3846AA2DBAA96}"
+                                 ToolTip="{local:Loc Key=SB3CADA3734215334}"/>
                     <RadioButton x:Name="TabPinned" Style="{StaticResource HeaderTab}" GroupName="Tabs"
-                                 Content="Закреплённые" Checked="Tab_Checked" AutomationProperties.Name="Вкладка: закреплённые"
-                                 ToolTip="Tab: следующая вкладка"/>
+                                 Content="{local:Loc Key=S40CDEF60755C34B3}" Checked="Tab_Checked" AutomationProperties.Name="{local:Loc Key=SDE01F354F722A6AA}"
+                                 ToolTip="{local:Loc Key=SB3CADA3734215334}"/>
                     <RadioButton x:Name="TabSymbols" Style="{StaticResource HeaderTab}" GroupName="Tabs"
-                                 Content="Символы" Checked="Tab_Checked" AutomationProperties.Name="Вкладка: символы"
-                                 ToolTip="Tab: следующая вкладка"/>
+                                 Content="{local:Loc Key=SA9E2FC1FF43D16B4}" Checked="Tab_Checked" AutomationProperties.Name="{local:Loc Key=S701E13AB41F1357B}"
+                                 ToolTip="{local:Loc Key=SB3CADA3734215334}"/>
                 </StackPanel>
                 <!-- Одна полоска на все вкладки: переезжает к выбранной (MoveTabIndicator) -->
                 <Border x:Name="TabIndicator" Width="16" Height="3" CornerRadius="1.5" HorizontalAlignment="Left" VerticalAlignment="Bottom"
@@ -324,14 +324,14 @@
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
-            <TextBox x:Name="Search" Margin="0,0,6,0" Style="{StaticResource SearchBox}" Tag="Поиск"
-                     AutomationProperties.Name="Поиск по истории" TextChanged="Search_TextChanged"/>
+            <TextBox x:Name="Search" Margin="0,0,6,0" Style="{StaticResource SearchBox}" Tag="{local:Loc Key=S180F58AB975323F9}"
+                     AutomationProperties.Name="{local:Loc Key=S2DC9E0798C91D2D1}" TextChanged="Search_TextChanged"/>
             <Button x:Name="SourceButton" Grid.Column="1" Width="88" Style="{StaticResource StandardButton}" FontSize="12"
-                    Padding="5,0" Content="Все ▾" Click="Source_Click" ToolTip="Фильтр по приложению"
-                    AutomationProperties.Name="Приложение: все"/>
+                    Padding="5,0" Content="{local:Loc Key=SA9A1762BA2E80189}" Click="Source_Click" ToolTip="{local:Loc Key=S2CCA114C69F11D07}"
+                    AutomationProperties.Name="{local:Loc Key=SB5957D9B1329C1D0}"/>
             <Button x:Name="KindButton" Grid.Column="2" Width="84" Margin="6,0,0,0" Padding="5,0" Style="{StaticResource StandardButton}"
-                    FontSize="12" Content="Виды ▾" Click="Kind_Click" ToolTip="Вид записи: все, без фильтра"
-                    AutomationProperties.Name="Вид записи: все"/>
+                    FontSize="12" Content="{local:Loc Key=S8593A09889BF93D1}" Click="Kind_Click" ToolTip="{local:Loc Key=S3D3419ACCC61723B}"
+                    AutomationProperties.Name="{local:Loc Key=S2263DC75D8F9FABF}"/>
         </Grid>
 
         <!-- InfoBar: пауза записи, подтверждение очистки, итог «Сжать промпт», ошибки. Раскрывается по высоте -->
@@ -355,7 +355,7 @@
                            VerticalAlignment="Center"><Run x:Name="InfoTitle" FontWeight="SemiBold"/><Run x:Name="InfoMessage"/></TextBlock>
                 <Button x:Name="InfoClose" Grid.Column="2" Style="{StaticResource SubtleIconButton}" Focusable="True" Width="24" Height="24" Margin="6,-3,0,-3"
                         VerticalAlignment="Top" FontSize="10" Content="&#xE711;" Click="InfoClose_Click"
-                        ToolTip="Закрыть" AutomationProperties.Name="Закрыть сообщение"/>
+                        ToolTip="{local:Loc Key=SA7A4033657E89FC9}" AutomationProperties.Name="{local:Loc Key=S935E004F83BF55A3}"/>
                 <StackPanel x:Name="InfoActions" Grid.Row="1" Grid.ColumnSpan="3" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,0,0">
                     <Button x:Name="InfoPrimary" Style="{StaticResource AccentButton}" Height="28" FontSize="13" Click="InfoPrimary_Click"/>
                     <Button x:Name="InfoSecondary" Style="{StaticResource StandardButton}" Height="28" FontSize="13" Margin="8,0,0,0" Click="InfoSecondary_Click"/>
@@ -377,7 +377,7 @@
                  VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.VirtualizationMode="Recycling"
                  VirtualizingPanel.ScrollUnit="Pixel"
                  SelectionChanged="List_SelectionChanged"
-                 AutomationProperties.Name="Записи">
+                 AutomationProperties.Name="{local:Loc Key=S8A7DEA5194EB5DDF}">
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <Grid ToolTip="{Binding SourceApp}">
@@ -395,7 +395,7 @@
                                 <Image Source="{Binding GraphPreview, IsAsync=True}" Width="260" Height="100" Stretch="Uniform"
                                        MouseEnter="Image_MouseEnter" MouseLeave="Image_MouseLeave" Unloaded="Image_Unloaded"
                                        ToolTipService.IsEnabled="False" RenderOptions.BitmapScalingMode="HighQuality"
-                                       AutomationProperties.Name="Схема нод">
+                                       AutomationProperties.Name="{local:Loc Key=S70EEB56C0B462E42}">
                                     <Image.CacheMode>
                                         <BitmapCache RenderAtScale="2"/>
                                     </Image.CacheMode>
@@ -475,14 +475,14 @@
                         <!-- Кнопки в ряд: высоту однострочной карточки задаёт одна кнопка (28), а не столбик из двух -->
                         <StackPanel x:Name="Actions" Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Opacity="0">
                             <Button x:Name="GraphButton" Style="{StaticResource SubtleIconButton}" Content="&#xE8A7;"
-                                    Visibility="Collapsed" Click="Graph_Click" ToolTip="Открыть граф" AutomationProperties.Name="Открыть граф нод"/>
+                                    Visibility="Collapsed" Click="Graph_Click" ToolTip="{local:Loc Key=SF8D92D9F2C398D8F}" AutomationProperties.Name="{local:Loc Key=S19CE8F92856A9D18}"/>
                             <Button x:Name="PinButton" Style="{StaticResource SubtleIconButton}" Content="&#xE718;"
-                                    Click="Pin_Click" ToolTip="Закрепить (Ctrl+P)" AutomationProperties.Name="Закрепить"/>
+                                    Click="Pin_Click" ToolTip="{local:Loc Key=SFAB397155D4AFDEF}" AutomationProperties.Name="{local:Loc Key=S340E3C751299C910}"/>
                             <StackPanel x:Name="ImageActions" Orientation="Horizontal" Visibility="Collapsed">
                                 <Button Style="{StaticResource SubtleIconButton}" Content="&#xE8D2;" Click="Ocr_Click"
-                                        ToolTip="Распознать текст" AutomationProperties.Name="Распознать текст"/>
+                                        ToolTip="{local:Loc Key=S9B45DFE62C689B6E}" AutomationProperties.Name="{local:Loc Key=S9B45DFE62C689B6E}"/>
                                 <Button Style="{StaticResource SubtleIconButton}" Content="&#xE8C1;" Click="TranslateImage_Click"
-                                        ToolTip="Перевести надписи на картинке (локально)" AutomationProperties.Name="Перевести надписи на картинке"/>
+                                        ToolTip="{local:Loc Key=SD675C9D5A093B6AA}" AutomationProperties.Name="{local:Loc Key=S98C1BFB8F849D1CC}"/>
                             </StackPanel>
                         </StackPanel>
                         <!-- В покое: едва заметное время попадания в буфер (и булавка у закреплённых); при наведении место занимают кнопки -->
@@ -530,8 +530,8 @@
                         <DataTrigger Binding="{Binding Pinned}" Value="True">
                             <Setter TargetName="PinnedMark" Property="Visibility" Value="Visible"/>
                             <Setter TargetName="PinButton" Property="Content" Value="&#xE77A;"/>
-                            <Setter TargetName="PinButton" Property="ToolTip" Value="Открепить (Ctrl+P)"/>
-                            <Setter TargetName="PinButton" Property="AutomationProperties.Name" Value="Открепить"/>
+                            <Setter TargetName="PinButton" Property="ToolTip" Value="{local:Loc Key=SD6667D915584518C}"/>
+                            <Setter TargetName="PinButton" Property="AutomationProperties.Name" Value="{local:Loc Key=S9FB423FBC9181142}"/>
                         </DataTrigger>
                         <DataTrigger Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType=ListBoxItem}}" Value="True">
                             <Setter TargetName="Actions" Property="Opacity" Value="1"/>
@@ -557,7 +557,7 @@
                  DragOver="Pinned_DragOver" DragLeave="Pinned_DragLeave" Drop="Pinned_Drop"
                  ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                  ScrollViewer.CanContentScroll="False"
-                 AutomationProperties.Name="Закреплённые записи"/>
+                 AutomationProperties.Name="{local:Loc Key=SEF23641CFBF07649}"/>
 
         <!-- Символы: группы (закреплённые сверху), внутри — сетка клеток -->
         <ListBox x:Name="SymbolList" Grid.Row="3" Focusable="False" Visibility="Collapsed"
@@ -565,7 +565,7 @@
                  ItemContainerStyle="{StaticResource SymbolCell}"
                  ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                  ScrollViewer.CanContentScroll="False"
-                 AutomationProperties.Name="Символы">
+                 AutomationProperties.Name="{local:Loc Key=SA9E2FC1FF43D16B4}">
             <ListBox.ItemsPanel>
                 <ItemsPanelTemplate>
                     <WrapPanel/>
@@ -598,7 +598,7 @@
             <StackPanel>
                 <DockPanel Margin="0,0,0,5">
                     <Button x:Name="SeriesClear" DockPanel.Dock="Right" Style="{StaticResource SubtleIconButton}" Width="22" Height="22"
-                            Content="&#xE711;" FontSize="10" Click="SeriesClear_Click" ToolTip="Снять все отметки" AutomationProperties.Name="Снять все отметки картинок и видео"/>
+                            Content="&#xE711;" FontSize="10" Click="SeriesClear_Click" ToolTip="{local:Loc Key=S720903101412B099}" AutomationProperties.Name="{local:Loc Key=SFF2E4AD1FF5DE649}"/>
                     <TextBlock x:Name="SeriesStatus" FontSize="12" FontWeight="SemiBold" VerticalAlignment="Center"
                                AutomationProperties.LiveSetting="Polite"/>
                 </DockPanel>
@@ -607,12 +607,12 @@
                          ScrollViewer.CanContentScroll="False" AllowDrop="True" SelectionChanged="SeriesQueue_SelectionChanged"
                          PreviewMouseLeftButtonDown="SeriesQueue_MouseDown" PreviewMouseMove="SeriesQueue_MouseMove"
                          DragOver="SeriesQueue_DragOver" DragLeave="SeriesQueue_DragLeave" Drop="SeriesQueue_Drop"
-                         AutomationProperties.Name="Порядок выбранных картинок и видео" ToolTip="Перетащите миниатюру для смены порядка. Ctrl+←/→ — переставить, Delete — снять отметку.">
+                         AutomationProperties.Name="{local:Loc Key=S5ECC2549250FD2FE}" ToolTip="{local:Loc Key=S62C783FB356CEFE6}">
                     <ListBox.ItemsPanel><ItemsPanelTemplate><StackPanel Orientation="Horizontal"/></ItemsPanelTemplate></ListBox.ItemsPanel>
                     <ListBox.ItemContainerStyle>
                         <Style TargetType="ListBoxItem">
                             <Setter Property="Margin" Value="0,0,4,0"/>
-                            <Setter Property="AutomationProperties.Name" Value="{Binding SeriesNumber, StringFormat=Файл {0}}"/>
+                            <Setter Property="AutomationProperties.Name" Value="{Binding SeriesNumber, StringFormat={local:Loc Key=S5B2EF8627A936CD5}}"/>
                             <Setter Property="Template">
                                 <Setter.Value>
                                     <ControlTemplate TargetType="ListBoxItem">
@@ -661,10 +661,10 @@
                 <Grid>
                     <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
                     <Button x:Name="SeriesNext" Style="{StaticResource StandardButton}" Height="32" Margin="0,0,4,0" Click="SeriesNext_Click"
-                            Padding="6,0" FontSize="12" ToolTip="Вставить следующую выбранную картинку или видео" AutomationProperties.Name="Вставить следующий выбранный файл"/>
+                            Padding="6,0" FontSize="12" ToolTip="{local:Loc Key=S2AA26FC72A2E6FCE}" AutomationProperties.Name="{local:Loc Key=S6076E7DEACE54EA2}"/>
                     <Button x:Name="SeriesAll" Grid.Column="1" Style="{StaticResource AccentButton}" Height="32" Margin="4,0,0,0" Click="SeriesAll_Click"
-                            Padding="6,0" FontSize="12" ToolTip="Вставить все оставшиеся картинки и видео одной пачкой в порядке очереди (Ctrl+Enter). Чат должен поддерживать вставку нескольких файлов."
-                            AutomationProperties.Name="Вставить все оставшиеся картинки и видео"/>
+                            Padding="6,0" FontSize="12" ToolTip="{local:Loc Key=SCADDE433A64D7B50}"
+                            AutomationProperties.Name="{local:Loc Key=S34DFA3C79F0B7C75}"/>
                 </Grid>
             </StackPanel>
         </Border>
@@ -682,15 +682,15 @@
                 </Grid.ColumnDefinitions>
                 <StackPanel Orientation="Horizontal">
                     <Border Style="{StaticResource KeyCap}"><TextBlock Text="Enter"/></Border>
-                    <TextBlock Text="вставить" Foreground="{DynamicResource TextSecondary}" VerticalAlignment="Center"/>
+                    <TextBlock Text="{local:Loc Key=SADC41711D61237AC}" Foreground="{DynamicResource TextSecondary}" VerticalAlignment="Center"/>
                 </StackPanel>
                 <StackPanel Grid.Column="2" Orientation="Horizontal">
-                    <Border Style="{StaticResource KeyCap}"><TextBlock Text="Alt+клик"/></Border>
-                    <TextBlock Text="выбрать" Foreground="{DynamicResource TextSecondary}" VerticalAlignment="Center" ToolTip="Alt+клик — начать выбор текстов или картинок и видео. Дальше отмечайте обычными кликами. Alt+пробел — с клавиатуры."/>
+                    <Border Style="{StaticResource KeyCap}"><TextBlock Text="{local:Loc Key=SA9C61AE59CA81A48}"/></Border>
+                    <TextBlock Text="{local:Loc Key=SDC348037F1B79A33}" Foreground="{DynamicResource TextSecondary}" VerticalAlignment="Center" ToolTip="{local:Loc Key=S7E3BECFF8AF12D2F}"/>
                 </StackPanel>
                 <StackPanel Grid.Column="4" Orientation="Horizontal">
                     <Border Style="{StaticResource KeyCap}"><TextBlock Text="Ctrl+1-9"/></Border>
-                    <TextBlock Text="быстро" Foreground="{DynamicResource TextSecondary}" VerticalAlignment="Center"/>
+                    <TextBlock Text="{local:Loc Key=SDCD85BADA23A9985}" Foreground="{DynamicResource TextSecondary}" VerticalAlignment="Center"/>
                 </StackPanel>
             </Grid>
         </Border>
@@ -721,7 +721,7 @@
                                 <TextBlock x:Name="PeekText" FontSize="13" LineHeight="20" LineStackingStrategy="BlockLineHeight" TextWrapping="Wrap"/>
                             </ScrollViewer>
                         </Border>
-                        <TextBlock x:Name="PeekHint" Text="Колесо мыши: прокрутка" FontSize="11" Margin="0,8,0,0"
+                        <TextBlock x:Name="PeekHint" Text="{local:Loc Key=S087397F71C86359B}" FontSize="11" Margin="0,8,0,0"
                                    Foreground="{DynamicResource TextSecondary}" Visibility="Collapsed"/>
                     </StackPanel>
                 </Grid>
@@ -760,11 +760,11 @@
                     BorderThickness="1" BorderBrush="{DynamicResource Accent}" Background="{DynamicResource MenuSurface}"
                     TextElement.Foreground="{DynamicResource TextPrimary}" TextElement.FontFamily="{StaticResource TextFont}">
                 <StackPanel>
-                    <TextBlock x:Name="ValueDropTitle" Text="Заменить значение" FontSize="16" FontWeight="SemiBold"/>
+                    <TextBlock x:Name="ValueDropTitle" Text="{local:Loc Key=SEEE48E65E8F3FB84}" FontSize="16" FontWeight="SemiBold"/>
                     <TextBlock x:Name="ValueDropHint" TextWrapping="Wrap" FontSize="12" Margin="0,6,0,12"
                                Foreground="{DynamicResource TextSecondary}" AutomationProperties.LiveSetting="Polite"/>
                     <ScrollViewer x:Name="ValueScroll" MaxHeight="320" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
-                        <ItemsControl x:Name="ValueChoices" AutomationProperties.Name="Значения для замены">
+                        <ItemsControl x:Name="ValueChoices" AutomationProperties.Name="{local:Loc Key=S7DBAD55F568ABCDC}">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
                                     <Button x:Name="ValueChoice" Margin="0,0,3,10" Padding="12,11" Height="Auto" MinHeight="48"
@@ -815,10 +815,10 @@
                                             <TextBlock Margin="0,9,0,0" FontSize="11" Foreground="{DynamicResource DropValueText}">
                                                 <TextBlock.Style>
                                                     <Style TargetType="TextBlock">
-                                                        <Setter Property="Text" Value="Итог команды"/>
+                                                        <Setter Property="Text" Value="{local:Loc Key=SD959E110D0F5AB19}"/>
                                                         <Style.Triggers>
                                                             <DataTrigger Binding="{Binding Tag, RelativeSource={RelativeSource AncestorType=Button}}" Value="Ready">
-                                                                <Setter Property="Text" Value="Отпустите — подставить сюда"/>
+                                                                <Setter Property="Text" Value="{local:Loc Key=S1AF8D8E007EF408C}"/>
                                                             </DataTrigger>
                                                         </Style.Triggers>
                                                     </Style>
@@ -830,7 +830,7 @@
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
                     </ScrollViewer>
-                    <TextBlock Text="Esc — отменить · Ctrl+Z — отменить замену" FontSize="11"
+                    <TextBlock Text="{local:Loc Key=S824CEE50BFE32C38}" FontSize="11"
                                Foreground="{DynamicResource TextSecondary}" TextWrapping="Wrap"/>
                 </StackPanel>
             </Border>
@@ -847,106 +847,117 @@
                 <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
                 <Grid Margin="12,12,12,4">
                     <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="*"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
-                    <Button x:Name="VisualSettingsTab" Content="Вид" Style="{StaticResource AccentButton}" Margin="0,0,4,0"
-                            Click="ShowVisualSettings_Click" AutomationProperties.Name="Настройки вида"/>
-                    <Button x:Name="StorageSettingsTab" Grid.Column="1" Content="Хранение" Style="{StaticResource StandardButton}"
-                            Margin="4,0,4,0" Click="ShowStorageSettings_Click" AutomationProperties.Name="Настройки хранения данных"/>
+                    <Button x:Name="VisualSettingsTab" Content="{local:Loc Key=S9022BA3739723A99}" Style="{StaticResource AccentButton}" Margin="0,0,4,0"
+                            Click="ShowVisualSettings_Click" AutomationProperties.Name="{local:Loc Key=SFFB51957D4F9BB3A}"/>
+                    <Button x:Name="StorageSettingsTab" Grid.Column="1" Content="{local:Loc Key=S349065E9C4467894}" Style="{StaticResource StandardButton}"
+                            Margin="4,0,4,0" Click="ShowStorageSettings_Click" AutomationProperties.Name="{local:Loc Key=S4EBEB45A877CDD5E}"/>
                     <Button x:Name="VfxSettingsTab" Grid.Column="2" Content="VFX" Style="{StaticResource StandardButton}"
-                            Margin="4,0,0,0" Click="ShowVfxSettings_Click" AutomationProperties.Name="Настройки эффектов рамки"/>
+                            Margin="4,0,0,0" Click="ShowVfxSettings_Click" AutomationProperties.Name="{local:Loc Key=SFD1E6F563F5BACAD}"/>
                 </Grid>
             <ScrollViewer x:Name="VisualSettingsView" Grid.Row="1" VerticalScrollBarVisibility="Auto" MaxHeight="388" Focusable="False" Padding="16,8,6,8">
                 <StackPanel Margin="0,0,6,0">
+                    <TextBlock Text="{local:Loc Key=S5BD57038DBADD651}" FontWeight="SemiBold" Margin="0,0,0,8"/>
+                    <Grid Margin="0,0,0,6">
+                        <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition/></Grid.ColumnDefinitions>
+                        <Button x:Name="EnglishLanguage" Content="English" Tag="en" Click="Language_Click" Margin="0,0,4,0"
+                                Style="{StaticResource StandardButton}" AutomationProperties.Name="English"/>
+                        <Button x:Name="RussianLanguage" Content="{local:Loc Key=S6DA140FDD4BE0189}" Tag="ru" Click="Language_Click" Grid.Column="1" Margin="4,0,0,0"
+                                Style="{StaticResource StandardButton}" AutomationProperties.Name="{local:Loc Key=S6DA140FDD4BE0189}"/>
+                    </Grid>
+                    <TextBlock x:Name="LanguageRestartHint" FontSize="12" Foreground="{DynamicResource TextSecondary}"
+                               TextWrapping="Wrap" Margin="0,0,0,12"/>
+                    <Border Height="1" Background="{DynamicResource WindowStroke}" Margin="0,0,0,12"/>
                     <ToggleButton x:Name="AnimationsToggle" Style="{StaticResource ToggleSwitch}" IsChecked="True"
                                   Checked="AnimationsToggle_Changed" Unchecked="AnimationsToggle_Changed"
-                                  AutomationProperties.Name="Анимация окна">
-                        <TextBlock Text="Анимация окна" FontWeight="SemiBold"/>
+                                  AutomationProperties.Name="{local:Loc Key=SF3767704BA91CBFA}">
+                        <TextBlock Text="{local:Loc Key=SF3767704BA91CBFA}" FontWeight="SemiBold"/>
                     </ToggleButton>
                     <StackPanel Margin="0,10,0,0" IsEnabled="{Binding IsChecked, ElementName=AnimationsToggle}">
                         <Grid>
-                            <TextBlock Text="Появление"/>
-                            <TextBlock x:Name="ShowTimingValue" HorizontalAlignment="Right" FontSize="13" Foreground="{DynamicResource TextSecondary}" Text="100 мс"/>
+                            <TextBlock Text="{local:Loc Key=S0F4D5C50A07B577B}"/>
+                            <TextBlock x:Name="ShowTimingValue" HorizontalAlignment="Right" FontSize="13" Foreground="{DynamicResource TextSecondary}" Text="{local:Loc Key=S00E525F2D9657182}"/>
                         </Grid>
                         <Slider x:Name="ShowTiming" Minimum="0" Maximum="1000" Value="100" TickFrequency="10"
                                 IsSnapToTickEnabled="True" Margin="0,4,0,10" ValueChanged="Timing_ValueChanged"
-                                AutomationProperties.Name="Длительность появления, миллисекунды"/>
+                                AutomationProperties.Name="{local:Loc Key=SDAAE57846A77A2E2}"/>
                         <Grid>
-                            <TextBlock Text="Исчезновение"/>
-                            <TextBlock x:Name="HideTimingValue" HorizontalAlignment="Right" FontSize="13" Foreground="{DynamicResource TextSecondary}" Text="100 мс"/>
+                            <TextBlock Text="{local:Loc Key=SCBA41AECC4B74466}"/>
+                            <TextBlock x:Name="HideTimingValue" HorizontalAlignment="Right" FontSize="13" Foreground="{DynamicResource TextSecondary}" Text="{local:Loc Key=S00E525F2D9657182}"/>
                         </Grid>
                         <Slider x:Name="HideTiming" Minimum="0" Maximum="1000" Value="100" TickFrequency="10"
                                 IsSnapToTickEnabled="True" Margin="0,4,0,0" ValueChanged="Timing_ValueChanged"
-                                AutomationProperties.Name="Длительность исчезновения, миллисекунды"/>
+                                AutomationProperties.Name="{local:Loc Key=S91C14BB346727ECC}"/>
                     </StackPanel>
                     <Border Height="1" Background="{DynamicResource WindowStroke}" Margin="0,12,0,12"/>
-                    <TextBlock Text="Увеличение картинок" FontWeight="SemiBold" Margin="0,0,0,10"/>
+                    <TextBlock Text="{local:Loc Key=S6A20ADC3B99637AE}" FontWeight="SemiBold" Margin="0,0,0,10"/>
                     <Grid>
-                        <TextBlock Text="Задержка"/>
-                        <TextBlock x:Name="ZoomDelayValue" HorizontalAlignment="Right" FontSize="13" Foreground="{DynamicResource TextSecondary}" Text="1 с"/>
+                        <TextBlock Text="{local:Loc Key=SB051F39468122ABD}"/>
+                        <TextBlock x:Name="ZoomDelayValue" HorizontalAlignment="Right" FontSize="13" Foreground="{DynamicResource TextSecondary}" Text="{local:Loc Key=S78EE5E545DA882DD}"/>
                     </Grid>
                     <Slider x:Name="ZoomDelaySlider" Minimum="100" Maximum="3000" Value="1000" TickFrequency="100"
                             IsSnapToTickEnabled="True" Margin="0,4,0,10" ValueChanged="ZoomDelay_ValueChanged"
-                            AutomationProperties.Name="Задержка увеличения картинки, миллисекунды"/>
+                            AutomationProperties.Name="{local:Loc Key=SF07F805077291E8D}"/>
                     <Grid>
-                        <TextBlock Text="Размер картинки"/>
+                        <TextBlock Text="{local:Loc Key=S602601E628CC43D0}"/>
                         <TextBlock x:Name="ZoomScaleValue" HorizontalAlignment="Right" FontSize="13" Foreground="{DynamicResource TextSecondary}" Text="780 × 360"/>
                     </Grid>
                     <Slider x:Name="ZoomScaleSlider" Minimum="1" Maximum="5" Value="3" TickFrequency="1"
                             IsSnapToTickEnabled="True" Margin="0,4,0,0" ValueChanged="ZoomScale_ValueChanged"
-                            AutomationProperties.Name="Размер просмотра картинки"/>
+                            AutomationProperties.Name="{local:Loc Key=SBF4D6267A5A07968}"/>
                     <Border Height="1" Background="{DynamicResource WindowStroke}" Margin="0,12,0,12"/>
                     <ToggleButton x:Name="TextPeekToggle" Style="{StaticResource ToggleSwitch}" IsChecked="True"
                                   Checked="TextPeekToggle_Changed" Unchecked="TextPeekToggle_Changed"
-                                  AutomationProperties.Name="Просмотр длинного текста при наведении">
-                        <TextBlock Text="Просмотр длинного текста" FontWeight="SemiBold" TextWrapping="Wrap"/>
+                                  AutomationProperties.Name="{local:Loc Key=S01C9518EFEFA5B99}">
+                        <TextBlock Text="{local:Loc Key=SF105708317E7FADB}" FontWeight="SemiBold" TextWrapping="Wrap"/>
                     </ToggleButton>
                     <StackPanel Margin="0,10,0,0" IsEnabled="{Binding IsChecked, ElementName=TextPeekToggle}">
                         <Grid>
-                            <TextBlock Text="Задержка"/>
-                            <TextBlock x:Name="TextPeekDelayValue" HorizontalAlignment="Right" FontSize="13" Foreground="{DynamicResource TextSecondary}" Text="0,6 с"/>
+                            <TextBlock Text="{local:Loc Key=SB051F39468122ABD}"/>
+                            <TextBlock x:Name="TextPeekDelayValue" HorizontalAlignment="Right" FontSize="13" Foreground="{DynamicResource TextSecondary}" Text="{local:Loc Key=S277FCF9DB1CC9840}"/>
                         </Grid>
                         <Slider x:Name="TextPeekDelaySlider" Minimum="100" Maximum="3000" Value="600" TickFrequency="100"
                                 IsSnapToTickEnabled="True" Margin="0,4,0,10" ValueChanged="TextPeekDelay_ValueChanged"
-                                AutomationProperties.Name="Задержка просмотра текста, миллисекунды"/>
+                                AutomationProperties.Name="{local:Loc Key=S4A64D47B205EBD7F}"/>
                         <Grid>
-                            <TextBlock Text="Ширина карточки"/>
+                            <TextBlock Text="{local:Loc Key=SC5ECD3BA97158C6B}"/>
                             <TextBlock x:Name="TextPeekWidthValue" HorizontalAlignment="Right" FontSize="13" Foreground="{DynamicResource TextSecondary}" Text="380 px"/>
                         </Grid>
                         <Slider x:Name="TextPeekWidthSlider" Minimum="300" Maximum="640" Value="380" TickFrequency="20"
                                 IsSnapToTickEnabled="True" Margin="0,4,0,0" ValueChanged="TextPeekWidth_ValueChanged"
-                                AutomationProperties.Name="Ширина карточки просмотра текста"/>
+                                AutomationProperties.Name="{local:Loc Key=S5A3519B294992D05}"/>
                     </StackPanel>
                     <Border Height="1" Background="{DynamicResource WindowStroke}" Margin="0,12,0,12"/>
                     <ToggleButton x:Name="OutsideHideToggle" Style="{StaticResource ToggleSwitch}" IsChecked="True"
                                   Checked="OutsideHideToggle_Changed" Unchecked="OutsideHideToggle_Changed"
-                                  AutomationProperties.Name="Скрывать панель, когда курсор ушёл">
-                        <TextBlock Text="Скрывать, когда курсор ушёл" FontWeight="SemiBold" TextWrapping="Wrap"/>
+                                  AutomationProperties.Name="{local:Loc Key=SDF1C14A41E216714}">
+                        <TextBlock Text="{local:Loc Key=S344E3EC15B8BA3C3}" FontWeight="SemiBold" TextWrapping="Wrap"/>
                     </ToggleButton>
                     <Grid Margin="0,10,0,0">
-                        <TextBlock Text="Через"/>
-                        <TextBlock x:Name="OutsideHideValue" HorizontalAlignment="Right" FontSize="13" Foreground="{DynamicResource TextSecondary}" Text="3 с"/>
+                        <TextBlock Text="{local:Loc Key=SC8D702A189B26FFC}"/>
+                        <TextBlock x:Name="OutsideHideValue" HorizontalAlignment="Right" FontSize="13" Foreground="{DynamicResource TextSecondary}" Text="{local:Loc Key=S034C71AC10A3A1FE}"/>
                     </Grid>
                     <Slider x:Name="OutsideHideSlider" Minimum="500" Maximum="10000" Value="3000" TickFrequency="500"
                             IsSnapToTickEnabled="True" Margin="0,4,0,0" ValueChanged="OutsideHideDelay_ValueChanged"
                             IsEnabled="{Binding IsChecked, ElementName=OutsideHideToggle}"
-                            AutomationProperties.Name="Задержка скрытия вне окна, миллисекунды"/>
+                            AutomationProperties.Name="{local:Loc Key=SBE300BBC861DE97D}"/>
                     <Border Height="1" Background="{DynamicResource WindowStroke}" Margin="0,12,0,12"/>
                     <ToggleButton x:Name="KeyHintsToggle" Style="{StaticResource ToggleSwitch}" IsChecked="True"
                                   Checked="KeyHintsToggle_Changed" Unchecked="KeyHintsToggle_Changed"
-                                  AutomationProperties.Name="Подсказки клавиш внизу панели">
-                        <TextBlock Text="Подсказки клавиш внизу" TextWrapping="Wrap"/>
+                                  AutomationProperties.Name="{local:Loc Key=S317D2C78ED442353}">
+                        <TextBlock Text="{local:Loc Key=SA8F576F608D69D5E}" TextWrapping="Wrap"/>
                     </ToggleButton>
                     <Border Height="1" Background="{DynamicResource WindowStroke}" Margin="0,16,0,12"/>
-                    <TextBlock Text="Обновления" FontSize="15" FontWeight="SemiBold" Margin="0,0,0,4"/>
+                    <TextBlock Text="{local:Loc Key=S455471DB0CFB8950}" FontSize="15" FontWeight="SemiBold" Margin="0,0,0,4"/>
                     <TextBlock x:Name="UpdateVersion" Foreground="{DynamicResource TextSecondary}" FontSize="12" Margin="0,0,0,10"/>
                     <ToggleButton x:Name="AutoUpdateToggle" Style="{StaticResource ToggleSwitch}" IsChecked="True"
                                   Checked="AutoUpdateToggle_Changed" Unchecked="AutoUpdateToggle_Changed"
-                                  AutomationProperties.Name="Обновлять автоматически">
-                        <TextBlock Text="Обновлять автоматически" TextWrapping="Wrap"/>
+                                  AutomationProperties.Name="{local:Loc Key=S44F2634FD416851A}">
+                        <TextBlock Text="{local:Loc Key=S44F2634FD416851A}" TextWrapping="Wrap"/>
                     </ToggleButton>
-                    <TextBlock Text="Установим в фоне, когда панель закрыта и операции завершены."
+                    <TextBlock Text="{local:Loc Key=S7CD2C8973CFF782E}"
                                TextWrapping="Wrap" FontSize="11" Foreground="{DynamicResource TextSecondary}" Margin="0,6,0,10"/>
                     <TextBlock x:Name="UpdateStatus" TextWrapping="Wrap" FontSize="12" Margin="0,0,0,10"/>
-                    <Button x:Name="UpdateButton" Content="Проверить обновления" Style="{StaticResource StandardButton}"
+                    <Button x:Name="UpdateButton" Content="{local:Loc Key=S93B08F7B14651B6D}" Style="{StaticResource StandardButton}"
                             HorizontalAlignment="Stretch" Click="UpdateButton_Click"/>
                 </StackPanel>
             </ScrollViewer>
@@ -954,99 +965,99 @@
                           MaxHeight="388" Focusable="False" Padding="16,8,16,16">
                 <StackPanel>
                     <ToggleButton x:Name="VfxToggle" Style="{StaticResource ToggleSwitch}" IsChecked="True"
-                                  Checked="Vfx_Changed" Unchecked="Vfx_Changed" AutomationProperties.Name="Эффект по краям окна">
-                        <TextBlock Text="Эффект по краям окна" FontWeight="SemiBold"/>
+                                  Checked="Vfx_Changed" Unchecked="Vfx_Changed" AutomationProperties.Name="{local:Loc Key=S73D5A91D62E6A9B0}">
+                        <TextBlock Text="{local:Loc Key=S73D5A91D62E6A9B0}" FontWeight="SemiBold"/>
                     </ToggleButton>
                     <TextBlock Text="Nether" FontSize="15" FontWeight="SemiBold" Margin="0,16,0,2"/>
-                    <TextBlock Text="Призрачное пламя из Moment Player" FontSize="12" TextWrapping="Wrap"
+                    <TextBlock Text="{local:Loc Key=S3E795DE749A1EA08}" FontSize="12" TextWrapping="Wrap"
                                Foreground="{DynamicResource TextSecondary}"/>
                     <Grid Height="156" Margin="0,6,0,10" IsHitTestVisible="False">
                         <Border Margin="32" CornerRadius="8" Background="{DynamicResource WindowSurface}"
                                 BorderBrush="{DynamicResource WindowStroke}" BorderThickness="1">
                             <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-                                <TextBlock Text="Буфер обмена" FontWeight="SemiBold" HorizontalAlignment="Center"/>
-                                <TextBlock Text="Пламя остаётся снаружи" FontSize="11" Foreground="{DynamicResource TextSecondary}"/>
+                                <TextBlock Text="{local:Loc Key=SEB31594AB4F133FA}" FontWeight="SemiBold" HorizontalAlignment="Center"/>
+                                <TextBlock Text="{local:Loc Key=SB5A318BE6EC5C751}" FontSize="11" Foreground="{DynamicResource TextSecondary}"/>
                             </StackPanel>
                         </Border>
                         <local:NetherBorder x:Name="VfxPreview" Inset="32"/>
                     </Grid>
                     <StackPanel IsEnabled="{Binding IsChecked, ElementName=VfxToggle}">
-                        <Grid><TextBlock Text="Интенсивность"/>
+                        <Grid><TextBlock Text="{local:Loc Key=SF195133BCEFB6A3B}"/>
                             <TextBlock x:Name="VfxOpacityValue" HorizontalAlignment="Right" Foreground="{DynamicResource TextSecondary}"/></Grid>
                         <Slider x:Name="VfxOpacitySlider" Minimum="10" Maximum="100" Value="85" TickFrequency="5" IsSnapToTickEnabled="True"
-                                Margin="0,4,0,12" ValueChanged="Vfx_ValueChanged" AutomationProperties.Name="Интенсивность эффекта, процентов"/>
-                        <Grid><TextBlock Text="Скорость"/>
+                                Margin="0,4,0,12" ValueChanged="Vfx_ValueChanged" AutomationProperties.Name="{local:Loc Key=S05F86AE8582FFC3E}"/>
+                        <Grid><TextBlock Text="{local:Loc Key=S70E98E32147CF4EC}"/>
                             <TextBlock x:Name="VfxSpeedValue" HorizontalAlignment="Right" Foreground="{DynamicResource TextSecondary}"/></Grid>
                         <Slider x:Name="VfxSpeedSlider" Minimum="25" Maximum="200" Value="100" TickFrequency="5" IsSnapToTickEnabled="True"
-                                Margin="0,4,0,10" ValueChanged="Vfx_ValueChanged" AutomationProperties.Name="Скорость эффекта, процентов"/>
+                                Margin="0,4,0,10" ValueChanged="Vfx_ValueChanged" AutomationProperties.Name="{local:Loc Key=S27410FC78B03DDB6}"/>
                     </StackPanel>
                     <TextBlock x:Name="VfxStatus" FontSize="12" TextWrapping="Wrap" Foreground="{DynamicResource TextSecondary}"
                                AutomationProperties.LiveSetting="Polite"/>
-                    <TextBlock Text="При выключенной анимации окна пламя замирает. В скрытом окне эффект не воспроизводится."
+                    <TextBlock Text="{local:Loc Key=SDD33660ECD470ABA}"
                                Margin="0,8,0,0" FontSize="11" TextWrapping="Wrap" Foreground="{DynamicResource TextSecondary}"/>
                 </StackPanel>
             </ScrollViewer>
             <ScrollViewer x:Name="StorageSettingsView" Grid.Row="1" Visibility="Collapsed" VerticalScrollBarVisibility="Auto"
                           MaxHeight="388" Focusable="False" Padding="16,8,6,12">
                 <StackPanel Margin="0,0,6,0">
-                    <TextBlock Text="История" FontSize="15" FontWeight="SemiBold" Margin="0,0,0,4"/>
-                    <TextBlock Text="Закреплённые записи хранятся до удаления вручную." TextWrapping="Wrap"
+                    <TextBlock Text="{local:Loc Key=S1417B7792D57BBB7}" FontSize="15" FontWeight="SemiBold" Margin="0,0,0,4"/>
+                    <TextBlock Text="{local:Loc Key=S8EF99396D284012F}" TextWrapping="Wrap"
                                FontSize="11" Foreground="{DynamicResource TextSecondary}" Margin="0,0,0,10"/>
-                    <Grid><TextBlock Text="Незакреплённых записей"/>
+                    <Grid><TextBlock Text="{local:Loc Key=SF9E6B4B56157141E}"/>
                         <TextBlock x:Name="HistoryCountValue" HorizontalAlignment="Right" Foreground="{DynamicResource TextSecondary}"/></Grid>
                     <Slider x:Name="HistoryCountSlider" Minimum="20" Maximum="1000" Value="100" TickFrequency="10" IsSnapToTickEnabled="True"
-                            Margin="0,4,0,10" ValueChanged="Storage_ValueChanged" AutomationProperties.Name="Максимум незакреплённых записей"/>
-                    <Grid><TextBlock Text="Обычные записи"/>
+                            Margin="0,4,0,10" ValueChanged="Storage_ValueChanged" AutomationProperties.Name="{local:Loc Key=S95E1B243A48FD248}"/>
+                    <Grid><TextBlock Text="{local:Loc Key=S78B7A9E85FF0C74F}"/>
                         <TextBlock x:Name="HistoryDaysValue" HorizontalAlignment="Right" Foreground="{DynamicResource TextSecondary}"/></Grid>
                     <Slider x:Name="HistoryDaysSlider" Minimum="1" Maximum="90" Value="7" TickFrequency="1" IsSnapToTickEnabled="True"
-                            Margin="0,4,0,10" ValueChanged="Storage_ValueChanged" AutomationProperties.Name="Срок хранения обычных записей, дней"/>
-                    <Grid><TextBlock Text="GIF, аудио и файлы"/>
+                            Margin="0,4,0,10" ValueChanged="Storage_ValueChanged" AutomationProperties.Name="{local:Loc Key=SD57B977768600584}"/>
+                    <Grid><TextBlock Text="{local:Loc Key=S57AD92DE020B8C62}"/>
                         <TextBlock x:Name="MediaDaysValue" HorizontalAlignment="Right" Foreground="{DynamicResource TextSecondary}"/></Grid>
                     <Slider x:Name="MediaDaysSlider" Minimum="1" Maximum="30" Value="1" TickFrequency="1" IsSnapToTickEnabled="True"
-                            Margin="0,4,0,0" ValueChanged="Storage_ValueChanged" AutomationProperties.Name="Срок хранения медиа и файлов, дней"/>
+                            Margin="0,4,0,0" ValueChanged="Storage_ValueChanged" AutomationProperties.Name="{local:Loc Key=S5BF473B2FD59A9AA}"/>
 
                     <Border Height="1" Background="{DynamicResource WindowStroke}" Margin="0,14,0,12"/>
-                    <TextBlock Text="Лимиты захвата" FontSize="15" FontWeight="SemiBold" Margin="0,0,0,10"/>
-                    <Grid><TextBlock Text="Текст каждого формата"/>
+                    <TextBlock Text="{local:Loc Key=S9AE3804BD96F4224}" FontSize="15" FontWeight="SemiBold" Margin="0,0,0,10"/>
+                    <Grid><TextBlock Text="{local:Loc Key=SBB728E0D3FA62A9E}"/>
                         <TextBlock x:Name="TextLimitValue" HorizontalAlignment="Right" Foreground="{DynamicResource TextSecondary}"/></Grid>
                     <Slider x:Name="TextLimitSlider" Minimum="10" Maximum="2000" Value="1000" TickFrequency="10" IsSnapToTickEnabled="True"
-                            Margin="0,4,0,10" ValueChanged="Storage_ValueChanged" AutomationProperties.Name="Лимит символов текста, тысяч"/>
-                    <Grid><TextBlock Text="Изображение"/>
+                            Margin="0,4,0,10" ValueChanged="Storage_ValueChanged" AutomationProperties.Name="{local:Loc Key=S8DBF01AE706F3996}"/>
+                    <Grid><TextBlock Text="{local:Loc Key=SE5F534734C3678AF}"/>
                         <TextBlock x:Name="ImageLimitValue" HorizontalAlignment="Right" Foreground="{DynamicResource TextSecondary}"/></Grid>
                     <Slider x:Name="ImageLimitSlider" Minimum="1" Maximum="80" Value="40" TickFrequency="1" IsSnapToTickEnabled="True"
-                            Margin="0,4,0,10" ValueChanged="Storage_ValueChanged" AutomationProperties.Name="Лимит пикселей изображения, мегапикселей"/>
-                    <Grid><TextBlock Text="Миниатюра"/>
+                            Margin="0,4,0,10" ValueChanged="Storage_ValueChanged" AutomationProperties.Name="{local:Loc Key=S8B97A912B02AE689}"/>
+                    <Grid><TextBlock Text="{local:Loc Key=S104FE8A2AA075597}"/>
                         <TextBlock x:Name="ThumbnailValue" HorizontalAlignment="Right" Foreground="{DynamicResource TextSecondary}"/></Grid>
                     <Slider x:Name="ThumbnailSlider" Minimum="160" Maximum="640" Value="320" TickFrequency="16" IsSnapToTickEnabled="True"
-                            Margin="0,4,0,2" ValueChanged="Storage_ValueChanged" AutomationProperties.Name="Длинная сторона миниатюры, пикселей"/>
-                    <TextBlock Text="Для новых записей" FontSize="11" Foreground="{DynamicResource TextSecondary}" Margin="0,0,0,10"/>
-                    <Grid><TextBlock Text="Файл или пакет"/>
+                            Margin="0,4,0,2" ValueChanged="Storage_ValueChanged" AutomationProperties.Name="{local:Loc Key=S29B06D0B60B7DCF6}"/>
+                    <TextBlock Text="{local:Loc Key=S4401E13B4F44ECDA}" FontSize="11" Foreground="{DynamicResource TextSecondary}" Margin="0,0,0,10"/>
+                    <Grid><TextBlock Text="{local:Loc Key=S2B2A9427D51075B7}"/>
                         <TextBlock x:Name="FileSizeValue" HorizontalAlignment="Right" Foreground="{DynamicResource TextSecondary}"/></Grid>
                     <Slider x:Name="FileSizeSlider" Minimum="10" Maximum="200" Value="100" TickFrequency="10" IsSnapToTickEnabled="True"
-                            Margin="0,4,0,10" ValueChanged="Storage_ValueChanged" AutomationProperties.Name="Лимит размера файла или пакета, мегабайт"/>
-                    <Grid><TextBlock Text="Файлов в пакете"/>
+                            Margin="0,4,0,10" ValueChanged="Storage_ValueChanged" AutomationProperties.Name="{local:Loc Key=S7A7D4120C3A5CBC3}"/>
+                    <Grid><TextBlock Text="{local:Loc Key=SD67C6C95201096DD}"/>
                         <TextBlock x:Name="FileCountValue" HorizontalAlignment="Right" Foreground="{DynamicResource TextSecondary}"/></Grid>
                     <Slider x:Name="FileCountSlider" Minimum="2" Maximum="100" Value="100" TickFrequency="1" IsSnapToTickEnabled="True"
-                            Margin="0,4,0,0" ValueChanged="Storage_ValueChanged" AutomationProperties.Name="Лимит количества файлов в пакете"/>
+                            Margin="0,4,0,0" ValueChanged="Storage_ValueChanged" AutomationProperties.Name="{local:Loc Key=SA94D16AFE71C0322}"/>
 
                     <Border Height="1" Background="{DynamicResource WindowStroke}" Margin="0,14,0,12"/>
-                    <TextBlock Text="Временные файлы" FontSize="15" FontWeight="SemiBold" Margin="0,0,0,4"/>
-                    <TextBlock Text="Расшифрованные копии для вставки удаляются при запуске и раз в час." TextWrapping="Wrap"
+                    <TextBlock Text="{local:Loc Key=S14387E4467F2FCC7}" FontSize="15" FontWeight="SemiBold" Margin="0,0,0,4"/>
+                    <TextBlock Text="{local:Loc Key=SD06333F24005105F}" TextWrapping="Wrap"
                                FontSize="11" Foreground="{DynamicResource TextSecondary}" Margin="0,0,0,10"/>
-                    <Grid><TextBlock Text="Срок очистки"/>
+                    <Grid><TextBlock Text="{local:Loc Key=SED5A6EFB8543B58C}"/>
                         <TextBlock x:Name="TempDaysValue" HorizontalAlignment="Right" Foreground="{DynamicResource TextSecondary}"/></Grid>
                     <Slider x:Name="TempDaysSlider" Minimum="1" Maximum="7" Value="1" TickFrequency="1" IsSnapToTickEnabled="True"
-                            Margin="0,4,0,0" ValueChanged="Storage_ValueChanged" AutomationProperties.Name="Срок очистки временных файлов, дней"/>
+                            Margin="0,4,0,0" ValueChanged="Storage_ValueChanged" AutomationProperties.Name="{local:Loc Key=S344A33BE4B76BFC0}"/>
 
                     <Border Height="1" Background="{DynamicResource WindowStroke}" Margin="0,14,0,12"/>
-                    <TextBlock Text="Расположение и защита" FontSize="15" FontWeight="SemiBold" Margin="0,0,0,4"/>
-                    <TextBlock Text="История: %LOCALAPPDATA%\ArkCopyBuffer. Файлы защищены Windows для текущей учётной записи."
+                    <TextBlock Text="{local:Loc Key=SEEC6352B23682FBE}" FontSize="15" FontWeight="SemiBold" Margin="0,0,0,4"/>
+                    <TextBlock Text="{local:Loc Key=SAEF3A78E959942CE}"
                                TextWrapping="Wrap" FontSize="11" Foreground="{DynamicResource TextSecondary}" Margin="0,0,0,12"/>
-                    <TextBlock Text="Сокращение сроков или количества удалит лишние незакреплённые записи при применении."
+                    <TextBlock Text="{local:Loc Key=SCC03D7C4F928EC30}"
                                TextWrapping="Wrap" FontSize="11" Foreground="{DynamicResource TextSecondary}" Margin="0,0,0,10"/>
-                    <Button x:Name="StorageApplyButton" Content="Применить" Style="{StaticResource AccentButton}"
-                            Click="StorageApply_Click" AutomationProperties.Name="Применить настройки хранения"/>
-                    <TextBlock x:Name="StorageStatus" Text="Настройки сохранены" TextWrapping="Wrap" FontSize="11"
+                    <Button x:Name="StorageApplyButton" Content="{local:Loc Key=SE15F960D93EB4EE8}" Style="{StaticResource AccentButton}"
+                            Click="StorageApply_Click" AutomationProperties.Name="{local:Loc Key=S8422C616A28F5F16}"/>
+                    <TextBlock x:Name="StorageStatus" Text="{local:Loc Key=SBABDB58139BE97EA}" TextWrapping="Wrap" FontSize="11"
                                Foreground="{DynamicResource TextSecondary}" Margin="0,8,0,0"/>
                 </StackPanel>
             </ScrollViewer>

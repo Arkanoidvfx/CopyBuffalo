@@ -51,9 +51,19 @@ public partial class App : Application
         if (!OperatingSystem.IsWindowsVersionAtLeast(10, 0, 17763) ||
             System.Runtime.InteropServices.RuntimeInformation.OSArchitecture != System.Runtime.InteropServices.Architecture.X64)
         {
-            MessageBox.Show("Нужна Windows 10 (1809 или новее) либо Windows 11, 64-битный процессор Intel/AMD.",
+            MessageBox.Show(UiText.T("Нужна Windows 10 (1809 или новее) либо Windows 11, 64-битный процессор Intel/AMD."),
                 "ArkCopyBuffer", MessageBoxButton.OK, MessageBoxImage.Information);
             Shutdown(1);
+            return;
+        }
+
+        if (e.Args is ["--localization-selftest", var localeDirectory, var language] && language is "en" or "ru")
+        {
+            UiText.Language = language;
+            System.Windows.Media.RenderOptions.ProcessRenderMode = RenderMode.SoftwareOnly;
+            ApplyTheme();
+            try { LocalizationChecks.Run(localeDirectory); Shutdown(0); }
+            catch (Exception ex) { Directory.CreateDirectory(localeDirectory); File.WriteAllText(Path.Combine(localeDirectory, "ERROR.txt"), ex.ToString()); Shutdown(1); }
             return;
         }
 
@@ -80,8 +90,11 @@ public partial class App : Application
 
         if (e.Args.Contains("--selftest"))
         {
+            if (e.Args is ["--selftest", _, var testLanguage] && testLanguage is "en" or "ru") UiText.Language = testLanguage;
+            System.Windows.Media.RenderOptions.ProcessRenderMode = RenderMode.SoftwareOnly;
             ApplyTheme(); // Offscreen layout tests need the same brushes as the running app.
-            Shutdown(HistoryStore.SelfTest(Path.Combine(DataDir, "selftest.log")));
+            string log = e.Args.Length >= 2 ? Path.Combine(Path.GetFullPath(e.Args[1]), "selftest.log") : Path.Combine(DataDir, "selftest.log");
+            Shutdown(HistoryStore.SelfTest(log));
             return;
         }
 
@@ -111,7 +124,7 @@ public partial class App : Application
             ex.Handled = true;
             if (_started) return;
             // Не запустились (история не читается, буфер не слушается): не висим невидимкой без трея, держа мьютекс.
-            MessageBox.Show($"ArkCopyBuffer не запустился: {ex.Exception.Message}\n\nПодробности: {Path.Combine(DataDir, "error.log")}",
+            MessageBox.Show(UiText.F($"ArkCopyBuffer не запустился: {ex.Exception.Message}\n\nПодробности: {Path.Combine(DataDir, "error.log")}"),
                 "ArkCopyBuffer", MessageBoxButton.OK, MessageBoxImage.Error);
             Shutdown(1);
         };
@@ -136,6 +149,17 @@ public partial class App : Application
         _watcher = new ClipboardWatcher(_store);
         _panel = new PanelWindow(_store, new SymbolCatalog(Path.Combine(DataDir, "symbols.json")));
         _panel.Storage = _storage;
+        _panel.LanguageChanged += language =>
+        {
+            try
+            {
+                using var key = Registry.CurrentUser.CreateSubKey(SettingsKey);
+                key.SetValue("Language", language, RegistryValueKind.String);
+                _panel.SetLanguagePreference(language);
+                Notify(InfoKind.Neutral, UiText.T("Язык изменится после перезапуска."), "");
+            }
+            catch (Exception ex) { Notify(InfoKind.Caution, UiText.T("Не удалось сохранить язык."), ex.Message); }
+        };
         _panel.StorageChanged += settings =>
         {
             using var key = Registry.CurrentUser.CreateSubKey(SettingsKey);
@@ -244,7 +268,7 @@ public partial class App : Application
         catch (Exception ex)
         {
             Log(ex);
-            _tray.ShowBalloonTip(5000, "ArkCopyBuffer", "Не удалось перехватить Win+V. История пишется, открыть можно из трея.", Forms.ToolTipIcon.Warning);
+            _tray.ShowBalloonTip(5000, "ArkCopyBuffer", UiText.T("Не удалось перехватить Win+V. История пишется, открыть можно из трея."), Forms.ToolTipIcon.Warning);
         }
         _started = true;
         InitializeUpdates();
@@ -349,7 +373,7 @@ public partial class App : Application
             catch (OperationCanceledException) { return; }
             catch (DirectoryNotFoundException) when (item.IsFolder)
             {
-                Notify(InfoKind.Caution, "Исходная папка недоступна.", "Она могла быть перемещена, удалена или находиться на отключённом диске.");
+                Notify(InfoKind.Caution, UiText.T("Исходная папка недоступна."), UiText.T("Она могла быть перемещена, удалена или находиться на отключённом диске."));
                 return;
             }
             catch (Exception ex) when (ex is FileNotFoundException or DirectoryNotFoundException or InvalidDataException or System.Security.Cryptography.CryptographicException)
@@ -359,22 +383,22 @@ public partial class App : Application
                 if (batch == null)
                 {
                     _store.Remove(item);
-                    Notify(InfoKind.Caution, "Файл записи повреждён или не найден.", "Запись удалена.");
+                    Notify(InfoKind.Caution, UiText.T("Файл записи повреждён или не найден."), UiText.T("Запись удалена."));
                 }
-                else Notify(InfoKind.Caution, "Не удалось подготовить картинки и видео.", "Вставьте их по одному, чтобы найти повреждённую запись.");
+                else Notify(InfoKind.Caution, UiText.T("Не удалось подготовить картинки и видео."), UiText.T("Вставьте их по одному, чтобы найти повреждённую запись."));
                 return;
             }
             catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
             {
                 // Временная копия занята/диск полон — сама запись цела, не удаляем.
                 Log(ex);
-                Notify(InfoKind.Caution, "Не удалось подготовить файл для вставки.", "Повторите позже.");
+                Notify(InfoKind.Caution, UiText.T("Не удалось подготовить файл для вставки."), UiText.T("Повторите позже."));
                 return;
             }
             catch (System.Runtime.InteropServices.ExternalException ex)
             {
                 Log(ex);
-                Notify(InfoKind.Caution, "Буфер обмена занят.", "Повторите вставку.");
+                Notify(InfoKind.Caution, UiText.T("Буфер обмена занят."), UiText.T("Повторите вставку."));
                 return;
             }
             if (target == IntPtr.Zero) return; // открыто из трея — только копируем
@@ -382,7 +406,7 @@ public partial class App : Application
             pasted = await Paster.PasteInto(target, Current);
             if (!Current()) { pasted = false; return; }
             Trace($"paste into {ProcessOf(target)}: {pasted}, fgNow={ProcessOf(Native.GetForegroundWindow())}");
-            if (!pasted) Notify(InfoKind.Info, "Скопировано.", "Не удалось вставить в нужное окно. Нажмите Ctrl+V.");
+            if (!pasted) Notify(InfoKind.Info, UiText.T("Скопировано."), UiText.T("Не удалось вставить в нужное окно. Нажмите Ctrl+V."));
         }
         finally { if (series is { } ticket) ticket.Complete(pasted); }
     }
@@ -399,11 +423,11 @@ public partial class App : Application
             catch (System.Runtime.InteropServices.ExternalException ex)
             {
                 Log(ex);
-                Notify(InfoKind.Caution, "Буфер обмена занят.", "Повторите действие.");
+                Notify(InfoKind.Caution, UiText.T("Буфер обмена занят."), UiText.T("Повторите действие."));
                 return;
             }
             if (_target != IntPtr.Zero)
-                Notify(InfoKind.Info, "Скопировано.", "Не удалось напечатать в нужном окне. Нажмите Ctrl+V.");
+                Notify(InfoKind.Info, UiText.T("Скопировано."), UiText.T("Не удалось напечатать в нужном окне. Нажмите Ctrl+V."));
         }
     }
 
@@ -420,7 +444,7 @@ public partial class App : Application
         item.Archiving = true;
         string? archive = null;
         bool copied = false;
-        _panel.SetArchiveProgress(item.FileName ?? "Подготовка папки…", cancel.Cancel);
+        _panel.SetArchiveProgress(item.FileName ?? UiText.T("Подготовка папки…"), cancel.Cancel);
         try
         {
             archive = await Paster.CreateFolderArchiveAsync(item.Text, cancel.Token, message =>
@@ -442,21 +466,21 @@ public partial class App : Application
                 _panel.HideAnimated();
                 if (await Paster.PasteInto(target, Current)) return;
             }
-            if (Current()) Notify(InfoKind.Success, "ZIP готов и скопирован.", "Нажмите Ctrl+V в приложении, принимающем файлы.");
+            if (Current()) Notify(InfoKind.Success, UiText.T("ZIP готов и скопирован."), UiText.T("Нажмите Ctrl+V в приложении, принимающем файлы."));
         }
         catch (OperationCanceledException)
         {
-            if (version == _pasteVersion && _started) Notify(InfoKind.Info, "Создание ZIP отменено.", "Исходная папка сохранена в истории.");
+            if (version == _pasteVersion && _started) Notify(InfoKind.Info, UiText.T("Создание ZIP отменено."), UiText.T("Исходная папка сохранена в истории."));
         }
         catch (System.Runtime.InteropServices.ExternalException ex)
         {
             Log(ex);
-            Notify(InfoKind.Caution, "Буфер обмена занят.", "Повторите отправку архивом.");
+            Notify(InfoKind.Caution, UiText.T("Буфер обмена занят."), UiText.T("Повторите отправку архивом."));
         }
         catch (Exception ex)
         {
             Log(ex);
-            Notify(InfoKind.Caution, "Не удалось создать ZIP.", ex.Message, 5000);
+            Notify(InfoKind.Caution, UiText.T("Не удалось создать ZIP."), ex.Message, 5000);
         }
         finally
         {
@@ -482,13 +506,13 @@ public partial class App : Application
             catch (System.Runtime.InteropServices.ExternalException ex)
             {
                 Log(ex);
-                Notify(InfoKind.Caution, "Звук извлечён в историю.", "Буфер обмена занят. Скопируйте аудиозапись из истории.");
+                Notify(InfoKind.Caution, UiText.T("Звук извлечён в историю."), UiText.T("Буфер обмена занят. Скопируйте аудиозапись из истории."));
                 return;
             }
-            Notify(InfoKind.Success, "Звук извлечён и скопирован.", result.FileName);
+            Notify(InfoKind.Success, UiText.T("Звук извлечён и скопирован."), result.FileName);
         }
         catch (OperationCanceledException) { }
-        catch (Exception ex) { Log(ex); Notify(InfoKind.Caution, "Не удалось извлечь звук.", ex.Message, 5000); }
+        catch (Exception ex) { Log(ex); Notify(InfoKind.Caution, UiText.T("Не удалось извлечь звук."), ex.Message, 5000); }
         finally { item.ExtractingAudio = false; }
     }
 
@@ -497,7 +521,7 @@ public partial class App : Application
     async void ProcessImage(ClipItem item, bool translate)
     {
         if (!item.IsImage || item.ImageHash == null || !_store.Items.Contains(item)) return;
-        if (_ocrCancel != null) { Notify(InfoKind.Info, "OCR уже работает.", "Дождитесь результата или отмените текущую обработку."); return; }
+        if (_ocrCancel != null) { Notify(InfoKind.Info, UiText.T("OCR уже работает."), UiText.T("Дождитесь результата или отмените текущую обработку.")); return; }
         using var cancel = new CancellationTokenSource();
         _ocrCancel = cancel;
         item.Recognizing = true;
@@ -507,16 +531,16 @@ public partial class App : Application
         string hash = item.ImageHash;
         bool Current() => _started && !cancel.IsCancellationRequested && _store.Items.Contains(item) && item.ImageHash == hash;
         byte[]? image = null;
-        string failureTitle = translate ? "Не удалось перевести текст." : "Не удалось распознать текст.";
+        string failureTitle = translate ? UiText.T("Не удалось перевести текст.") : UiText.T("Не удалось распознать текст.");
         try
         {
             if ((long)item.ImageWidth * item.ImageHeight > _storage.MaxImagePixels)
-                throw new ScreenshotOcr.Failure("Изображение превышает лимит размера в настройках хранения.");
+                throw new ScreenshotOcr.Failure(UiText.T("Изображение превышает лимит размера в настройках хранения."));
             image = await ScreenshotOcr.ReadImageAsync(_store.ImagesDir, hash, cancel.Token);
             if (!Current()) return;
             var result = await _ocr.RecognizeAsync(image, _storage.MaxImagePixels, cancel.Token);
             if (!Current()) return;
-            if (string.IsNullOrWhiteSpace(result.Text)) { Notify(InfoKind.Info, "Текст на изображении не найден.", "Попробуйте другой снимок или более крупный текст."); return; }
+            if (string.IsNullOrWhiteSpace(result.Text)) { Notify(InfoKind.Info, UiText.T("Текст на изображении не найден."), UiText.T("Попробуйте другой снимок или более крупный текст.")); return; }
             ClipItem output;
             if (translate)
             {
@@ -539,7 +563,7 @@ public partial class App : Application
             }
             else
             {
-                if (result.Text.Length > _storage.MaxChars) throw new ScreenshotOcr.Failure("Полученный текст превышает лимит хранения. Он не был обрезан; увеличьте лимит в настройках.");
+                if (result.Text.Length > _storage.MaxChars) throw new ScreenshotOcr.Failure(UiText.T("Полученный текст превышает лимит хранения. Он не был обрезан; увеличьте лимит в настройках."));
                 _store.Add(result.Text, null, null, DateTime.UtcNow, item.SourceApp);
                 bool singleLine = result.Text.IndexOfAny(['\r', '\n', '\t']) < 0;
                 output = _store.Items.Where(i => !i.IsImage && !i.IsMedia && (i.Text == result.Text || singleLine && i.Text.Trim() == result.Text))
@@ -551,7 +575,7 @@ public partial class App : Application
             catch (Exception ex)
             {
                 Log(ex);
-                if (Current()) Notify(InfoKind.Caution, "Результат не сохранён на диск.", "Он остаётся в истории этой сессии. Повторите обработку, чтобы сохранить его.", 5000);
+                if (Current()) Notify(InfoKind.Caution, UiText.T("Результат не сохранён на диск."), UiText.T("Он остаётся в истории этой сессии. Повторите обработку, чтобы сохранить его."), 5000);
                 return;
             }
             if (!Current()) return;
@@ -574,13 +598,13 @@ public partial class App : Application
             if (translate && _panel.IsShown) _panel.ShowTranslatedImageResult(copied, result.Regions.Any(r => r.Confidence < .85));
             else if (_panel.IsShown) _panel.ShowOcrResult(output, result, copied);
             else Notify(result.ReviewNeeded || !copied ? InfoKind.Caution : InfoKind.Success,
-                translate ? (copied ? "Картинка с переводом скопирована." : "Картинка с переводом в истории.") : copied ? "Текст распознан и скопирован." : "Распознанный текст в истории.",
-                result.ReviewNeeded ? "Проверьте похожие буквы и порядок строк." : "Откройте историю по Win+V.");
+                translate ? (copied ? UiText.T("Картинка с переводом скопирована.") : UiText.T("Картинка с переводом в истории.")) : copied ? UiText.T("Текст распознан и скопирован.") : UiText.T("Распознанный текст в истории."),
+                result.ReviewNeeded ? UiText.T("Проверьте похожие буквы и порядок строк.") : UiText.T("Откройте историю по Win+V."));
         }
         catch (OperationCanceledException) { }
         catch (ScreenshotOcr.Failure ex) { if (Current()) Notify(InfoKind.Caution, failureTitle, ex.Message, 5000); }
         catch (PromptCompressor.Failure ex) { Log(ex); if (Current()) Notify(InfoKind.Caution, failureTitle, ex.Message, 5000); }
-        catch (Exception ex) { Log(ex); if (Current()) Notify(InfoKind.Caution, failureTitle, "Исходное изображение осталось в истории.", 5000); }
+        catch (Exception ex) { Log(ex); if (Current()) Notify(InfoKind.Caution, failureTitle, UiText.T("Исходное изображение осталось в истории."), 5000); }
         finally
         {
             if (image != null) System.Security.Cryptography.CryptographicOperations.ZeroMemory(image);
@@ -600,7 +624,7 @@ public partial class App : Application
             var compressed = await _compressor.CompressAsync(item.Text);
             if (compressed.Length == 0 || compressed.Length >= item.Text.Length)
             {
-                Notify(InfoKind.Info, "Промпт уже компактный.", "Короче не получилось.");
+                Notify(InfoKind.Info, UiText.T("Промпт уже компактный."), UiText.T("Короче не получилось."));
                 return;
             }
             _store.Add(compressed, null, null, DateTime.UtcNow);
@@ -608,20 +632,20 @@ public partial class App : Application
             catch (System.Runtime.InteropServices.ExternalException ex)
             {
                 Log(ex);
-                Notify(InfoKind.Caution, "Сжатый промпт в истории,", "но буфер обмена занят.");
+                Notify(InfoKind.Caution, UiText.T("Сжатый промпт в истории,"), UiText.T("но буфер обмена занят."));
                 return;
             }
-            Notify(InfoKind.Success, "Промпт сжат:", $"{item.Text.Length:N0} → {compressed.Length:N0} символов. Уже в буфере обмена.");
+            Notify(InfoKind.Success, UiText.T("Промпт сжат:"), UiText.F($"{item.Text.Length:N0} → {compressed.Length:N0} символов. Уже в буфере обмена."));
         }
         catch (PromptCompressor.Failure ex)
         {
             Log(ex);
-            Notify(InfoKind.Critical, "Не удалось сжать промпт.", ex.Message, 5000);
+            Notify(InfoKind.Critical, UiText.T("Не удалось сжать промпт."), ex.Message, 5000);
         }
         catch (Exception ex)
         {
             Log(ex);
-            Notify(InfoKind.Critical, "Не удалось сжать промпт.", $"Подробности: {Path.Combine(DataDir, "error.log")}", 5000);
+            Notify(InfoKind.Critical, UiText.T("Не удалось сжать промпт."), UiText.F($"Подробности: {Path.Combine(DataDir, "error.log")}"), 5000);
         }
         finally { item.Compressing = false; }
     }
@@ -662,17 +686,17 @@ public partial class App : Application
         var header = new StackPanel { Children = { new TextBlock { Text = "ArkCopyBuffer", FontSize = 13, FontWeight = FontWeights.SemiBold }, _trayStatus } };
         menu.Items.Add(new MenuItem { Header = header, Focusable = false, IsHitTestVisible = false });
         menu.Items.Add(new Separator());
-        menu.Items.Add(PanelWindow.Entry("Открыть историю", "\uE77F", OpenFromTray, "Win+V"));
-        _pauseItem = PanelWindow.Entry("Пауза записи", "", () => SetPaused(!_watcher.Paused));
+        menu.Items.Add(PanelWindow.Entry(UiText.T("Открыть историю"), "\uE77F", OpenFromTray, "Win+V"));
+        _pauseItem = PanelWindow.Entry(UiText.T("Пауза записи"), "", () => SetPaused(!_watcher.Paused));
         menu.Items.Add(_pauseItem);
         menu.Items.Add(new Separator());
-        _autostartItem = PanelWindow.Entry("Запускать вместе с Windows", "", () => SetAutostart(!IsAutostart()));
+        _autostartItem = PanelWindow.Entry(UiText.T("Запускать вместе с Windows"), "", () => SetAutostart(!IsAutostart()));
         menu.Items.Add(_autostartItem);
-        menu.Items.Add(PanelWindow.Entry("Настройки", "\uE713", () => { OpenFromTray(); _panel.OpenSettings(); }));
+        menu.Items.Add(PanelWindow.Entry(UiText.T("Настройки"), "\uE713", () => { OpenFromTray(); _panel.OpenSettings(); }));
         menu.Items.Add(new Separator());
-        menu.Items.Add(PanelWindow.Entry("Очистить историю…", "\uE74D", () => { OpenFromTray(); _panel.AskClear(); }));
-        menu.Items.Add(PanelWindow.Entry("Перезапустить", "\uE72C", Restart));
-        menu.Items.Add(PanelWindow.Entry("Выход", "\uE7E8", Shutdown));
+        menu.Items.Add(PanelWindow.Entry(UiText.T("Очистить историю…"), "\uE74D", () => { OpenFromTray(); _panel.AskClear(); }));
+        menu.Items.Add(PanelWindow.Entry(UiText.T("Перезапустить"), "\uE72C", Restart));
+        menu.Items.Add(PanelWindow.Entry(UiText.T("Выход"), "\uE7E8", Shutdown));
         Motion.AnimateOpen(menu, 8); // меню трея открывается над значком — выезжает вверх
         UpdateTrayStatus();
         return menu;
@@ -691,7 +715,7 @@ public partial class App : Application
     void UpdateTrayStatus()
     {
         bool paused = _watcher.Paused;
-        _trayStatus.Text = paused ? "Запись на паузе" : "Запись идёт";
+        _trayStatus.Text = paused ? UiText.T("Запись на паузе") : UiText.T("Запись идёт");
         _pauseItem.IsChecked = paused;
     }
 
@@ -700,7 +724,7 @@ public partial class App : Application
     {
         _watcher.Paused = paused;
         _tray.Icon = paused ? PausedTrayIcon() : CreateTrayIcon();
-        _tray.Text = paused ? "ArkCopyBuffer: запись на паузе" : "ArkCopyBuffer: Win+V";
+        _tray.Text = paused ? UiText.T("ArkCopyBuffer: запись на паузе") : "ArkCopyBuffer: Win+V";
         UpdateTrayStatus();
         _panel.SetPaused(paused);
     }

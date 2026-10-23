@@ -77,7 +77,7 @@ partial class PanelWindow
         if (!_collectingMerge || _mergeWindow != null || !MatchesKind(item, "text") || !_store.Items.Contains(item)) return;
         if (!_mergeParts.Remove(item))
         {
-            if (_mergeParts.Count >= 50) { ShowInfo(InfoKind.Caution, "Выбрано 50 текстов", "Завершите это объединение, затем можно собрать следующее."); return; }
+            if (_mergeParts.Count >= 50) { ShowInfo(InfoKind.Caution, UiText.T("Выбрано 50 текстов"), UiText.T("Завершите это объединение, затем можно собрать следующее.")); return; }
             _mergeParts.Add(item);
         }
         if (!_mergeTextFilter)
@@ -100,14 +100,14 @@ partial class PanelWindow
         if (!_mergeTextFilter) return;
         SeriesBar.Visibility = Visibility.Visible; KeyHints.Visibility = Visibility.Collapsed;
         SeriesQueue.Visibility = SeriesNext.Visibility = Visibility.Collapsed;
-        SeriesStatus.Text = $"Выбрано текстов: {_mergeParts.Count}";
-        SeriesHint.Text = "Клик — выбрать или снять отметку. Ctrl+Enter — объединить. Esc — отменить.";
-        SeriesAll.Content = $"Объединить · {_mergeParts.Count}";
-        SeriesAll.ToolTip = "Открыть окно объединения текстов (Ctrl+Enter). Успешное объединение завершит выбор.";
+        SeriesStatus.Text = UiText.F($"Выбрано текстов: {_mergeParts.Count}");
+        SeriesHint.Text = UiText.T("Клик — выбрать или снять отметку. Ctrl+Enter — объединить. Esc — отменить.");
+        SeriesAll.Content = UiText.F($"Объединить · {_mergeParts.Count}");
+        SeriesAll.ToolTip = UiText.T("Открыть окно объединения текстов (Ctrl+Enter). Успешное объединение завершит выбор.");
         SeriesAll.IsEnabled = _mergeParts.Count >= 2 && _mergeWindow == null;
         Grid.SetColumn(SeriesAll, 0); Grid.SetColumnSpan(SeriesAll, 2); SeriesAll.Margin = new Thickness(0);
-        System.Windows.Automation.AutomationProperties.SetName(SeriesAll, "Объединить выбранные тексты");
-        System.Windows.Automation.AutomationProperties.SetName(SeriesClear, "Отменить выбор текстов");
+        System.Windows.Automation.AutomationProperties.SetName(SeriesAll, UiText.T("Объединить выбранные тексты"));
+        System.Windows.Automation.AutomationProperties.SetName(SeriesClear, UiText.T("Отменить выбор текстов"));
     }
     void SyncMergeSelection()
     {
@@ -215,7 +215,7 @@ partial class PanelWindow
     void CompleteMergeSelection()
     {
         FinishMergeSelection(open: false);
-        ShowInfo(InfoKind.Success, "Тексты объединены", "Результат в истории и буфере обмена.");
+        ShowInfo(InfoKind.Success, UiText.T("Тексты объединены"), UiText.T("Результат в истории и буфере обмена."));
     }
 
     internal static void SelfTestMergeSelection(string directory, Action<bool, string> check)
@@ -314,7 +314,7 @@ partial class PanelWindow
             check(scroll.VerticalOffset > 0 && Math.Abs(card.TranslatePoint(new Point(), scroll).Y - top) < 2,
                 "выбор текста: первая отметка и фильтрация сохраняют позицию карточки при прокрутке");
             panel.ReleaseMergeAlt();
-            check(panel._mergeTextFilter && panel.SeriesAll.Content?.ToString() == "Объединить · 1" && !panel.SeriesAll.IsEnabled,
+            check(panel._mergeTextFilter && panel.SeriesAll.Content?.ToString() == UiText.F($"Объединить · {1}") && !panel.SeriesAll.IsEnabled,
                 "выбор текста: отпускание Alt сохраняет выбор и явную кнопку объединения");
             check(panel.HandleImageSelectionMouseDown(second, ModifierKeys.None) && panel._mergeParts.SequenceEqual([first, second]) && panel.SeriesAll.IsEnabled,
                 "выбор текста: обычный клик после первой отметки выбирает следующий текст");

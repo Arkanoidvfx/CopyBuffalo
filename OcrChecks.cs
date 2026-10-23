@@ -50,7 +50,7 @@ static class OcrChecks
         check(image.Working && !JsonSerializer.Serialize(image).Contains("Recognizing"), "OCR: индикатор работает, состояние обработки не хранится на диске");
         var store = new HistoryStore(Path.Combine(dir,"ocr-menu","history.dat"));
         var panel = new PanelWindow(store,new SymbolCatalog(Path.Combine(dir,"ocr-symbols.json")));
-        check(!panel.OcrEntry(image).IsEnabled && panel.OcrEntry(image).Header?.ToString() == "Распознаётся текст…", "OCR: повторный запуск на обрабатываемой карточке недоступен");
+        check(!panel.OcrEntry(image).IsEnabled && panel.OcrEntry(image).Header?.ToString() == UiText.T("Распознаётся текст…"), "OCR: повторный запуск на обрабатываемой карточке недоступен");
         check(!panel.TranslateImageEntry(image).IsEnabled, "Перевод: повторный запуск во время обработки недоступен");
         image.Recognizing=false;
         int invoked=0;

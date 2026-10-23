@@ -419,11 +419,11 @@ static class UnrealGraph
             return button;
         }
         var tools = new StackPanel { Orientation = Orientation.Horizontal };
-        tools.Children.Add(Tool("\uE738", "Уменьшить (Ctrl+−)", () => ZoomAt(zoom.ScaleX / 1.25, Center(), true)));
-        tools.Children.Add(Tool(percent, "Масштаб 100 %", () => ZoomAt(1, Center(), true)));
-        tools.Children.Add(Tool("\uE710", "Увеличить (Ctrl++)", () => ZoomAt(zoom.ScaleX * 1.25, Center(), true)));
+        tools.Children.Add(Tool("\uE738", UiText.T("Уменьшить (Ctrl+−)"), () => ZoomAt(zoom.ScaleX / 1.25, Center(), true)));
+        tools.Children.Add(Tool(percent, UiText.T("Масштаб 100 %"), () => ZoomAt(1, Center(), true)));
+        tools.Children.Add(Tool("\uE710", UiText.T("Увеличить (Ctrl++)"), () => ZoomAt(zoom.ScaleX * 1.25, Center(), true)));
         tools.Children.Add(new Border { Width = 1, Height = 20, Margin = new Thickness(4, 0, 4, 0), Background = Brush(58, 58, 58) });
-        tools.Children.Add(Tool("\uE9A6", "Вписать в окно (Ctrl+0)", () => Fit(true)));
+        tools.Children.Add(Tool("\uE9A6", UiText.T("Вписать в окно (Ctrl+0)"), () => Fit(true)));
         var toolbar = new Border
         {
             Child = tools, Padding = new Thickness(4), CornerRadius = new CornerRadius(8), Margin = new Thickness(16),
@@ -433,7 +433,7 @@ static class UnrealGraph
         };
         var hints = new StackPanel { Orientation = Orientation.Horizontal, Margin = new Thickness(16, 0, 0, 24), Opacity = 0.8,
             HorizontalAlignment = HorizontalAlignment.Left, VerticalAlignment = VerticalAlignment.Bottom, IsHitTestVisible = false };
-        foreach (var hint in new[] { "Колесо: масштаб", "Перетаскивание: сдвиг", "Esc: закрыть" })
+        foreach (var hint in new[] { UiText.T("Колесо: масштаб"), UiText.T("Перетаскивание: сдвиг"), UiText.T("Esc: закрыть") })
             hints.Children.Add(new TextBlock { Text = hint, Foreground = Subtle, FontSize = 12, Margin = new Thickness(0, 0, 16, 0) });
         var layout = new System.Windows.Controls.Grid(); // Grid — имя поля-кисти в этом классе
         layout.Children.Add(viewport);

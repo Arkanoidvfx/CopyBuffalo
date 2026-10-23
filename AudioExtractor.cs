@@ -19,12 +19,12 @@ static class AudioExtractor
         return doc.RootElement.GetProperty("streams").EnumerateArray().Select((s, n) =>
         {
             string codec = s.TryGetProperty("codec_name", out var c) ? c.GetString() ?? "unknown" : "unknown";
-            var parts = new List<string> { $"Дорожка {n + 1}" };
+            var parts = new List<string> { UiText.F($"Дорожка {n + 1}") };
             if (s.TryGetProperty("tags", out var tags))
                 foreach (var key in new[] { "language", "title" })
                     if (tags.TryGetProperty(key, out var tag) && !string.IsNullOrWhiteSpace(tag.GetString())) parts.Add(tag.GetString()!);
             parts.Add(codec.ToUpperInvariant());
-            if (s.TryGetProperty("channels", out var channels)) parts.Add($"{channels.GetInt32()} кан.");
+            if (s.TryGetProperty("channels", out var channels)) parts.Add(UiText.F($"{channels.GetInt32()} кан."));
             return new Track(s.GetProperty("index").GetInt32(), codec, string.Join(" · ", parts));
         }).ToArray();
     }
@@ -40,7 +40,7 @@ static class AudioExtractor
     internal static async Task ExtractFileAsync(string source, string output, Track track, CancellationToken cancel)
     {
         if (track.Index < 0) throw new ArgumentOutOfRangeException(nameof(track));
-        if (File.Exists(output)) throw new IOException("Выходной файл уже существует.");
+        if (File.Exists(output)) throw new IOException(UiText.T("Выходной файл уже существует."));
         try
         {
             await RunAsync("ffmpeg", ["-hide_banner", "-loglevel", "error", "-nostdin", "-n", "-i", source,
@@ -60,14 +60,14 @@ static class AudioExtractor
             {
                 cancel.ThrowIfCancellationRequested();
                 var size = new FileInfo(output).Length;
-                if (size == 0) throw new InvalidOperationException("Звуковая дорожка пуста.");
-                if (size > maxBytes) throw new InvalidOperationException("Аудиофайл превышает лимит файлов в настройках хранения.");
+                if (size == 0) throw new InvalidOperationException(UiText.T("Звуковая дорожка пуста."));
+                if (size > maxBytes) throw new InvalidOperationException(UiText.T("Аудиофайл превышает лимит файлов в настройках хранения."));
                 var bytes = File.ReadAllBytes(output);
                 var hash = Convert.ToHexString(SHA256.HashData(bytes));
                 ImageFiles.WriteMedia(imagesDir, hash, bytes, null);
                 var name = Path.GetFileNameWithoutExtension(source);
                 if (name.Length > 180) name = name[..180];
-                return new Result(hash, $"{name} — дорожка {track.Index}{Extension(track.Codec)}", size);
+                return new Result(hash, UiText.F($"{name} — дорожка {track.Index}{Extension(track.Codec)}"), size);
             }, cancel);
         }
         finally { try { File.Delete(output); } catch { } }
@@ -83,7 +83,7 @@ static class AudioExtractor
         foreach (var arg in args) start.ArgumentList.Add(arg);
         using var process = new Process { StartInfo = start };
         try { process.Start(); }
-        catch (Win32Exception ex) { throw new InvalidOperationException($"Не найден {tool}. Установите FFmpeg (ffmpeg и ffprobe) в PATH или рядом с ArkCopyBuffer.exe.", ex); }
+        catch (Win32Exception ex) { throw new InvalidOperationException(UiText.F($"Не найден {tool}. Установите FFmpeg (ffmpeg и ffprobe) в PATH или рядом с ArkCopyBuffer.exe."), ex); }
         using var timeout = CancellationTokenSource.CreateLinkedTokenSource(cancel);
         timeout.CancelAfter(TimeSpan.FromMinutes(2));
         using var registration = timeout.Token.Register(() => { try { process.Kill(entireProcessTree: true); } catch { } });
@@ -91,10 +91,10 @@ static class AudioExtractor
         var stderr = process.StandardError.ReadToEndAsync();
         try { await process.WaitForExitAsync(timeout.Token); timeout.Token.ThrowIfCancellationRequested(); }
         catch (OperationCanceledException) when (!cancel.IsCancellationRequested)
-        { throw new TimeoutException("FFmpeg не завершил обработку за 2 минуты."); }
+        { throw new TimeoutException(UiText.T("FFmpeg не завершил обработку за 2 минуты.")); }
         var error = await stderr;
         if (process.ExitCode != 0) throw new InvalidOperationException(string.IsNullOrWhiteSpace(error)
-            ? $"{tool}: ошибка обработки (код 0x{process.ExitCode:X8})." : error.Trim());
+            ? UiText.F($"{tool}: ошибка обработки (код 0x{process.ExitCode:X8}).") : error.Trim());
         return await stdout;
     }
 

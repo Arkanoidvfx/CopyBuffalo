@@ -1,6 +1,6 @@
 # Local OCR
 
-Use **Распознать текст** (Recognize text) on an image to save its text as a new history entry. The original image stays in history. OCR runs locally on the CPU; it does not need the optional AI package.
+Use **Recognize text** on an image to save its text as a new history entry. The original image stays in history. OCR runs locally on the CPU; it does not need the optional AI package.
 
 The worker uses [pure-onnx-ocr 0.3.1](https://github.com/siska-tech/pure-onnx-ocr/tree/59a6c2c33c72e4dc8e7e5500f544d6674b0e6643), PaddlePaddle's Cyrillic PP-OCRv5 mobile recognizer, and PP-OCRv5 mobile detector. `tools/ocr/Build-Ocr.ps1` pins revisions and SHA-256 hashes; `Cargo.lock` pins Rust dependencies. Licenses are included in the generated bundle.
 

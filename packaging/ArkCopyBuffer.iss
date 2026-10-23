@@ -1,5 +1,5 @@
 #ifndef AppVersion
-  #define AppVersion "0.2.0"
+  #define AppVersion "0.2.1"
 #endif
 
 [Setup]
@@ -33,8 +33,26 @@ RestartApplications=no
 WizardStyle=modern
 
 [Languages]
-Name: "russian"; MessagesFile: "compiler:Languages\Russian.isl"
 Name: "english"; MessagesFile: "compiler:Default.isl"
+Name: "russian"; MessagesFile: "compiler:Languages\Russian.isl"
+
+[CustomMessages]
+english.FullInstall=Full installation
+russian.FullInstall=Полная установка
+english.CustomInstall=Choose components
+russian.CustomInstall=Выбор компонентов
+english.CoreComponent=Clipboard history, OCR, and media tools
+russian.CoreComponent=История буфера, OCR и работа с медиа
+english.AiComponent=Local AI: model and CPU/NVIDIA runtime
+russian.AiComponent=Сжатие промптов: модель и CPU/NVIDIA-сервер
+english.DesktopShortcut=Create a desktop shortcut
+russian.DesktopShortcut=Создать ярлык на рабочем столе
+english.Autostart=Start with Windows
+russian.Autostart=Запускать вместе с Windows
+english.Launch=Launch ArkCopyBuffer
+russian.Launch=Запустить ArkCopyBuffer
+english.UnsupportedSystem=Only Windows 10 and Windows 11 (Intel/AMD x64) are supported.
+russian.UnsupportedSystem=Поддерживаются только Windows 10 и Windows 11 (Intel/AMD x64).
 
 [Files]
 Source: "{#StageDir}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
@@ -43,17 +61,17 @@ Source: "{#AiDir}\*"; DestDir: "{app}\ai"; Excludes: "models\*"; Components: ai;
 Source: "{#AiDir}\models\*.gguf"; DestDir: "{app}\ai\models"; Components: ai; Flags: ignoreversion nocompression
 
 [Types]
-Name: "full"; Description: "Полная установка"
-Name: "custom"; Description: "Выбор компонентов"; Flags: iscustom
+Name: "full"; Description: "{cm:FullInstall}"
+Name: "custom"; Description: "{cm:CustomInstall}"; Flags: iscustom
 
 [Components]
-Name: "core"; Description: "История буфера и извлечение звука"; Types: full custom; Flags: fixed
-Name: "ai"; Description: "Сжатие промптов: модель и CPU/NVIDIA-сервер"; Types: full custom
+Name: "core"; Description: "{cm:CoreComponent}"; Types: full custom; Flags: fixed
+Name: "ai"; Description: "{cm:AiComponent}"; Types: full custom
 #endif
 
 [Tasks]
-Name: "desktopicon"; Description: "Создать ярлык на рабочем столе"
-Name: "autostart"; Description: "Запускать вместе с Windows"
+Name: "desktopicon"; Description: "{cm:DesktopShortcut}"
+Name: "autostart"; Description: "{cm:Autostart}"
 
 [Icons]
 Name: "{userprograms}\ArkCopyBuffer"; Filename: "{app}\ArkCopyBuffer.exe"; WorkingDir: "{app}"; Check: not IsUpdate
@@ -63,7 +81,7 @@ Name: "{userdesktop}\ArkCopyBuffer"; Filename: "{app}\ArkCopyBuffer.exe"; Workin
 Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; ValueType: string; ValueName: "ArkCopyBuffer"; ValueData: """{app}\ArkCopyBuffer.exe"""; Tasks: autostart; Check: not IsUpdate
 
 [Run]
-Filename: "{app}\ArkCopyBuffer.exe"; Description: "Запустить ArkCopyBuffer"; Flags: nowait postinstall skipifsilent
+Filename: "{app}\ArkCopyBuffer.exe"; Description: "{cm:Launch}"; Flags: nowait postinstall skipifsilent
 
 [Code]
 function IsUpdate(): Boolean;
@@ -78,7 +96,7 @@ begin
   GetWindowsVersionEx(V);
   Result := V.ProductType = 1;
   if not Result then
-    MsgBox('Поддерживаются только Windows 10 и Windows 11 (Intel/AMD x64).', mbError, MB_OK);
+    MsgBox(CustomMessage('UnsupportedSystem'), mbError, MB_OK);
 end;
 
 procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);

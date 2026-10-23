@@ -67,8 +67,8 @@ partial class PanelWindow
 
     void SetDragVisualStatus(bool replace, bool move, bool choose = false)
     {
-        DragGhostStatus.Text = replace ? "Отпустите — заменить" : move ? "Отпустите — переместить"
-            : choose ? "Перетащите на нужное значение" : "Наведите на карточку";
+        DragGhostStatus.Text = replace ? UiText.T("Отпустите — заменить") : move ? UiText.T("Отпустите — переместить")
+            : choose ? UiText.T("Перетащите на нужное значение") : UiText.T("Наведите на карточку");
         DragGhostGlyph.Text = replace ? "\uE710" : move ? "\uE8AB" : choose ? "\uE70F" : "\uE7C3";
     }
 
@@ -231,11 +231,11 @@ partial class PanelWindow
             "drag performance: editing the target invalidates the cache; unchanged positive previews are reused");
         check(!ReferenceEquals(changed, ValueChanges(plain, @"D:\other.mp4")), "drag performance: changing the source path invalidates cached substitutions");
         SetDragVisualStatus(true, false);
-        check(DragGhostStatus.Text == "Отпустите — заменить", "подсказка показывает замену значения");
+        check(DragGhostStatus.Text == UiText.T("Отпустите — заменить"), "подсказка показывает замену значения");
         SetDragVisualStatus(false, true);
-        check(DragGhostStatus.Text == "Отпустите — переместить", "подсказка отличает перестановку от замены");
+        check(DragGhostStatus.Text == UiText.T("Отпустите — переместить"), "подсказка отличает перестановку от замены");
         SetDragVisualStatus(false, false, true);
-        check(DragGhostStatus.Text == "Перетащите на нужное значение", "неоднозначная цель предлагает точный выбор");
+        check(DragGhostStatus.Text == UiText.T("Перетащите на нужное значение"), "неоднозначная цель предлагает точный выбор");
         var lifted = new ListBoxItem { Opacity = 0.38 };
         _liftedCard = lifted;
         _mergingDrag = true;

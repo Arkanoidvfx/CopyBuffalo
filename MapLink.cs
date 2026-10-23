@@ -28,7 +28,7 @@ internal static class MapLink
         var parts = uri.AbsolutePath.Split('/', StringSplitOptions.RemoveEmptyEntries);
         if (google && (parts.Length == 0 || parts[0] != "maps") && host != "maps.google.com") return false;
         if (yandex && (parts.Length == 0 || parts[0] != "maps")) return false;
-        title = google ? "Google Карты" : "Яндекс Карты";
+        title = google ? UiText.T("Google Карты") : UiText.T("Яндекс Карты");
         int action = google && host != "maps.google.com" ? 1 : google ? 0 : 1;
         string Get(string key)
         {
@@ -51,9 +51,9 @@ internal static class MapLink
                 var to = Get("destination");
                 if (from.Length == 0 && stops.Length > 0) from = stops[0];
                 if (to.Length == 0 && stops.Length > 1) to = stops[^1];
-                title += " · маршрут";
+                title += UiText.T(" · маршрут");
                 detail = from.Length > 0 && to.Length > 0 ? $"{from} → {to}"
-                    : to.Length > 0 ? $"До {to}" : from.Length > 0 ? $"От {from}" : "Маршрут";
+                    : to.Length > 0 ? UiText.F($"До {to}") : from.Length > 0 ? UiText.F($"От {from}") : UiText.T("Маршрут");
                 return true;
             }
             if (parts.Length > action + 1 && parts[action] is "place" or "search")
@@ -66,11 +66,11 @@ internal static class MapLink
             var route = Get("rtext").Split('~');
             if (route.Length >= 2 && route.Any(p => p.Length > 0))
             {
-                title += " · маршрут";
+                title += UiText.T(" · маршрут");
                 var from = Clean(route[0]);
                 var to = Clean(route[^1]);
                 detail = from.Length > 0 && to.Length > 0 ? $"{from} → {to}"
-                    : to.Length > 0 ? $"До {to}" : $"От {from}";
+                    : to.Length > 0 ? UiText.F($"До {to}") : UiText.F($"От {from}");
                 return true;
             }
             int place = Array.FindIndex(parts, action, p => p is "org" or "geo");
@@ -79,8 +79,8 @@ internal static class MapLink
             if (detail.Length == 0) detail = Get("text");
             if (detail.Length == 0) detail = Get("whatshere[point]");
         }
-        title += detail.Length > 0 ? " · место" : "";
-        if (detail.Length == 0) detail = "Карта";
+        title += detail.Length > 0 ? UiText.T(" · место") : "";
+        if (detail.Length == 0) detail = UiText.T("Карта");
         return true;
     }
 

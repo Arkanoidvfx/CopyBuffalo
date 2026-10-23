@@ -126,20 +126,20 @@ partial class PanelWindow
         if (!SeriesActive) return;
         SeriesNext.Visibility = Visibility.Visible;
         Grid.SetColumn(SeriesAll, 1); Grid.SetColumnSpan(SeriesAll, 1); SeriesAll.Margin = new Thickness(4, 0, 0, 0);
-        AutomationProperties.SetName(SeriesClear, "Отменить выбор картинок и видео");
-        SeriesAll.ToolTip = "Вставить картинки и видео одной пачкой по порядку (Ctrl+Enter). Успешная вставка всей очереди завершит выбор.";
+        AutomationProperties.SetName(SeriesClear, UiText.T("Отменить выбор картинок и видео"));
+        SeriesAll.ToolTip = UiText.T("Вставить картинки и видео одной пачкой по порядку (Ctrl+Enter). Успешная вставка всей очереди завершит выбор.");
         for (int i = 0; i < _seriesQueue.Count; i++) _seriesQueue[i].SeriesNumber = i + 1;
         int done = _seriesQueue.Count(i => i.SeriesInserted);
         var next = NextSeriesItem;
-        SeriesStatus.Text = done == 0 ? $"Выбрано: {_seriesQueue.Count}" : $"Вставлено {done} из {_seriesQueue.Count}";
-        SeriesHint.Text = "Клик — выбрать или снять отметку. Ctrl+Enter — вставить все. Esc — отменить.";
+        SeriesStatus.Text = done == 0 ? UiText.F($"Выбрано: {_seriesQueue.Count}") : UiText.F($"Вставлено {done} из {_seriesQueue.Count}");
+        SeriesHint.Text = UiText.T("Клик — выбрать или снять отметку. Ctrl+Enter — вставить все. Esc — отменить.");
         SeriesQueue.Visibility = _seriesQueue.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
-        SeriesNext.Content = next != null ? $"Следующая · {done + 1}/{_seriesQueue.Count}" : "Следующая";
+        SeriesNext.Content = next != null ? UiText.F($"Следующая · {done + 1}/{_seriesQueue.Count}") : UiText.T("Следующая");
         SeriesNext.IsEnabled = next != null && _seriesPending == null;
-        SeriesAll.Content = _seriesPending != null ? "Вставляем…" : $"Вставить все · {_seriesQueue.Count - done}";
+        SeriesAll.Content = _seriesPending != null ? UiText.T("Вставляем…") : UiText.F($"Вставить все · {_seriesQueue.Count - done}");
         SeriesAll.IsEnabled = SeriesNext.IsEnabled;
-        AutomationProperties.SetName(SeriesNext, "Вставить следующий файл: " + SeriesNext.Content);
-        AutomationProperties.SetName(SeriesAll, "Вставить все оставшиеся картинки и видео: " + (_seriesQueue.Count - done));
+        AutomationProperties.SetName(SeriesNext, UiText.T("Вставить следующий файл: ") + SeriesNext.Content);
+        AutomationProperties.SetName(SeriesAll, UiText.T("Вставить все оставшиеся картинки и видео: ") + (_seriesQueue.Count - done));
     }
 
     void SyncImageSeries()
@@ -271,8 +271,8 @@ partial class PanelWindow
         _seriesDragItem = null;
         _dragging = true; CancelZoom(); StopGif();
         BeginDragVisual(SeriesQueue, item);
-        DragGhostText.Text = $"Файл {item.SeriesNumber}";
-        DragGhostStatus.Text = "Перетащите между миниатюрами";
+        DragGhostText.Text = UiText.F($"Файл {item.SeriesNumber}");
+        DragGhostStatus.Text = UiText.T("Перетащите между миниатюрами");
         try { DragDrop.DoDragDrop(SeriesQueue, new DataObject(SeriesDragFormat, item), DragDropEffects.Move); }
         finally { ClearSeriesDrop(); _dragging = false; EndDragVisual(); }
     }

@@ -64,14 +64,14 @@ partial class PanelWindow
         {
             _vfxWindow?.Hide();
             if (!VfxEnabled) VfxPreview.Frame = null;
-            VfxStatus.Text = VfxEnabled ? "Готов к показу" : "Выключен";
+            VfxStatus.Text = VfxEnabled ? UiText.T("Готов к показу") : UiText.T("Выключен");
             return;
         }
         try
         {
             if (_vfxFrames == null)
             {
-                VfxStatus.Text = "Загрузка эффекта…";
+                VfxStatus.Text = UiText.T("Загрузка эффекта…");
                 var frames = await NetherBorder.Frames.Value;
                 if (version != _vfxVersion || !_vfxReady || !IsVisible || !VfxEnabled) return;
                 _vfxFrames = frames;
@@ -87,14 +87,14 @@ partial class PanelWindow
             _vfxWindow.Align(this);
             if (Animations) _vfxTimer.Start();
             else _vfxClock.Stop();
-            VfxStatus.Text = Animations ? "Включён · 64 кадра · только по краям" : "Статичная рамка · анимация окна выключена";
+            VfxStatus.Text = Animations ? UiText.T("Включён · 64 кадра · только по краям") : UiText.T("Статичная рамка · анимация окна выключена");
         }
         catch (Exception ex)
         {
             App.Log(ex);
             if (version != _vfxVersion || !_vfxReady) return;
             _vfxWindow?.Hide();
-            VfxStatus.Text = "Не удалось загрузить эффект. Попробуйте перезапустить приложение.";
+            VfxStatus.Text = UiText.T("Не удалось загрузить эффект. Попробуйте перезапустить приложение.");
             VfxStatus.SetResourceReference(ForegroundProperty, "CriticalText");
         }
     }
@@ -250,7 +250,7 @@ partial class PanelWindow
             panel.VfxOpacity = -1; panel.VfxSpeed = 999;
             check(panel.VfxOpacity == 10 && panel.VfxSpeed == 200 && changed == 2, "VFX: settings clamp persisted values and notify persistence");
             panel.VfxEnabled = false;
-            check(panel.VfxPreview.Frame == null && panel.VfxStatus.Text == "Выключен", "VFX: disabling removes the preview immediately");
+            check(panel.VfxPreview.Frame == null && panel.VfxStatus.Text == UiText.T("Выключен"), "VFX: disabling removes the preview immediately");
             panel._vfxTimer.Start(); panel._vfxClock.Start(); panel.RefreshVfx();
             check(!panel._vfxTimer.IsEnabled && !panel._vfxClock.IsRunning && panel._vfxWindow == null,
                 "VFX: hidden panels stop playback and do not create an overlay");

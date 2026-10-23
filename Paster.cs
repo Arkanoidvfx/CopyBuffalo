@@ -31,7 +31,7 @@ static class Paster
         {
             await Task.Run(() =>
             {
-                if (!Directory.Exists(item.Text)) throw new DirectoryNotFoundException("Исходная папка недоступна.");
+                if (!Directory.Exists(item.Text)) throw new DirectoryNotFoundException(UiText.T("Исходная папка недоступна."));
             });
             files = ([item.Text], null);
         }
@@ -79,7 +79,7 @@ static class Paster
     internal static string[] PrepareImageSeries(IReadOnlyList<ClipItem> items, string imagesDir)
     {
         if (items.Count == 0 || items.Any(i => !i.IsVisualMedia) || items.Select(i => i.Id).Distinct().Count() != items.Count)
-            throw new InvalidDataException("Выберите разные картинки или видео для вставки.");
+            throw new InvalidDataException(UiText.T("Выберите разные картинки или видео для вставки."));
         var dir = Path.Combine(GifTempDir, "series-" + Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(dir);
         try
@@ -90,12 +90,12 @@ static class Paster
             {
                 string extension = items[i].IsImage ? items[i].IsGif ? ".gif" : ".png" : Path.GetExtension(items[i].FileName ?? "");
                 if (extension.Length is < 2 or > 16 || !extension.Skip(1).All(char.IsAsciiLetterOrDigit))
-                    throw new InvalidDataException("У видео отсутствует или повреждено расширение файла.");
+                    throw new InvalidDataException(UiText.T("У видео отсутствует или повреждено расширение файла."));
                 var bytes = ImageFiles.ReadFull(imagesDir, items[i].ImageHash!);
                 try
                 {
                     if (drive.AvailableFreeSpace < bytes.LongLength + 64L * 1024 * 1024)
-                        throw new IOException("На диске временных файлов недостаточно места для картинок и видео.");
+                        throw new IOException(UiText.T("На диске временных файлов недостаточно места для картинок и видео."));
                     paths[i] = Path.Combine(dir, $"{i + 1:D4}{extension}");
                     File.WriteAllBytes(paths[i], bytes);
                 }
@@ -135,7 +135,7 @@ static class Paster
         try
         {
             var name = Path.GetFileName(Path.TrimEndingDirectorySeparator(source));
-            if (name.Length == 0) name = "Папка";
+            if (name.Length == 0) name = UiText.T("Папка");
             if (name.Length > 240) name = name[..240];
             var zip = FolderArchive.Create(source, Path.Combine(dir, name + ".zip"), cancel, progress);
             Directory.SetLastWriteTimeUtc(dir, DateTime.UtcNow);

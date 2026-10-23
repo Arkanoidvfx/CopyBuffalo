@@ -23,10 +23,16 @@ The OCR build downloads pinned sources and models and requires the Rust toolchai
 
 ```powershell
 .\publish\ArkCopyBuffer.exe --selftest
+.\publish\ArkCopyBuffer.exe --selftest .tmp\checks-en en
+.\publish\ArkCopyBuffer.exe --selftest .tmp\checks-ru ru
+.\publish\ArkCopyBuffer.exe --localization-selftest .tmp\locale-en en
+.\publish\ArkCopyBuffer.exe --localization-selftest .tmp\locale-ru ru
 pwsh -NoProfile -File packaging/Test-Updater.ps1 -App .\publish\ArkCopyBuffer.exe
 ```
 
 Self-tests write a log under `%LOCALAPPDATA%\ArkCopyBuffer\selftest.log` and use synthetic fixtures. Run them outside an active gaming session: some checks exercise native window lifecycle and rendering. Do not use real clipboard history as test data.
+
+The optional directory and language arguments isolate self-test output and select the language before application resources load. Localization checks render the panel, settings, editor, and merge window offscreen and verify both catalogs, placeholders, language selection, and synthetic history. They do not show windows or use the real clipboard.
 
 After packaging, `packaging/Test-Distribution.ps1` checks the staged bundle without relying on system .NET or FFmpeg. Some distribution checks exercise local AI; check available GPU memory before running them alongside other GPU work.
 
@@ -57,6 +63,8 @@ For GitHub, `packaging/Prepare-GitHubRelease.ps1` splits the full installer into
 Validation for v0.2.0 included 489 synthetic checks, distribution dependency checks, helper failure/tamper checks, and an isolated end-to-end download/install/restart with exact history/settings comparisons. That does not cover every physical PC or interrupted power supply.
 
 ## UI conventions
+
+English is the default. Settings → View offers English and Russian; the saved `Language` preference applies on restart. `Strings.resx` is English and `Strings.ru.resx` is Russian. `UiText.T` resolves a source string; `UiText.F` formats a translated `FormattableString`; XAML uses `Loc`. Keys are `S` plus the first 16 uppercase SHA-256 hex characters of the source after normalizing line endings to LF. Keep both resource catalogs and their format arguments in sync. User content, stored group names, OCR character tables, and model examples are not UI translations.
 
 Use the shared `TextFont` / `MonoFont` resources; see [Typography](typography.md). Side menus and previews use `SidePlacements` to respect monitor work areas and DPI. Keep window activation and clipboard writes out of background work.
 

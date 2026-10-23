@@ -24,8 +24,8 @@ sealed class MergeSlot : INotifyPropertyChanged
     public int Number { get; }
     public MergePart? Path { get; internal set; }
     public string Heading => $"{Owner.Number}. {Owner.Title}";
-    public string Label => $"Слот {Number} · {(Range.Length == 0 ? "пустые кавычки" : Range.Label)}";
-    public string Value => Path?.Text ?? "Перетащите сюда путь";
+    public string Label => UiText.F($"Слот {Number} · {(Range.Length == 0 ? UiText.T("пустые кавычки") : Range.Label)}");
+    public string Value => Path?.Text ?? UiText.T("Перетащите сюда путь");
     public bool Assigned => Path != null;
     public MergeSlot(MergePart owner, TextSubstitution.Change range, int number) => (Owner, Range, Number) = (owner, range, number);
     public event PropertyChangedEventHandler? PropertyChanged;
@@ -71,7 +71,7 @@ sealed class TextMerge
         var slots = Slots.OrderBy(s => Parts.IndexOf(s.Owner)).ThenBy(s => s.Range.Start).ToArray();
         int count = Math.Min(paths.Length, slots.Length);
         for (int i = 0; i < count; i++)
-            if (!CanAssign(paths[i], slots[i])) throw new InvalidOperationException($"Путь {i + 1} не подходит к слоту {i + 1}. Назначьте его вручную или оставьте строкой.");
+            if (!CanAssign(paths[i], slots[i])) throw new InvalidOperationException(UiText.F($"Путь {i + 1} не подходит к слоту {i + 1}. Назначьте его вручную или оставьте строкой."));
         foreach (var slot in Slots) slot.Path = null;
         for (int i = 0; i < count; i++) slots[i].Path = paths[i];
         Refresh();
@@ -87,7 +87,7 @@ sealed class TextMerge
     public void Assign(MergePart path, MergeSlot slot)
     {
         if (!CanAssign(path, slot))
-            throw new InvalidOperationException("Этот путь не подходит к кавычкам слота. Можно объединить его отдельной строкой.");
+            throw new InvalidOperationException(UiText.T("Этот путь не подходит к кавычкам слота. Можно объединить его отдельной строкой."));
         var old = Slots.FirstOrDefault(s => s.Path == path);
         if (old == slot) return;
         if (old != null) old.Path = slot.Path is { } previous && Replacement(old, previous) != null ? previous : null;
@@ -114,8 +114,8 @@ sealed class TextMerge
         {
             var part = Parts[i]; part.Number = i + 1;
             var assigned = SubstitutePaths ? Slots.FirstOrDefault(s => s.Path == part) : null;
-            part.Detail = assigned != null ? $"Подставлен в текст {Parts.IndexOf(assigned.Owner) + 1}, слот {assigned.Number}"
-                : part.IsPath ? "Путь · перетащите в слот или оставьте строкой" : $"{part.Text.Length:N0} символов · отдельный текст";
+            part.Detail = assigned != null ? UiText.F($"Подставлен в текст {Parts.IndexOf(assigned.Owner) + 1}, слот {assigned.Number}")
+                : part.IsPath ? UiText.T("Путь · перетащите в слот или оставьте строкой") : UiText.F($"{part.Text.Length:N0} символов · отдельный текст");
             part.Refresh();
         }
         foreach (var slot in Slots) slot.Refresh();
@@ -129,7 +129,7 @@ sealed class TextMerge
             string text = part.Text;
             if (SubstitutePaths)
                 foreach (var slot in Slots.Where(s => s.Owner == part && s.Path != null).OrderByDescending(s => s.Range.Start))
-                    text = (Replacement(slot, slot.Path!) ?? throw new InvalidOperationException("Назначение пути больше не подходит к слоту.")).Apply(text);
+                    text = (Replacement(slot, slot.Path!) ?? throw new InvalidOperationException(UiText.T("Назначение пути больше не подходит к слоту."))).Apply(text);
             lines.Add(text.TrimEnd('\r', '\n'));
         }
         return string.Join(Environment.NewLine, lines);

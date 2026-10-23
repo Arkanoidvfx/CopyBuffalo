@@ -12,10 +12,10 @@ static class TranslatedImage
     {
         if (ocr.Width <= 0 || ocr.Height <= 0 || (long)ocr.Width * ocr.Height > Math.Min(maxPixels, 80_000_000)
             || ocr.Regions.Count == 0 || translations.Count != ocr.Regions.Count)
-            throw new ScreenshotOcr.Failure("Не удалось сопоставить перевод с изображением.");
+            throw new ScreenshotOcr.Failure(UiText.T("Не удалось сопоставить перевод с изображением."));
         var decoded = ImageFiles.Decode(image);
         if (decoded.PixelWidth != ocr.Width || decoded.PixelHeight != ocr.Height)
-            throw new ScreenshotOcr.Failure("Размер изображения изменился во время перевода.");
+            throw new ScreenshotOcr.Failure(UiText.T("Размер изображения изменился во время перевода."));
         var source = new FormatConvertedBitmap(decoded, PixelFormats.Bgra32, null, 0);
         int stride = checked(ocr.Width * 4);
         var pixels = new byte[checked(stride * ocr.Height)];
@@ -28,8 +28,8 @@ static class TranslatedImage
             var r = ocr.Regions[i];
             var box = Rect.Intersect(bounds, new Rect(r.X, r.Y, r.Width, r.Height));
             if (box.IsEmpty || box.Width < 1 || box.Height < 1)
-                throw new ScreenshotOcr.Failure("Надпись находится за границами картинки.");
-            if (string.IsNullOrWhiteSpace(translations[i])) throw new ScreenshotOcr.Failure("Перевод надписи пуст.");
+                throw new ScreenshotOcr.Failure(UiText.T("Надпись находится за границами картинки."));
+            if (string.IsNullOrWhiteSpace(translations[i])) throw new ScreenshotOcr.Failure(UiText.T("Перевод надписи пуст."));
             if (translations[i] == r.Text) continue;
             var (background, foreground) = Sample(pixels, stride, box);
             double right = Math.Min(ocr.Width, box.X + box.Width * 1.8);
@@ -45,7 +45,7 @@ static class TranslatedImage
                     App.TextTypeface, size, new SolidColorBrush(foreground), 1) { LineHeight = box.Height };
                 if (text.WidthIncludingTrailingWhitespace <= available && text.Height <= box.Height + .1) break;
                 size -= .5;
-                if (size < minimum) throw new ScreenshotOcr.Failure("Перевод не помещается на картинке без потери читаемости. Выделите меньшую область или увеличьте изображение.");
+                if (size < minimum) throw new ScreenshotOcr.Failure(UiText.T("Перевод не помещается на картинке без потери читаемости. Выделите меньшую область или увеличьте изображение."));
             }
             double width = Math.Max(box.Width, text.WidthIncludingTrailingWhitespace);
             var erase = Rect.Intersect(bounds, new Rect(Math.Floor(box.X - 1), Math.Floor(box.Y - 1),
