@@ -1,0 +1,9 @@
+CopyBuffalo local OCR worker
+pure-onnx-ocr 0.3.1 by Shion Watanabe / siska-tech: Apache-2.0.
+https://github.com/siska-tech/pure-onnx-ocr/tree/59a6c2c33c72e4dc8e7e5500f544d6674b0e6643
+PP-OCRv5 mobile detector and Cyrillic recognizer by PaddlePaddle: Apache-2.0.
+https://huggingface.co/PaddlePaddle/PP-OCRv5_mobile_det_onnx/tree/e6f4fa85f00e168c862bc462aebca69eef9b3d3d
+https://huggingface.co/PaddlePaddle/cyrillic_PP-OCRv5_mobile_rec_onnx/tree/2cef88145434beb8afa9dd82d77d799eb1ad7b29
+Exact Rust dependencies: tools/ocr/Cargo.lock; SPDX notices: dependencies.txt.
+License texts for dependencies are included in their corresponding subdirectories.
+The worker runs locally on CPU and exits after each recognition request.

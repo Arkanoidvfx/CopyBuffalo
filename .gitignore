@@ -6,3 +6,6 @@ publish/
 .tmp/
 .codex-delegate/
 .codex-delegate-enabled
+.cache/
+dist/
+Assets/Ocr/

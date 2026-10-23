@@ -6,14 +6,36 @@
         Цвета — токены Windows 11 (Fluent 2). Кисти с этими ключами создаёт App.ApplyTheme
         под тёмную/светлую тему системы, здесь только стили, которые на них ссылаются.
         Скругления: окно и меню 8, карточки и контролы 4 — как в Win11.
+        Движение (длительности, кривые) — в Motion.cs: анимации запускаются из кода, чтобы их выключала одна настройка.
     -->
     <Application.Resources>
         <FontFamily x:Key="IconFont">Segoe Fluent Icons, Segoe MDL2 Assets</FontFamily>
-        <FontFamily x:Key="TextFont">Segoe UI Variable Text, Segoe UI</FontFamily>
+        <!-- Статические Plex имеют общие метрики Sans/Mono и не зависят от установленных шрифтов. -->
+        <FontFamily x:Key="TextFont">./Assets/Fonts/#IBM Plex Sans, Segoe UI</FontFamily>
+        <FontFamily x:Key="MonoFont">./Assets/Fonts/#IBM Plex Mono, Consolas</FontFamily>
+
+        <Style TargetType="ToolTip">
+            <Setter Property="FontFamily" Value="{StaticResource TextFont}"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="UseLayoutRounding" Value="True"/>
+            <Setter Property="TextOptions.TextFormattingMode" Value="Display"/>
+        </Style>
+
+        <!-- Рамка фокуса с клавиатуры: 2 px, как в Win11 -->
+        <Style x:Key="FocusRing">
+            <Setter Property="Control.Template">
+                <Setter.Value>
+                    <ControlTemplate>
+                        <Rectangle Margin="-2" RadiusX="6" RadiusY="6" Stroke="{DynamicResource TextPrimary}" StrokeThickness="2"/>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
 
         <!-- Иконочная кнопка без фона (pin, «…») -->
         <Style x:Key="SubtleIconButton" TargetType="Button">
             <Setter Property="Focusable" Value="False"/>
+            <Setter Property="FocusVisualStyle" Value="{StaticResource FocusRing}"/>
             <Setter Property="Width" Value="28"/>
             <Setter Property="Height" Value="28"/>
             <Setter Property="FontFamily" Value="{StaticResource IconFont}"/>
@@ -34,32 +56,6 @@
                             <Trigger Property="IsPressed" Value="True">
                                 <Setter TargetName="Bd" Property="Background" Value="{DynamicResource SubtlePressed}"/>
                             </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
-        <!-- Текстовая кнопка без фона («Очистить всё») -->
-        <Style x:Key="SubtleTextButton" TargetType="Button" BasedOn="{StaticResource SubtleIconButton}">
-            <Setter Property="Width" Value="NaN"/>
-            <Setter Property="Padding" Value="10,0"/>
-            <Setter Property="FontFamily" Value="{StaticResource TextFont}"/>
-            <Setter Property="FontSize" Value="13"/>
-            <Setter Property="Foreground" Value="{DynamicResource TextPrimary}"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border x:Name="Bd" CornerRadius="4" Background="Transparent" Padding="{TemplateBinding Padding}">
-                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource SubtleHover}"/>
-                            </Trigger>
-                            <Trigger Property="IsPressed" Value="True">
-                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource SubtlePressed}"/>
-                            </Trigger>
                             <Trigger Property="IsEnabled" Value="False">
                                 <Setter Property="Foreground" Value="{DynamicResource TextDisabled}"/>
                             </Trigger>
@@ -69,7 +65,62 @@
             </Setter>
         </Style>
 
-        <!-- Поле поиска: Fluent TextBox, нижняя линия становится акцентной при фокусе -->
+        <!-- Главная кнопка: заливка акцентом («Сохранить», «Очистить») -->
+        <Style x:Key="AccentButton" TargetType="Button">
+            <Setter Property="FocusVisualStyle" Value="{StaticResource FocusRing}"/>
+            <Setter Property="Height" Value="32"/>
+            <Setter Property="Padding" Value="12,0"/>
+            <Setter Property="FontFamily" Value="{StaticResource TextFont}"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Background" Value="{DynamicResource Accent}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource ControlStroke}"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextOnAccent}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Bd" CornerRadius="4" Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="1" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Opacity" Value="0.9"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Bd" Property="Opacity" Value="0.8"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Обычная кнопка с подложкой («Отмена», «Возобновить») -->
+        <Style x:Key="StandardButton" TargetType="Button" BasedOn="{StaticResource AccentButton}">
+            <Setter Property="Background" Value="{DynamicResource ControlFill}"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextPrimary}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Bd" CornerRadius="4" Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="1" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource ControlFillHover}"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource SubtlePressed}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Поле поиска: Fluent TextBox, нижняя линия становится акцентной при фокусе; крестик очищает запрос -->
         <Style x:Key="SearchBox" TargetType="TextBox">
             <Setter Property="FontFamily" Value="{StaticResource TextFont}"/>
             <Setter Property="FontSize" Value="14"/>
@@ -89,18 +140,23 @@
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
                                 <TextBlock x:Name="Placeholder" Text="{TemplateBinding Tag}" VerticalAlignment="Center" Margin="2,0,0,0"
                                            Foreground="{DynamicResource TextSecondary}" IsHitTestVisible="False" Visibility="Collapsed"/>
                                 <ScrollViewer x:Name="PART_ContentHost" VerticalAlignment="Center" Focusable="False"
                                               HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden"/>
-                                <TextBlock Grid.Column="1" Text="&#xE721;" FontFamily="{StaticResource IconFont}" FontSize="12"
+                                <Button x:Name="PART_Clear" Grid.Column="1" Style="{StaticResource SubtleIconButton}" Width="22" Height="22"
+                                        Margin="4,0,4,0" FontSize="10" Content="&#xE711;"
+                                        ToolTip="Очистить поиск (Esc)" AutomationProperties.Name="Очистить поиск"/>
+                                <TextBlock Grid.Column="2" Text="&#xE721;" FontFamily="{StaticResource IconFont}" FontSize="12"
                                            VerticalAlignment="Center" Foreground="{DynamicResource TextSecondary}" IsHitTestVisible="False"/>
                             </Grid>
                         </Grid>
                         <ControlTemplate.Triggers>
                             <Trigger Property="Text" Value="">
                                 <Setter TargetName="Placeholder" Property="Visibility" Value="Visible"/>
+                                <Setter TargetName="PART_Clear" Property="Visibility" Value="Collapsed"/>
                             </Trigger>
                             <Trigger Property="IsMouseOver" Value="True">
                                 <Setter TargetName="Bd" Property="Background" Value="{DynamicResource ControlFillHover}"/>
@@ -109,6 +165,44 @@
                                 <Setter TargetName="Bd" Property="Background" Value="{DynamicResource ControlFillFocused}"/>
                                 <Setter TargetName="Underline" Property="BorderThickness" Value="0,0,0,2"/>
                                 <Setter TargetName="Underline" Property="BorderBrush" Value="{DynamicResource Accent}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Поле ввода в диалоге: без лупы и крестика. Tag="Error" — красная линия (важнее фокуса) -->
+        <Style x:Key="FieldBox" TargetType="TextBox">
+            <Setter Property="FontFamily" Value="{StaticResource TextFont}"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextPrimary}"/>
+            <Setter Property="CaretBrush" Value="{DynamicResource TextPrimary}"/>
+            <Setter Property="SelectionBrush" Value="{DynamicResource Accent}"/>
+            <Setter Property="Height" Value="32"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <Grid>
+                            <Border x:Name="Bd" CornerRadius="4" Background="{DynamicResource ControlFill}"
+                                    BorderBrush="{DynamicResource ControlStroke}" BorderThickness="1"/>
+                            <Border x:Name="Underline" CornerRadius="0,0,4,4" BorderThickness="0,0,0,1"
+                                    BorderBrush="{DynamicResource ControlStrongStroke}"/>
+                            <ScrollViewer x:Name="PART_ContentHost" Margin="11,0,11,0" VerticalAlignment="Center" Focusable="False"
+                                          HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden"/>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource ControlFillHover}"/>
+                            </Trigger>
+                            <Trigger Property="IsKeyboardFocused" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource ControlFillFocused}"/>
+                                <Setter TargetName="Underline" Property="BorderThickness" Value="0,0,0,2"/>
+                                <Setter TargetName="Underline" Property="BorderBrush" Value="{DynamicResource Accent}"/>
+                            </Trigger>
+                            <Trigger Property="Tag" Value="Error">
+                                <Setter TargetName="Underline" Property="BorderThickness" Value="0,0,0,2"/>
+                                <Setter TargetName="Underline" Property="BorderBrush" Value="{DynamicResource CriticalText}"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -138,6 +232,19 @@
             </Setter>
         </Style>
 
+        <!-- Номер для Ctrl+1…9: показывается, пока Ctrl зажат (PanelWindow.ShowShortcuts) -->
+        <Style x:Key="ShortcutKey" TargetType="Border">
+            <Setter Property="Width" Value="20"/>
+            <Setter Property="Height" Value="20"/>
+            <Setter Property="CornerRadius" Value="4"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource Accent}"/>
+            <Setter Property="Background" Value="{DynamicResource MenuSurface}"/>
+            <Setter Property="Visibility" Value="Collapsed"/>
+            <Setter Property="IsHitTestVisible" Value="False"/>
+            <Setter Property="RenderTransformOrigin" Value="0.5,0.5"/>
+        </Style>
+
         <!-- Карточка записи -->
         <Style x:Key="ClipItemContainer" TargetType="ListBoxItem">
             <Setter Property="Focusable" Value="False"/>
@@ -154,17 +261,80 @@
                                     BorderBrush="{DynamicResource CardStroke}" BorderThickness="1" Padding="12,6,6,6">
                                 <ContentPresenter/>
                             </Border>
-                            <!-- Акцентная метка выбранной записи, как у списков Win11 -->
+                            <!-- Новая запись: вспышка акцентом гаснет за 1,2 с -->
+                            <Border x:Name="Glow" CornerRadius="4" Background="{DynamicResource Accent}" Opacity="0" IsHitTestVisible="False"/>
+                            <!-- Акцентная метка выбранной записи, как у списков Win11: вырастает по высоте -->
                             <Border x:Name="Pill" Width="3" Height="16" CornerRadius="1.5" HorizontalAlignment="Left"
-                                    Margin="0,0,0,0" Background="{DynamicResource Accent}" Visibility="Collapsed"/>
+                                    Background="{DynamicResource Accent}" Visibility="Collapsed" RenderTransformOrigin="0.5,0.5"/>
+                            <Border x:Name="PeekProgress" Height="2" Margin="6,0,6,1" VerticalAlignment="Bottom" CornerRadius="1"
+                                    Background="{DynamicResource Accent}" Visibility="Collapsed" IsHitTestVisible="False" RenderTransformOrigin="0,0.5"/>
+                            <Border x:Name="Key" Style="{StaticResource ShortcutKey}" Margin="8,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center">
+                                <TextBlock FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource Accent}"
+                                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <Border x:Name="SeriesBadge" Margin="8,8,0,0" Padding="5,1" MinWidth="20" Height="22" CornerRadius="4" HorizontalAlignment="Left" VerticalAlignment="Top"
+                                    Background="{DynamicResource MenuSurface}" BorderBrush="{DynamicResource AccentRing}" BorderThickness="1"
+                                    Visibility="Collapsed" IsHitTestVisible="False">
+                                <TextBlock x:Name="SeriesBadgeNumber" Text="{Binding SeriesNumber}" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimary}" HorizontalAlignment="Center"/>
+                            </Border>
+                            <!-- «Сжать промпт» идёт: акцентный отрезок бежит по нижнему краю карточки -->
+                            <Border x:Name="Busy" Height="2" Margin="6,0,6,1" VerticalAlignment="Bottom" CornerRadius="1"
+                                    Background="{DynamicResource Accent}" Visibility="Collapsed" IsHitTestVisible="False">
+                                <Border.OpacityMask>
+                                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                        <LinearGradientBrush.RelativeTransform><TranslateTransform/></LinearGradientBrush.RelativeTransform>
+                                        <GradientStop Color="Transparent" Offset="0.3"/>
+                                        <GradientStop Color="Black" Offset="0.5"/>
+                                        <GradientStop Color="Transparent" Offset="0.7"/>
+                                    </LinearGradientBrush>
+                                </Border.OpacityMask>
+                            </Border>
                         </Grid>
                         <ControlTemplate.Triggers>
+                            <DataTrigger Binding="{Binding InSeries}" Value="False">
+                                <Setter TargetName="SeriesBadgeNumber" Property="Text" Value=""/>
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding InSeries}" Value="True">
+                                <Setter TargetName="SeriesBadge" Property="Visibility" Value="Visible"/>
+                                <Setter TargetName="SeriesBadge" Property="BorderBrush" Value="{DynamicResource AccentRing}"/>
+                                <Setter Property="AutomationProperties.ItemStatus" Value="Выбрано для вставки"/>
+                                <Setter TargetName="Bd" Property="Padding" Value="36,6,6,6"/>
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="{DynamicResource AccentRing}"/>
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding SeriesInserted}" Value="True">
+                                <Setter TargetName="Bd" Property="Opacity" Value="0.45"/>
+                                <Setter Property="AutomationProperties.ItemStatus" Value="Вставлено"/>
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding Working}" Value="True">
+                                <Setter TargetName="Busy" Property="Visibility" Value="Visible"/>
+                                <DataTrigger.EnterActions>
+                                    <BeginStoryboard x:Name="BusySweep">
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="Busy" From="-0.7" To="0.7" Duration="0:0:1.2" RepeatBehavior="Forever"
+                                                             Storyboard.TargetProperty="(Border.OpacityMask).(Brush.RelativeTransform).(TranslateTransform.X)">
+                                                <DoubleAnimation.EasingFunction><SineEase EasingMode="EaseInOut"/></DoubleAnimation.EasingFunction>
+                                            </DoubleAnimation>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </DataTrigger.EnterActions>
+                                <!-- Снять анимацию: иначе она крутилась бы и у скрытой полосы -->
+                                <DataTrigger.ExitActions><RemoveStoryboard BeginStoryboardName="BusySweep"/></DataTrigger.ExitActions>
+                            </DataTrigger>
                             <Trigger Property="IsMouseOver" Value="True">
                                 <Setter TargetName="Bd" Property="Background" Value="{DynamicResource CardHover}"/>
                             </Trigger>
+                            <!-- Выбранная отличается от наведённой обводкой, как выбранные плитки и символы -->
                             <Trigger Property="IsSelected" Value="True">
                                 <Setter TargetName="Bd" Property="Background" Value="{DynamicResource CardHover}"/>
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="{DynamicResource AccentRing}"/>
                                 <Setter TargetName="Pill" Property="Visibility" Value="Visible"/>
+                            </Trigger>
+                            <Trigger Property="Tag" Value="Replace">
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="{DynamicResource Accent}"/>
+                            </Trigger>
+                            <Trigger Property="Tag" Value="Merge">
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="{DynamicResource Accent}"/>
+                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource CardHover}"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -172,14 +342,41 @@
             </Setter>
         </Style>
 
-        <!-- Плитка закреплённой записи (сетка 3 столбца): выбранная обводится акцентом, как в сетках Win11 -->
+        <!-- Кнопка на плитке (открепить, «ещё»): на своей подложке, чтобы читалась и поверх картинки -->
+        <Style x:Key="TileActionButton" TargetType="Button" BasedOn="{StaticResource SubtleIconButton}">
+            <Setter Property="Width" Value="22"/>
+            <Setter Property="Height" Value="22"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Bd" CornerRadius="4" Background="{DynamicResource MenuSurface}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Foreground" Value="{DynamicResource TextPrimary}"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Bd" Property="Opacity" Value="0.8"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!--
+            Плитка закреплённой записи: 104 × 104, три в ряд с шагом 6. Цвет — заливка 16% и полоса 3 px сверху.
+            Выбранная обводится акцентом, как в сетках Win11. Заголовок группы — та же ячейка на всю ширину.
+        -->
         <Style x:Key="PinTileContainer" TargetType="ListBoxItem">
             <Setter Property="Focusable" Value="False"/>
             <!-- Без этого ListBoxItem берёт системный ControlText (чёрный) — на тёмной карточке текст не виден -->
             <Setter Property="Foreground" Value="{DynamicResource TextPrimary}"/>
-            <Setter Property="Margin" Value="2"/>
-            <Setter Property="Width" Value="108"/>
-            <Setter Property="Height" Value="96"/>
+            <Setter Property="Margin" Value="3"/>
+            <Setter Property="Width" Value="104"/>
+            <Setter Property="Height" Value="104"/>
             <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
             <Setter Property="VerticalContentAlignment" Value="Stretch"/>
             <Setter Property="AutomationProperties.Name" Value="{Binding Preview}"/>
@@ -191,17 +388,66 @@
                                     BorderBrush="{DynamicResource CardStroke}" BorderThickness="1">
                                 <Grid>
                                     <Border CornerRadius="3" Background="{Binding TileTint}" IsHitTestVisible="False"/>
-                                    <ContentPresenter x:Name="TileContent" Margin="8,6"/>
+                                    <Border Height="3" VerticalAlignment="Top" CornerRadius="3,3,0,0" Background="{Binding TileBand}" IsHitTestVisible="False"/>
+                                    <ContentPresenter x:Name="TileContent"/>
                                 </Grid>
                             </Border>
+                            <Border x:Name="Glow" CornerRadius="4" Background="{DynamicResource Accent}" Opacity="0" IsHitTestVisible="False"/>
                             <Border x:Name="Ring" CornerRadius="4" BorderThickness="2" BorderBrush="{DynamicResource Accent}"
                                     Visibility="Collapsed" IsHitTestVisible="False"/>
-                            <Border x:Name="BeforeMark" Width="3" HorizontalAlignment="Left" Background="{DynamicResource Accent}"
-                                    Visibility="Collapsed" IsHitTestVisible="False"/>
-                            <Border x:Name="AfterMark" Width="3" HorizontalAlignment="Right" Background="{DynamicResource Accent}"
-                                    Visibility="Collapsed" IsHitTestVisible="False"/>
+                            <Border x:Name="BeforeMark" Width="3" CornerRadius="1.5" Margin="-5,6,0,6" HorizontalAlignment="Left"
+                                    Background="{DynamicResource Accent}" Visibility="Collapsed" IsHitTestVisible="False"/>
+                            <Border x:Name="AfterMark" Width="3" CornerRadius="1.5" Margin="0,6,-5,6" HorizontalAlignment="Right"
+                                    Background="{DynamicResource Accent}" Visibility="Collapsed" IsHitTestVisible="False"/>
+                            <!-- Задержка перед просмотром текста: полоска заполняется, как у картинок -->
+                            <Border x:Name="PeekProgress" Height="2" Margin="6,0,6,1" VerticalAlignment="Bottom" CornerRadius="1"
+                                    Background="{DynamicResource Accent}" Visibility="Collapsed" IsHitTestVisible="False" RenderTransformOrigin="0,0.5"/>
+                            <Border x:Name="Key" Style="{StaticResource ShortcutKey}" Width="16" Height="16" Margin="8,7,0,0"
+                                    HorizontalAlignment="Left" VerticalAlignment="Top">
+                                <TextBlock FontSize="10" FontWeight="SemiBold" Foreground="{DynamicResource Accent}"
+                                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <Border x:Name="SeriesBadge" Margin="8,8,0,0" Padding="5,1" MinWidth="20" Height="22" CornerRadius="4" HorizontalAlignment="Left" VerticalAlignment="Top"
+                                    Background="{DynamicResource MenuSurface}" BorderBrush="{DynamicResource AccentRing}" BorderThickness="1"
+                                    Visibility="Collapsed" IsHitTestVisible="False">
+                                <TextBlock x:Name="SeriesBadgeNumber" Text="{Binding SeriesNumber}" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimary}" HorizontalAlignment="Center"/>
+                            </Border>
+                            <!-- «Сжать промпт» идёт: акцентный отрезок бежит по нижнему краю -->
+                            <Border x:Name="Busy" Height="2" Margin="6,0,6,1" VerticalAlignment="Bottom" CornerRadius="1"
+                                    Background="{DynamicResource Accent}" Visibility="Collapsed" IsHitTestVisible="False">
+                                <Border.OpacityMask>
+                                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                        <LinearGradientBrush.RelativeTransform><TranslateTransform/></LinearGradientBrush.RelativeTransform>
+                                        <GradientStop Color="Transparent" Offset="0.3"/>
+                                        <GradientStop Color="Black" Offset="0.5"/>
+                                        <GradientStop Color="Transparent" Offset="0.7"/>
+                                    </LinearGradientBrush>
+                                </Border.OpacityMask>
+                            </Border>
                         </Grid>
                         <ControlTemplate.Triggers>
+                            <DataTrigger Binding="{Binding InSeries}" Value="True">
+                                <Setter TargetName="SeriesBadge" Property="Visibility" Value="Visible"/>
+                                <Setter Property="AutomationProperties.ItemStatus" Value="Выбрано для вставки"/>
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding SeriesInserted}" Value="True">
+                                <Setter TargetName="Bd" Property="Opacity" Value="0.45"/>
+                                <Setter Property="AutomationProperties.ItemStatus" Value="Вставлено"/>
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding Working}" Value="True">
+                                <Setter TargetName="Busy" Property="Visibility" Value="Visible"/>
+                                <DataTrigger.EnterActions>
+                                    <BeginStoryboard x:Name="BusySweep">
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="Busy" From="-0.7" To="0.7" Duration="0:0:1.2" RepeatBehavior="Forever"
+                                                             Storyboard.TargetProperty="(Border.OpacityMask).(Brush.RelativeTransform).(TranslateTransform.X)">
+                                                <DoubleAnimation.EasingFunction><SineEase EasingMode="EaseInOut"/></DoubleAnimation.EasingFunction>
+                                            </DoubleAnimation>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </DataTrigger.EnterActions>
+                                <DataTrigger.ExitActions><RemoveStoryboard BeginStoryboardName="BusySweep"/></DataTrigger.ExitActions>
+                            </DataTrigger>
                             <Trigger Property="IsMouseOver" Value="True">
                                 <Setter TargetName="Bd" Property="Background" Value="{DynamicResource CardHover}"/>
                             </Trigger>
@@ -210,11 +456,121 @@
                                 <Setter TargetName="Ring" Property="Visibility" Value="Visible"/>
                             </Trigger>
                             <DataTrigger Binding="{Binding IsGroupHeader}" Value="True">
-                                <Setter Property="Width" Value="332"/>
-                                <Setter Property="Height" Value="34"/>
-                                <Setter TargetName="TileContent" Property="Margin" Value="0"/>
+                                <Setter Property="Width" Value="324"/>
+                                <Setter Property="Height" Value="Auto"/>
+                                <Setter Property="Margin" Value="3,3,3,0"/>
                                 <Setter TargetName="Bd" Property="Background" Value="Transparent"/>
                                 <Setter TargetName="Bd" Property="BorderThickness" Value="0"/>
+                                <Setter TargetName="Ring" Property="Visibility" Value="Collapsed"/>
+                            </DataTrigger>
+                            <Trigger Property="Tag" Value="Before">
+                                <Setter TargetName="BeforeMark" Property="Visibility" Value="Visible"/>
+                            </Trigger>
+                            <Trigger Property="Tag" Value="Replace">
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="{DynamicResource Accent}"/>
+                            </Trigger>
+                            <Trigger Property="Tag" Value="Merge">
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="{DynamicResource Accent}"/>
+                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource CardHover}"/>
+                            </Trigger>
+                            <Trigger Property="Tag" Value="After">
+                                <Setter TargetName="AfterMark" Property="Visibility" Value="Visible"/>
+                            </Trigger>
+                            <Trigger Property="Tag" Value="Group">
+                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource SubtleHover}"/>
+                                <Setter TargetName="Bd" Property="BorderThickness" Value="1"/>
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="{DynamicResource Accent}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Строка закреплённого в виде «список»: значок типа, заголовок и подробности; выбранная — как в «Буфере» -->
+        <Style x:Key="PinRowContainer" TargetType="ListBoxItem">
+            <Setter Property="Focusable" Value="False"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextPrimary}"/>
+            <Setter Property="Margin" Value="0,0,0,2"/>
+            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+            <Setter Property="AutomationProperties.Name" Value="{Binding Preview}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ListBoxItem">
+                        <Grid>
+                            <Border x:Name="Bd" CornerRadius="4" Background="Transparent" BorderBrush="Transparent" BorderThickness="1" Padding="7,0,6,0">
+                                <ContentPresenter/>
+                            </Border>
+                            <Border x:Name="Glow" CornerRadius="4" Background="{DynamicResource Accent}" Opacity="0" IsHitTestVisible="False"/>
+                            <Border x:Name="Pill" Width="3" Height="16" CornerRadius="1.5" HorizontalAlignment="Left"
+                                    Background="{DynamicResource Accent}" Visibility="Collapsed" RenderTransformOrigin="0.5,0.5"/>
+                            <Border x:Name="BeforeMark" Height="2" CornerRadius="1" Margin="6,-2,6,0" VerticalAlignment="Top"
+                                    Background="{DynamicResource Accent}" Visibility="Collapsed" IsHitTestVisible="False"/>
+                            <Border x:Name="AfterMark" Height="2" CornerRadius="1" Margin="6,0,6,-2" VerticalAlignment="Bottom"
+                                    Background="{DynamicResource Accent}" Visibility="Collapsed" IsHitTestVisible="False"/>
+                            <!-- Задержка перед просмотром текста: полоска заполняется, как у картинок -->
+                            <Border x:Name="PeekProgress" Height="2" Margin="6,0,6,1" VerticalAlignment="Bottom" CornerRadius="1"
+                                    Background="{DynamicResource Accent}" Visibility="Collapsed" IsHitTestVisible="False" RenderTransformOrigin="0,0.5"/>
+                            <Border x:Name="Key" Style="{StaticResource ShortcutKey}" Width="18" Height="18" Margin="14,0,0,0"
+                                    HorizontalAlignment="Left" VerticalAlignment="Center">
+                                <TextBlock FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource Accent}"
+                                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <Border x:Name="SeriesBadge" Margin="8,8,0,0" Padding="5,1" MinWidth="20" Height="22" CornerRadius="4" HorizontalAlignment="Left" VerticalAlignment="Top"
+                                    Background="{DynamicResource MenuSurface}" BorderBrush="{DynamicResource AccentRing}" BorderThickness="1"
+                                    Visibility="Collapsed" IsHitTestVisible="False">
+                                <TextBlock x:Name="SeriesBadgeNumber" Text="{Binding SeriesNumber}" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimary}" HorizontalAlignment="Center"/>
+                            </Border>
+                            <!-- «Сжать промпт» идёт: акцентный отрезок бежит по нижнему краю -->
+                            <Border x:Name="Busy" Height="2" Margin="6,0,6,1" VerticalAlignment="Bottom" CornerRadius="1"
+                                    Background="{DynamicResource Accent}" Visibility="Collapsed" IsHitTestVisible="False">
+                                <Border.OpacityMask>
+                                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                        <LinearGradientBrush.RelativeTransform><TranslateTransform/></LinearGradientBrush.RelativeTransform>
+                                        <GradientStop Color="Transparent" Offset="0.3"/>
+                                        <GradientStop Color="Black" Offset="0.5"/>
+                                        <GradientStop Color="Transparent" Offset="0.7"/>
+                                    </LinearGradientBrush>
+                                </Border.OpacityMask>
+                            </Border>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <DataTrigger Binding="{Binding InSeries}" Value="True">
+                                <Setter TargetName="SeriesBadge" Property="Visibility" Value="Visible"/>
+                                <Setter Property="AutomationProperties.ItemStatus" Value="Выбрано для вставки"/>
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding SeriesInserted}" Value="True">
+                                <Setter TargetName="Bd" Property="Opacity" Value="0.45"/>
+                                <Setter Property="AutomationProperties.ItemStatus" Value="Вставлено"/>
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding Working}" Value="True">
+                                <Setter TargetName="Busy" Property="Visibility" Value="Visible"/>
+                                <DataTrigger.EnterActions>
+                                    <BeginStoryboard x:Name="BusySweep">
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="Busy" From="-0.7" To="0.7" Duration="0:0:1.2" RepeatBehavior="Forever"
+                                                             Storyboard.TargetProperty="(Border.OpacityMask).(Brush.RelativeTransform).(TranslateTransform.X)">
+                                                <DoubleAnimation.EasingFunction><SineEase EasingMode="EaseInOut"/></DoubleAnimation.EasingFunction>
+                                            </DoubleAnimation>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </DataTrigger.EnterActions>
+                                <DataTrigger.ExitActions><RemoveStoryboard BeginStoryboardName="BusySweep"/></DataTrigger.ExitActions>
+                            </DataTrigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource SubtleHover}"/>
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource CardHover}"/>
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="{DynamicResource AccentRing}"/>
+                                <Setter TargetName="Pill" Property="Visibility" Value="Visible"/>
+                            </Trigger>
+                            <DataTrigger Binding="{Binding IsGroupHeader}" Value="True">
+                                <Setter Property="Margin" Value="0,6,0,0"/>
+                                <Setter TargetName="Bd" Property="Padding" Value="0"/>
+                                <Setter TargetName="Bd" Property="Background" Value="Transparent"/>
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="Transparent"/>
+                                <Setter TargetName="Pill" Property="Visibility" Value="Collapsed"/>
                             </DataTrigger>
                             <Trigger Property="Tag" Value="Before">
                                 <Setter TargetName="BeforeMark" Property="Visibility" Value="Visible"/>
@@ -224,8 +580,14 @@
                             </Trigger>
                             <Trigger Property="Tag" Value="Group">
                                 <Setter TargetName="Bd" Property="Background" Value="{DynamicResource SubtleHover}"/>
-                                <Setter TargetName="Bd" Property="BorderThickness" Value="1"/>
                                 <Setter TargetName="Bd" Property="BorderBrush" Value="{DynamicResource Accent}"/>
+                            </Trigger>
+                            <Trigger Property="Tag" Value="Replace">
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="{DynamicResource Accent}"/>
+                            </Trigger>
+                            <Trigger Property="Tag" Value="Merge">
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="{DynamicResource Accent}"/>
+                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource CardHover}"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -252,6 +614,11 @@
                             </Border>
                             <Border x:Name="Ring" CornerRadius="4" BorderThickness="2" BorderBrush="{DynamicResource Accent}"
                                     Visibility="Collapsed" IsHitTestVisible="False"/>
+                            <Border x:Name="Key" Style="{StaticResource ShortcutKey}" Width="15" Height="15" CornerRadius="3"
+                                    HorizontalAlignment="Left" VerticalAlignment="Top">
+                                <TextBlock FontSize="10" FontWeight="SemiBold" Foreground="{DynamicResource Accent}"
+                                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
                         </Grid>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
@@ -267,21 +634,18 @@
             </Setter>
         </Style>
 
-        <!-- Вкладка в шапке: текст + акцентная полоска снизу у выбранной -->
+        <!-- Вкладка в шапке. Акцентная полоска общая на все вкладки (TabIndicator в PanelWindow) и переезжает к выбранной -->
         <Style x:Key="HeaderTab" TargetType="RadioButton">
             <Setter Property="Focusable" Value="False"/>
             <Setter Property="Cursor" Value="Hand"/>
             <Setter Property="FontSize" Value="14"/>
             <Setter Property="Foreground" Value="{DynamicResource TextSecondary}"/>
+            <Setter Property="RenderTransformOrigin" Value="0.5,0.5"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="RadioButton">
                         <Border x:Name="Bd" CornerRadius="4" Background="Transparent" Padding="8,0" Height="32">
-                            <Grid>
-                                <ContentPresenter VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                                <Border x:Name="Line" Height="3" Width="16" CornerRadius="1.5" VerticalAlignment="Bottom"
-                                        Background="{DynamicResource Accent}" Visibility="Hidden"/>
-                            </Grid>
+                            <ContentPresenter VerticalAlignment="Center" HorizontalAlignment="Center"/>
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
@@ -291,7 +655,161 @@
                             <Trigger Property="IsChecked" Value="True">
                                 <!-- Без SemiBold: иначе ширина вкладки прыгает при переключении -->
                                 <Setter Property="Foreground" Value="{DynamicResource TextPrimary}"/>
-                                <Setter TargetName="Line" Property="Visibility" Value="Visible"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!--
+            Переключатель Fluent. Бегунок стоит у своего края по триггеру, а PanelWindow.AnimateSwitch
+            проигрывает переезд сдвигом (FLIP): так бегунок и растягивается при нажатии от нужного края.
+        -->
+        <Style x:Key="ToggleSwitch" TargetType="ToggleButton">
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextPrimary}"/>
+            <Setter Property="FocusVisualStyle" Value="{StaticResource FocusRing}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ToggleButton">
+                        <Grid Background="Transparent">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <ContentPresenter VerticalAlignment="Center" Margin="0,0,12,0"/>
+                            <Border x:Name="Track" Grid.Column="1" Width="40" Height="20" CornerRadius="10" Background="Transparent"
+                                    BorderThickness="1" BorderBrush="{DynamicResource ControlStrongStroke}" VerticalAlignment="Center">
+                                <Ellipse x:Name="Knob" Width="12" Height="12" HorizontalAlignment="Left" Margin="3,0,3,0"
+                                         Fill="{DynamicResource TextSecondary}"/>
+                            </Border>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Knob" Property="Width" Value="14"/>
+                                <Setter TargetName="Knob" Property="Height" Value="14"/>
+                                <Setter TargetName="Knob" Property="Margin" Value="2,0,2,0"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Knob" Property="Width" Value="17"/>
+                            </Trigger>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="Track" Property="Background" Value="{DynamicResource Accent}"/>
+                                <Setter TargetName="Track" Property="BorderBrush" Value="{DynamicResource Accent}"/>
+                                <Setter TargetName="Knob" Property="Fill" Value="{DynamicResource TextOnAccent}"/>
+                                <Setter TargetName="Knob" Property="HorizontalAlignment" Value="Right"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Opacity" Value="0.45"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Ползунок Fluent: заполненная акцентом часть, круглый бегунок, точка растёт при наведении -->
+        <Style x:Key="SliderFill" TargetType="RepeatButton">
+            <Setter Property="Focusable" Value="False"/>
+            <Setter Property="IsTabStop" Value="False"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="RepeatButton">
+                        <Grid Background="Transparent">
+                            <Border Height="4" CornerRadius="2" Margin="10,0,-10,0" VerticalAlignment="Center" Background="{TemplateBinding Background}"/>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="SliderThumb" TargetType="Thumb">
+            <Setter Property="Width" Value="20"/>
+            <Setter Property="Height" Value="20"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Thumb">
+                        <Grid>
+                            <Ellipse Fill="{DynamicResource SliderThumbFill}" Stroke="{DynamicResource ControlStroke}" StrokeThickness="1"/>
+                            <Ellipse x:Name="Core" Width="12" Height="12" Fill="{DynamicResource Accent}"/>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Core" Property="Width" Value="14"/>
+                                <Setter TargetName="Core" Property="Height" Value="14"/>
+                            </Trigger>
+                            <Trigger Property="IsDragging" Value="True">
+                                <Setter TargetName="Core" Property="Width" Value="10"/>
+                                <Setter TargetName="Core" Property="Height" Value="10"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style TargetType="Slider">
+            <Setter Property="FocusVisualStyle" Value="{StaticResource FocusRing}"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Slider">
+                        <Grid Height="20" Background="Transparent">
+                            <Border Height="4" CornerRadius="2" Margin="10,0" VerticalAlignment="Center" Background="{DynamicResource ControlStrongStroke}"/>
+                            <Track x:Name="PART_Track">
+                                <Track.DecreaseRepeatButton>
+                                    <RepeatButton Style="{StaticResource SliderFill}" Background="{DynamicResource Accent}" Command="Slider.DecreaseLarge"/>
+                                </Track.DecreaseRepeatButton>
+                                <Track.IncreaseRepeatButton>
+                                    <RepeatButton Style="{StaticResource SliderFill}" Background="Transparent" Command="Slider.IncreaseLarge"/>
+                                </Track.IncreaseRepeatButton>
+                                <Track.Thumb>
+                                    <Thumb Style="{StaticResource SliderThumb}"/>
+                                </Track.Thumb>
+                            </Track>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Opacity" Value="0.45"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Клавиша в строке-подсказке: Enter, Shift+Enter, Ctrl+1-9 -->
+        <Style x:Key="KeyCap" TargetType="Border">
+            <Setter Property="CornerRadius" Value="3"/>
+            <Setter Property="BorderThickness" Value="1,1,1,2"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource WindowStroke}"/>
+            <Setter Property="Background" Value="{DynamicResource ControlFill}"/>
+            <Setter Property="Padding" Value="5,0,5,1"/>
+            <Setter Property="Margin" Value="0,0,5,0"/>
+        </Style>
+
+        <!-- Кнопки плавающей панели масштаба в окне графа: окно всегда тёмное, цвета свои -->
+        <Style x:Key="GraphToolButton" TargetType="Button">
+            <Setter Property="Focusable" Value="False"/>
+            <Setter Property="MinWidth" Value="32"/>
+            <Setter Property="Height" Value="32"/>
+            <Setter Property="Padding" Value="8,0"/>
+            <Setter Property="FontFamily" Value="{StaticResource IconFont}"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Foreground" Value="#D9FFFFFF"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Bd" CornerRadius="4" Background="Transparent" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="#14FFFFFF"/>
+                                <Setter Property="Foreground" Value="White"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="#0AFFFFFF"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -323,41 +841,71 @@
             </Setter>
         </Style>
 
-        <!-- Меню «…» -->
+        <!-- Меню «…» и меню трея. MenuRoot — для анимации открытия (Motion.AnimateOpen) -->
         <Style TargetType="ContextMenu">
             <Setter Property="HasDropShadow" Value="False"/>
+            <Setter Property="UseLayoutRounding" Value="True"/>
+            <Setter Property="TextOptions.TextFormattingMode" Value="Display"/>
             <Setter Property="FontFamily" Value="{StaticResource TextFont}"/>
             <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextPrimary}"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="ContextMenu">
-                        <Border Margin="12,4,12,16" Background="{DynamicResource MenuSurface}" BorderBrush="{DynamicResource MenuStroke}"
+                        <Border x:Name="MenuRoot" Margin="12,4,12,16" Background="{DynamicResource MenuSurface}" BorderBrush="{DynamicResource MenuStroke}"
                                 BorderThickness="1" CornerRadius="8" Padding="0,4" MinWidth="200">
                             <Border.Effect>
                                 <DropShadowEffect BlurRadius="16" ShadowDepth="4" Direction="270" Opacity="0.22"/>
                             </Border.Effect>
-                            <ItemsPresenter/>
+                            <ItemsPresenter KeyboardNavigation.DirectionalNavigation="Cycle"/>
                         </Border>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
         </Style>
 
+        <Style x:Key="{x:Static MenuItem.SeparatorStyleKey}" TargetType="Separator">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Separator">
+                        <Border Height="1" Margin="0,4" Background="{DynamicResource WindowStroke}"/>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Пункт меню: значок (Tag), текст, справа сочетание клавиш (InputGestureText); у отмеченного — галочка -->
         <Style TargetType="MenuItem">
             <Setter Property="Foreground" Value="{DynamicResource TextPrimary}"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="MenuItem">
-                        <Border x:Name="Bd" CornerRadius="4" Margin="4,1" Padding="10,7,16,7" Background="Transparent">
-                            <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="{TemplateBinding Tag}" FontFamily="{StaticResource IconFont}" FontSize="14"
-                                           Width="28" VerticalAlignment="Center"/>
-                                <ContentPresenter ContentSource="Header" VerticalAlignment="Center" RecognizesAccessKey="True"/>
-                            </StackPanel>
+                        <Border x:Name="Bd" CornerRadius="4" Margin="4,1" Padding="10,7,12,7" Background="Transparent">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="28"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock x:Name="Glyph" Text="{TemplateBinding Tag}" FontFamily="{StaticResource IconFont}" FontSize="14"
+                                           VerticalAlignment="Center"/>
+                                <ContentPresenter Grid.Column="1" ContentSource="Header" VerticalAlignment="Center" RecognizesAccessKey="True"/>
+                                <TextBlock x:Name="Gesture" Grid.Column="2" Text="{TemplateBinding InputGestureText}" Margin="24,0,0,0"
+                                           FontSize="12" Foreground="{DynamicResource TextSecondary}" VerticalAlignment="Center"/>
+                            </Grid>
                         </Border>
                         <ControlTemplate.Triggers>
+                            <Trigger Property="InputGestureText" Value="">
+                                <Setter TargetName="Gesture" Property="Visibility" Value="Collapsed"/>
+                            </Trigger>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="Glyph" Property="Text" Value="&#xE73E;"/>
+                            </Trigger>
                             <Trigger Property="IsHighlighted" Value="True">
                                 <Setter TargetName="Bd" Property="Background" Value="{DynamicResource SubtleHover}"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Foreground" Value="{DynamicResource TextDisabled}"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>

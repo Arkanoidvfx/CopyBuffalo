@@ -1,0 +1,45 @@
+ArkCopyBuffer distribution components
+
+Microsoft .NET 10.0.12, Windows Desktop Runtime: Microsoft license / MIT notices.
+https://github.com/dotnet/runtime
+https://github.com/dotnet/wpf
+Included license and third-party notices are in licenses/.
+
+IBM Plex Sans and IBM Plex Mono (static Regular/SemiBold): SIL Open Font License 1.1.
+Copyright 2017 IBM Corp., Reserved Font Name "Plex".
+https://github.com/IBM/plex/tree/763c36ef9117782905ae010056dfbe8fd2653a25
+The unmodified fonts and their license are embedded in ArkCopyBuffer.exe;
+the readable license is also included as licenses/IBM-Plex-OFL.txt.
+
+FFmpeg 9.0.1 full static Windows build by Gyan Doshi: GPLv3.
+FFmpeg is launched as a separate executable, without linking to the app.
+Original build and sources: https://www.gyan.dev/ffmpeg/builds/
+Exact FFmpeg source used by this build: https://github.com/FFmpeg/FFmpeg/commit/bf1b838f2a
+Original build README/configuration and GPL license are included.
+For public redistribution, provide corresponding sources for the exact
+FFmpeg build and its enabled external libraries as required by its license.
+
+Local OCR (included in core and full packages): pure-onnx-ocr 0.3.1 — Apache-2.0.
+PP-OCRv5 mobile detector and Cyrillic mobile recognizer by PaddlePaddle — Apache-2.0.
+https://github.com/siska-tech/pure-onnx-ocr/tree/59a6c2c33c72e4dc8e7e5500f544d6674b0e6643
+https://huggingface.co/PaddlePaddle/cyrillic_PP-OCRv5_mobile_rec_onnx/tree/2cef88145434beb8afa9dd82d77d799eb1ad7b29
+Sources, hashes and locked build: tools/ocr/Build-Ocr.ps1 and tools/ocr/Cargo.lock.
+Rust dependency licenses and notices are included in ocr/licenses/.
+OCR uses a separate local CPU executable; no images are uploaded.
+
+AI add-on:
+llama.cpp b9728 — MIT.
+https://github.com/ggml-org/llama.cpp/releases/tag/b9728
+https://github.com/ggml-org/llama.cpp/tree/b9728
+Windows CPU and CUDA 13.3 builds; native runtime DLLs distributed together.
+Qwen3.5-4B — Apache 2.0; Q4_K_M GGUF by Unsloth.
+https://huggingface.co/Qwen/Qwen3.5-4B
+https://huggingface.co/unsloth/Qwen3.5-4B-GGUF
+NVIDIA CUDA runtime/cuBLAS — NVIDIA CUDA EULA (redistributable components).
+https://docs.nvidia.com/cuda/eula/index.html
+Microsoft Visual C++ app-local redistributable runtime — Microsoft terms.
+https://learn.microsoft.com/cpp/windows/redistributing-visual-cpp-files
+
+The AI add-on includes the corresponding MIT/Apache notices,
+NVIDIA EULA and Microsoft redistributable-file list in ai/licenses/.
+No clipboard history, settings, registry exports or personal data are included.

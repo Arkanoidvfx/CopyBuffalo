@@ -8,6 +8,9 @@ static class Native
     public static readonly IntPtr OurInputMarker = new(0x41524B43); // "ARKC"
 
     public const int WH_KEYBOARD_LL = 13;
+    public const int WH_MOUSE_LL = 14, WM_MOUSEWHEEL = 0x020A;
+    [StructLayout(LayoutKind.Sequential)]
+    public struct MSLLHOOKSTRUCT { public POINT pt; public uint mouseData, flags, time; public IntPtr dwExtraInfo; }
     public const int WM_KEYDOWN = 0x0100, WM_KEYUP = 0x0101, WM_SYSKEYDOWN = 0x0104, WM_SYSKEYUP = 0x0105;
     public const int WM_QUIT = 0x0012, WM_APP = 0x8000, WM_CLIPBOARDUPDATE = 0x031D;
     public const int VK_SHIFT = 0x10, VK_CONTROL = 0x11, VK_MENU = 0x12, VK_LWIN = 0x5B, VK_RWIN = 0x5C, VK_V = 0x56;
@@ -74,6 +77,7 @@ static class Native
     // --- Clipboard listener ---
     [DllImport("user32.dll", SetLastError = true)] public static extern bool AddClipboardFormatListener(IntPtr hwnd);
     [DllImport("user32.dll")] public static extern bool RemoveClipboardFormatListener(IntPtr hwnd);
+    [DllImport("user32.dll")] public static extern IntPtr GetClipboardOwner();
 
     // --- Окна и фокус ---
     [DllImport("user32.dll")] public static extern IntPtr GetForegroundWindow();
@@ -83,6 +87,12 @@ static class Native
     [DllImport("user32.dll")] public static extern uint GetWindowThreadProcessId(IntPtr hwnd, out uint pid);
     [DllImport("user32.dll")] public static extern bool AttachThreadInput(uint idAttach, uint idAttachTo, bool attach);
 
+    // --- Смена окна переднего плана (клик вне панели), без опоры на IsActive WPF ---
+    public delegate void WinEventProc(IntPtr hook, uint evt, IntPtr hwnd, int idObject, int idChild, uint thread, uint time);
+    public const uint EVENT_SYSTEM_FOREGROUND = 3, WINEVENT_OUTOFCONTEXT = 0;
+    [DllImport("user32.dll")]
+    public static extern IntPtr SetWinEventHook(uint eventMin, uint eventMax, IntPtr hmod, WinEventProc proc, uint pid, uint thread, uint flags);
+
     public const int GWL_EXSTYLE = -20;
     public const long WS_EX_TOOLWINDOW = 0x80, WS_EX_APPWINDOW = 0x40000;
     [DllImport("user32.dll")] public static extern IntPtr GetWindowLongPtr(IntPtr hwnd, int index);
@@ -91,6 +101,15 @@ static class Native
     public static readonly IntPtr HWND_TOPMOST = new(-1);
     public const uint SWP_NOACTIVATE = 0x10, SWP_NOSIZE = 0x1;
     [DllImport("user32.dll")] public static extern bool SetWindowPos(IntPtr hwnd, IntPtr after, int x, int y, int cx, int cy, uint flags);
+    [DllImport("user32.dll")] public static extern bool DestroyIcon(IntPtr icon);
+
+    /// <summary>Тёмная системная рамка окна (Windows 10 20H1+). На старых сборках вызов просто ничего не меняет.</summary>
+    public static void UseDarkTitleBar(IntPtr hwnd)
+    {
+        int on = 1;
+        DwmSetWindowAttribute(hwnd, 20 /* DWMWA_USE_IMMERSIVE_DARK_MODE */, ref on, sizeof(int));
+    }
+    [DllImport("dwmapi.dll")] static extern int DwmSetWindowAttribute(IntPtr hwnd, int attr, ref int value, int size);
 
     // --- Каретка / мышь / мониторы ---
     [StructLayout(LayoutKind.Sequential)] public struct POINT { public int X, Y; }
@@ -180,5 +199,35 @@ static class Native
             finally { CloseHandle(token); }
         }
         finally { CloseHandle(proc); }
+    }
+
+    [DllImport("user32.dll")] public static extern uint GetClipboardSequenceNumber();
+
+    // --- Job Object: дочерний процесс умирает вместе с нами ---
+    [DllImport("kernel32.dll", SetLastError = true)] static extern IntPtr CreateJobObject(IntPtr attrs, string? name);
+    [DllImport("kernel32.dll", SetLastError = true)] static extern bool SetInformationJobObject(IntPtr job, int cls, byte[] info, int len);
+    [DllImport("kernel32.dll", SetLastError = true)] static extern bool AssignProcessToJobObject(IntPtr job, IntPtr process);
+
+    /// <summary>
+    /// Job с KILL_ON_JOB_CLOSE: его процессы завершаются, когда закрывается наш хэндл — в том числе при падении
+    /// или Stop-Process, где OnExit не вызывается. Иначе llama-server остался бы сиротой и держал видеопамять.
+    /// </summary>
+    public static IntPtr CreateKillOnCloseJob()
+    {
+        var job = CreateJobObject(IntPtr.Zero, null);
+        var info = new byte[144]; // JOBOBJECT_EXTENDED_LIMIT_INFORMATION (x64)
+        BitConverter.TryWriteBytes(info.AsSpan(16), 0x2000); // BasicLimitInformation.LimitFlags = JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE
+        if (job == IntPtr.Zero || !SetInformationJobObject(job, 9 /* JobObjectExtendedLimitInformation */, info, info.Length))
+        {
+            int error = Marshal.GetLastWin32Error();
+            if (job != IntPtr.Zero) CloseHandle(job);
+            throw new System.ComponentModel.Win32Exception(error);
+        }
+        return job;
+    }
+
+    public static void AssignToJob(IntPtr job, System.Diagnostics.Process process)
+    {
+        if (!AssignProcessToJobObject(job, process.Handle)) throw new System.ComponentModel.Win32Exception();
     }
 }

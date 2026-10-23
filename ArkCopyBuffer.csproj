@@ -2,8 +2,8 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net9.0-windows</TargetFramework>
-    <Version>0.1.0</Version>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <Version>0.2.0</Version>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
@@ -17,7 +17,10 @@
   <!-- Рабочая сборка: dotnet publish -c Release. ReadyToRun — код скомпилирован заранее, панель не ждёт JIT при первом Win+V -->
   <PropertyGroup Condition="'$(Configuration)' == 'Release'">
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
-    <SelfContained>false</SelfContained>
+    <SelfContained>true</SelfContained>
+    <PublishSingleFile>true</PublishSingleFile>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    <RuntimeFrameworkVersion>10.0.12</RuntimeFrameworkVersion>
     <PublishReadyToRun>true</PublishReadyToRun>
     <PublishDir>publish\</PublishDir>
   </PropertyGroup>
@@ -30,11 +33,24 @@
 
   <ItemGroup>
     <EmbeddedResource Include="Assets\App.ico" />
+    <EmbeddedResource Include="Assets\Vfx\Nether\*.png" />
+    <Resource Include="Assets\Fonts\*.ttf;Assets\Fonts\IBM-Plex-OFL.txt" />
+    <Content Include="Assets\Fonts\IBM-Plex-OFL.txt" Link="licenses\IBM-Plex-OFL.txt"
+             CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" ExcludeFromSingleFile="true" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Interop.UIAutomationClient" Version="10.19041.0" />
-    <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="10.0.12" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Assets\Ocr\**\*" Link="ocr\%(RecursiveDir)%(Filename)%(Extension)"
+             CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" ExcludeFromSingleFile="true" />
+  </ItemGroup>
+
+  <Target Name="VerifyOcrBundle" BeforeTargets="PrepareForPublish">
+    <Error Condition="!Exists('Assets\Ocr\copybuffalo-ocr.exe') Or !Exists('Assets\Ocr\det\inference.onnx') Or !Exists('Assets\Ocr\det\inference.yml') Or !Exists('Assets\Ocr\rec\inference.onnx') Or !Exists('Assets\Ocr\rec\inference.yml') Or !Exists('Assets\Ocr\licenses\NOTICE.txt')"
+           Text="Build the local OCR bundle first: pwsh -File tools/ocr/Build-Ocr.ps1" />
+  </Target>
 
 </Project>

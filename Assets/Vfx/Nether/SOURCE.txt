@@ -1,0 +1,8 @@
+Original Nether animation from the user's Moment Player project:
+D:\Projects\Moment_Player\assets\VFX\Nether\base
+Copied unchanged: Nether_Hover_0.png through Nether_Hover_63.png.
+Native frame delay: 40 ms; Moment Player set speed: 85%.
+ArkCopyBuffer draws each complete frame once at 170% of the panel bounds,
+matching Moment Player's Nether fit.conf; the content opening is excluded.
+Display frames use a one-source-pixel Gaussian in premultiplied colour/alpha
+to soften tiny transparency cut-outs when enlarged. The PNG files are unchanged.

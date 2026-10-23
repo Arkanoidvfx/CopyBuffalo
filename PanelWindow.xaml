@@ -1,6 +1,7 @@
 <Window x:Class="ArkCopyBuffer.PanelWindow" x:ClassModifier="internal"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:ArkCopyBuffer"
         Title="Буфер обмена"
         AutomationProperties.Name="История буфера обмена"
         Width="392" Height="492"
@@ -12,13 +13,263 @@
         Foreground="{DynamicResource TextPrimary}"
         UseLayoutRounding="True"
         TextOptions.TextFormattingMode="Display">
+    <Window.Resources>
+        <!-- Заголовок группы закреплённых: свернуть, имя, счётчик, линия, настоящее меню «⋯»; у пустой — зона для перетаскивания -->
+        <DataTemplate x:Key="PinGroupHeader">
+            <StackPanel>
+                <Grid x:Name="Head" Height="30" Background="Transparent">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <Button x:Name="Chevron" Style="{StaticResource SubtleIconButton}" Width="22" Height="22" Margin="-3,0,4,0" FontSize="10"
+                            Content="&#xE70D;" Click="GroupChevron_Click" RenderTransformOrigin="0.5,0.5"
+                            ToolTip="Свернуть группу" AutomationProperties.Name="Свернуть группу"/>
+                    <TextBlock Grid.Column="1" Text="{Binding Name}" FontSize="12" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                    <Border Grid.Column="2" MinWidth="18" Height="16" Margin="6,0,0,0" Padding="5,0" CornerRadius="8" VerticalAlignment="Center"
+                            Background="{DynamicResource SubtleHover}">
+                        <TextBlock Text="{Binding Count}" FontSize="11" Foreground="{DynamicResource TextSecondary}" HorizontalAlignment="Center"/>
+                    </Border>
+                    <Border Grid.Column="3" Height="1" Margin="8,0" VerticalAlignment="Center" Background="{DynamicResource WindowStroke}"/>
+                    <Button x:Name="GroupMore" Grid.Column="4" Style="{StaticResource SubtleIconButton}" Width="24" Height="24" FontSize="12"
+                            Content="&#xE712;" Click="GroupMore_Click" Opacity="0"
+                            ToolTip="Параметры группы" AutomationProperties.Name="Параметры группы"/>
+                </Grid>
+                <Grid x:Name="DropZone" Height="52" Margin="0,4,0,2" Visibility="Collapsed">
+                    <Rectangle RadiusX="4" RadiusY="4" Stroke="{DynamicResource ControlStrongStroke}" StrokeThickness="1" StrokeDashArray="4 3" Opacity="0.5"/>
+                    <TextBlock Text="Перетащите запись сюда" FontSize="12" Foreground="{DynamicResource TextSecondary}"
+                               HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                </Grid>
+            </StackPanel>
+            <DataTemplate.Triggers>
+                <DataTrigger Binding="{Binding Collapsed}" Value="True">
+                    <Setter TargetName="Chevron" Property="RenderTransform">
+                        <Setter.Value><RotateTransform Angle="-90"/></Setter.Value>
+                    </Setter>
+                    <Setter TargetName="Chevron" Property="ToolTip" Value="Развернуть группу"/>
+                    <Setter TargetName="Chevron" Property="AutomationProperties.Name" Value="Развернуть группу"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding IsEmptyGroup}" Value="True">
+                    <Setter TargetName="DropZone" Property="Visibility" Value="Visible"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding IsMouseOver, ElementName=Head}" Value="True">
+                    <Setter TargetName="GroupMore" Property="Opacity" Value="1"/>
+                </DataTrigger>
+            </DataTemplate.Triggers>
+        </DataTemplate>
+
+        <ItemsPanelTemplate x:Key="PinTilePanel"><WrapPanel VerticalAlignment="Top"/></ItemsPanelTemplate>
+        <ItemsPanelTemplate x:Key="PinRowPanel"><StackPanel/></ItemsPanelTemplate>
+
+        <!-- Плитка: строка сверху — номер Ctrl и кнопки при наведении; ниже содержимое по типу записи -->
+        <DataTemplate x:Key="PinTileTemplate">
+            <Grid>
+                <Grid x:Name="TileBody">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="27"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Grid x:Name="ImageLayer" Grid.RowSpan="2" Visibility="Collapsed">
+                        <Image x:Name="ImagePreview" Source="{Binding Thumbnail, IsAsync=True}" Stretch="UniformToFill" VerticalAlignment="Top"
+                               MouseEnter="Image_MouseEnter" MouseLeave="Image_MouseLeave" RenderOptions.BitmapScalingMode="HighQuality">
+                            <Image.Clip><RectangleGeometry Rect="0,0,102,102" RadiusX="3" RadiusY="3"/></Image.Clip>
+                        </Image>
+                        <Border Height="40" VerticalAlignment="Top" CornerRadius="3,3,0,0" IsHitTestVisible="False">
+                            <Border.Background>
+                                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                    <GradientStop Color="#99000000" Offset="0"/>
+                                    <GradientStop Color="#00000000" Offset="1"/>
+                                </LinearGradientBrush>
+                            </Border.Background>
+                        </Border>
+                        <Border x:Name="GifBadge" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="6" Padding="5,1,5,2"
+                                CornerRadius="4" Background="#B3000000" Visibility="Collapsed" IsHitTestVisible="False">
+                            <TextBlock Text="{Binding Badge}" FontSize="10" FontWeight="SemiBold" Foreground="White"/>
+                        </Border>
+                    </Grid>
+                    <Grid Grid.RowSpan="2" Margin="8,8,8,6">
+                        <TextBlock x:Name="TextPreview" Text="{Binding Preview}" FontSize="12" TextWrapping="Wrap"
+                                   LineStackingStrategy="BlockLineHeight" LineHeight="15" MaxHeight="90" VerticalAlignment="Top">
+                            <!-- Последняя строка тает вместо многоточия посреди слова; целиком — в просмотре при наведении -->
+                            <TextBlock.OpacityMask>
+                                <LinearGradientBrush StartPoint="0,72" EndPoint="0,90" MappingMode="Absolute">
+                                    <GradientStop Color="Black" Offset="0"/>
+                                    <GradientStop Color="Transparent" Offset="1"/>
+                                </LinearGradientBrush>
+                            </TextBlock.OpacityMask>
+                        </TextBlock>
+                        <StackPanel x:Name="TitlePreview" Visibility="Collapsed">
+                            <TextBlock x:Name="TileTitle" Text="{Binding TileTitle}" FontSize="12" FontWeight="SemiBold" TextWrapping="Wrap"
+                                       TextTrimming="CharacterEllipsis" LineStackingStrategy="BlockLineHeight" LineHeight="16" MaxHeight="48"/>
+                            <TextBlock x:Name="TileSub" Text="{Binding TileSub}" FontSize="11" TextWrapping="Wrap" TextTrimming="CharacterEllipsis"
+                                       LineStackingStrategy="BlockLineHeight" LineHeight="15" MaxHeight="60" Margin="0,3,0,0"
+                                       Foreground="{DynamicResource TextSecondary}"/>
+                        </StackPanel>
+                        <StackPanel x:Name="ColorPreview" Visibility="Collapsed">
+                            <Ellipse Width="30" Height="30" Fill="{Binding Swatch}" Stroke="#26FFFFFF" HorizontalAlignment="Left"/>
+                            <TextBlock Text="{Binding TileTitle}" FontFamily="{StaticResource MonoFont}" FontSize="12" Margin="0,8,0,0"/>
+                        </StackPanel>
+                    </Grid>
+                    <!-- Кнопки в строке сверху: не закрывают текст -->
+                    <StackPanel x:Name="TileActions" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top"
+                                Margin="0,4,4,0" Opacity="0">
+                        <Button Style="{StaticResource TileActionButton}" Content="&#xE77A;" Click="Pin_Click"
+                                ToolTip="Открепить (Ctrl+P)" AutomationProperties.Name="Открепить"/>
+                        <StackPanel x:Name="ImageActions" Orientation="Horizontal" Visibility="Collapsed">
+                            <Button Style="{StaticResource TileActionButton}" Content="&#xE8D2;" Click="Ocr_Click" Margin="2,0,0,0"
+                                    ToolTip="Распознать текст" AutomationProperties.Name="Распознать текст"/>
+                            <Button Style="{StaticResource TileActionButton}" Content="&#xE8C1;" Click="TranslateImage_Click" Margin="2,0,0,0"
+                                    ToolTip="Перевести надписи на картинке (локально)" AutomationProperties.Name="Перевести надписи на картинке"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Grid>
+                <ContentPresenter x:Name="GroupBody" Content="{Binding}" ContentTemplate="{StaticResource PinGroupHeader}" Visibility="Collapsed"/>
+            </Grid>
+            <DataTemplate.Triggers>
+                <DataTrigger Binding="{Binding IsImage}" Value="True">
+                    <Setter TargetName="ImageActions" Property="Visibility" Value="Visible"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Recognizing}" Value="True">
+                    <Setter TargetName="ImageActions" Property="IsEnabled" Value="False"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding IsGroupHeader}" Value="True">
+                    <Setter TargetName="TileBody" Property="Visibility" Value="Collapsed"/>
+                    <Setter TargetName="GroupBody" Property="Visibility" Value="Visible"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Kind}" Value="code">
+                    <Setter TargetName="TextPreview" Property="FontFamily" Value="{StaticResource MonoFont}"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Kind}" Value="url">
+                    <Setter TargetName="TextPreview" Property="Visibility" Value="Collapsed"/>
+                    <Setter TargetName="TitlePreview" Property="Visibility" Value="Visible"/>
+                    <Setter TargetName="TileTitle" Property="FontSize" Value="13"/>
+                    <Setter TargetName="TileTitle" Property="LineHeight" Value="17"/>
+                    <Setter TargetName="TileTitle" Property="TextWrapping" Value="NoWrap"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Kind}" Value="path">
+                    <Setter TargetName="TextPreview" Property="Visibility" Value="Collapsed"/>
+                    <Setter TargetName="TitlePreview" Property="Visibility" Value="Visible"/>
+                    <Setter TargetName="TileSub" Property="FontFamily" Value="{StaticResource MonoFont}"/>
+                    <Setter TargetName="TileSub" Property="TextWrapping" Value="NoWrap"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Kind}" Value="media">
+                    <Setter TargetName="TextPreview" Property="Visibility" Value="Collapsed"/>
+                    <Setter TargetName="TitlePreview" Property="Visibility" Value="Visible"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Kind}" Value="graph">
+                    <Setter TargetName="TextPreview" Property="Visibility" Value="Collapsed"/>
+                    <Setter TargetName="TitlePreview" Property="Visibility" Value="Visible"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Kind}" Value="color">
+                    <Setter TargetName="TextPreview" Property="Visibility" Value="Collapsed"/>
+                    <Setter TargetName="ColorPreview" Property="Visibility" Value="Visible"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding ShowTileImage}" Value="True">
+                    <Setter TargetName="TextPreview" Property="Visibility" Value="Collapsed"/>
+                    <Setter TargetName="TitlePreview" Property="Visibility" Value="Collapsed"/>
+                    <Setter TargetName="ImageLayer" Property="Visibility" Value="Visible"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding HasBadge}" Value="True">
+                    <Setter TargetName="GifBadge" Property="Visibility" Value="Visible"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType=ListBoxItem}}" Value="True">
+                    <Setter TargetName="TileActions" Property="Opacity" Value="1"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding IsSelected, RelativeSource={RelativeSource AncestorType=ListBoxItem}}" Value="True">
+                    <Setter TargetName="TileActions" Property="Opacity" Value="1"/>
+                </DataTrigger>
+            </DataTemplate.Triggers>
+        </DataTemplate>
+
+        <!-- Строка списка: квадрат со значком типа (или миниатюрой, образцом цвета), заголовок, подробности -->
+        <DataTemplate x:Key="PinRowTemplate">
+            <Grid>
+                <Grid x:Name="RowBody" Height="44">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <Border x:Name="Ico" Width="30" Height="30" CornerRadius="4" Margin="0,0,10,0" Background="{DynamicResource SubtleHover}">
+                        <Grid>
+                            <TextBlock x:Name="IcoGlyph" Text="{Binding KindGlyph}" FontFamily="{StaticResource IconFont}" FontSize="14"
+                                       Foreground="{DynamicResource TextSecondary}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <Image x:Name="RowImage" Source="{Binding Thumbnail, IsAsync=True}" Stretch="UniformToFill" Visibility="Collapsed"
+                                   RenderOptions.BitmapScalingMode="HighQuality">
+                                <Image.Clip><RectangleGeometry Rect="0,0,30,30" RadiusX="4" RadiusY="4"/></Image.Clip>
+                            </Image>
+                        </Grid>
+                    </Border>
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                        <TextBlock x:Name="RowTitle" Text="{Binding TileTitle}" FontSize="13" FontWeight="SemiBold" TextTrimming="CharacterEllipsis"/>
+                        <TextBlock x:Name="RowSub" Text="{Binding TileSub}" FontSize="12" TextTrimming="CharacterEllipsis"
+                                   Foreground="{DynamicResource TextSecondary}"/>
+                    </StackPanel>
+                    <StackPanel x:Name="RowActions" Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center" Opacity="0" Margin="6,0,0,0">
+                        <Button Style="{StaticResource SubtleIconButton}" Content="&#xE77A;" Click="Pin_Click"
+                                ToolTip="Открепить (Ctrl+P)" AutomationProperties.Name="Открепить"/>
+                        <StackPanel x:Name="ImageActions" Orientation="Horizontal" Visibility="Collapsed">
+                            <Button Style="{StaticResource SubtleIconButton}" Content="&#xE8D2;" Click="Ocr_Click"
+                                    ToolTip="Распознать текст" AutomationProperties.Name="Распознать текст"/>
+                            <Button Style="{StaticResource SubtleIconButton}" Content="&#xE8C1;" Click="TranslateImage_Click"
+                                    ToolTip="Перевести надписи на картинке (локально)" AutomationProperties.Name="Перевести надписи на картинке"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Grid>
+                <ContentPresenter x:Name="GroupBody" Content="{Binding}" ContentTemplate="{StaticResource PinGroupHeader}" Visibility="Collapsed"/>
+            </Grid>
+            <DataTemplate.Triggers>
+                <DataTrigger Binding="{Binding IsGroupHeader}" Value="True">
+                    <Setter TargetName="RowBody" Property="Visibility" Value="Collapsed"/>
+                    <Setter TargetName="GroupBody" Property="Visibility" Value="Visible"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding IsImage}" Value="True">
+                    <Setter TargetName="ImageActions" Property="Visibility" Value="Visible"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Recognizing}" Value="True">
+                    <Setter TargetName="ImageActions" Property="IsEnabled" Value="False"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding HasTileColor}" Value="True">
+                    <Setter TargetName="Ico" Property="Background" Value="{Binding TileTint}"/>
+                    <Setter TargetName="IcoGlyph" Property="Foreground" Value="{Binding TileBand}"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Kind}" Value="color">
+                    <Setter TargetName="Ico" Property="Background" Value="{Binding Swatch}"/>
+                    <Setter TargetName="IcoGlyph" Property="Visibility" Value="Collapsed"/>
+                    <Setter TargetName="RowTitle" Property="FontFamily" Value="{StaticResource MonoFont}"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Kind}" Value="path">
+                    <Setter TargetName="RowSub" Property="FontFamily" Value="{StaticResource MonoFont}"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Kind}" Value="code">
+                    <Setter TargetName="RowTitle" Property="FontFamily" Value="{StaticResource MonoFont}"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding ShowTileImage}" Value="True">
+                    <Setter TargetName="RowImage" Property="Visibility" Value="Visible"/>
+                    <Setter TargetName="IcoGlyph" Property="Visibility" Value="Collapsed"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType=ListBoxItem}}" Value="True">
+                    <Setter TargetName="RowActions" Property="Opacity" Value="1"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding IsSelected, RelativeSource={RelativeSource AncestorType=ListBoxItem}}" Value="True">
+                    <Setter TargetName="RowActions" Property="Opacity" Value="1"/>
+                </DataTrigger>
+            </DataTemplate.Triggers>
+        </DataTemplate>
+    </Window.Resources>
     <!--
         Прозрачное окно: панель 360×460, по 16 px вокруг — под тень. Скругление, рамку и тень рисуем сами,
-        потому что DWM не умеет плавно масштабировать окно, а анимация появления/исчезновения — это Scale + Opacity всего Root.
+        потому что DWM не умеет плавно масштабировать окно, а анимация появления/исчезновения — это Scale + сдвиг + Opacity всего Root.
     -->
     <Grid x:Name="Root" Margin="16">
         <Grid.RenderTransform>
-            <ScaleTransform x:Name="RootScale"/>
+            <TransformGroup>
+                <ScaleTransform x:Name="RootScale"/>
+                <TranslateTransform x:Name="RootShift"/>
+            </TransformGroup>
         </Grid.RenderTransform>
         <!-- Тень отдельным слоем: эффект не пересчитывает содержимое при каждом кадре -->
         <Border CornerRadius="8" Background="{DynamicResource WindowSurface}">
@@ -28,54 +279,108 @@
         </Border>
         <Border CornerRadius="8" Background="{DynamicResource WindowSurface}"
                 BorderBrush="{DynamicResource WindowStroke}" BorderThickness="1">
-    <Grid Margin="11,7,5,11">
+    <Grid Margin="11,7,5,9">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <DockPanel Margin="4,0,6,6" Height="32">
-            <!-- Корзина вместо текста «Очистить всё»: три вкладки и надпись в 360 px не помещаются -->
-            <Button x:Name="ClearButton" DockPanel.Dock="Right" Style="{StaticResource SubtleIconButton}" Width="32" Height="32"
-                    Content="&#xE74D;" Click="Clear_Click" FontSize="14"
-                    ToolTip="Очистить всё, кроме закреплённых" AutomationProperties.Name="Очистить всё, кроме закреплённых"/>
-            <Button x:Name="GroupButton" DockPanel.Dock="Right" Style="{StaticResource SubtleIconButton}" Width="32" Height="32"
+            <!-- Пауза, настройки и очистка — в меню «⋯»: опасная очистка не лежит в одном клике рядом с шестерёнкой -->
+            <Button x:Name="MoreButton" DockPanel.Dock="Right" Style="{StaticResource SubtleIconButton}" Focusable="True" Width="32" Height="32"
+                    Content="&#xE712;" Click="More_HeaderClick" FontSize="14"
+                    ToolTip="Ещё: пауза, настройки, очистка (F6 — фокус на кнопки)"
+                    AutomationProperties.Name="Ещё: пауза записи, настройки, очистка истории"/>
+            <Button x:Name="GroupButton" DockPanel.Dock="Right" Style="{StaticResource SubtleIconButton}" Focusable="True" Width="32" Height="32"
                     Content="&#xE710;" Click="Group_Click" FontSize="14" Visibility="Collapsed"
                     ToolTip="Новая группа" AutomationProperties.Name="Создать группу закреплённых"/>
-            <Button x:Name="SettingsButton" DockPanel.Dock="Right" Style="{StaticResource SubtleIconButton}" Width="32" Height="32"
-                    Content="&#xE713;" Click="Settings_Click" FontSize="15"
-                    ToolTip="Настройки" AutomationProperties.Name="Настройки"/>
-            <StackPanel Orientation="Horizontal" Margin="-8,0,0,0">
-                <RadioButton x:Name="TabAll" Style="{StaticResource HeaderTab}" GroupName="Tabs" IsChecked="True"
-                             Content="Буфер" Checked="Tab_Checked" AutomationProperties.Name="Вкладка: буфер обмена"
-                             ToolTip="Tab: следующая вкладка"/>
-                <RadioButton x:Name="TabPinned" Style="{StaticResource HeaderTab}" GroupName="Tabs"
-                             Content="Закреплённые" Checked="Tab_Checked" AutomationProperties.Name="Вкладка: закреплённые"
-                             ToolTip="Tab: следующая вкладка"/>
-                <RadioButton x:Name="TabSymbols" Style="{StaticResource HeaderTab}" GroupName="Tabs"
-                             Content="Символы" Checked="Tab_Checked" AutomationProperties.Name="Вкладка: символы"
-                             ToolTip="Tab: следующая вкладка"/>
-            </StackPanel>
+            <Button x:Name="ViewButton" DockPanel.Dock="Right" Style="{StaticResource SubtleIconButton}" Focusable="True" Width="32" Height="32"
+                    Content="&#xE8FD;" Click="View_Click" FontSize="14" Visibility="Collapsed"
+                    ToolTip="Показать списком" AutomationProperties.Name="Показать закреплённые списком"/>
+            <Grid x:Name="TabsHost" Margin="-8,0,0,0" HorizontalAlignment="Left">
+                <StackPanel Orientation="Horizontal">
+                    <RadioButton x:Name="TabAll" Style="{StaticResource HeaderTab}" GroupName="Tabs" IsChecked="True"
+                                 Content="Буфер" Checked="Tab_Checked" AutomationProperties.Name="Вкладка: буфер обмена"
+                                 ToolTip="Tab: следующая вкладка"/>
+                    <RadioButton x:Name="TabPinned" Style="{StaticResource HeaderTab}" GroupName="Tabs"
+                                 Content="Закреплённые" Checked="Tab_Checked" AutomationProperties.Name="Вкладка: закреплённые"
+                                 ToolTip="Tab: следующая вкладка"/>
+                    <RadioButton x:Name="TabSymbols" Style="{StaticResource HeaderTab}" GroupName="Tabs"
+                                 Content="Символы" Checked="Tab_Checked" AutomationProperties.Name="Вкладка: символы"
+                                 ToolTip="Tab: следующая вкладка"/>
+                </StackPanel>
+                <!-- Одна полоска на все вкладки: переезжает к выбранной (MoveTabIndicator) -->
+                <Border x:Name="TabIndicator" Width="16" Height="3" CornerRadius="1.5" HorizontalAlignment="Left" VerticalAlignment="Bottom"
+                        Background="{DynamicResource Accent}" IsHitTestVisible="False"/>
+            </Grid>
         </DockPanel>
 
-        <TextBox x:Name="Search" Grid.Row="1" Margin="0,0,6,8" Style="{StaticResource SearchBox}" Tag="Поиск"
-                 AutomationProperties.Name="Поиск по истории" TextChanged="Search_TextChanged"/>
+        <Grid Grid.Row="1" Margin="0,0,6,8">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <TextBox x:Name="Search" Margin="0,0,6,0" Style="{StaticResource SearchBox}" Tag="Поиск"
+                     AutomationProperties.Name="Поиск по истории" TextChanged="Search_TextChanged"/>
+            <Button x:Name="SourceButton" Grid.Column="1" Width="88" Style="{StaticResource StandardButton}" FontSize="12"
+                    Padding="5,0" Content="Все ▾" Click="Source_Click" ToolTip="Фильтр по приложению"
+                    AutomationProperties.Name="Приложение: все"/>
+            <Button x:Name="KindButton" Grid.Column="2" Width="84" Margin="6,0,0,0" Padding="5,0" Style="{StaticResource StandardButton}"
+                    FontSize="12" Content="Виды ▾" Click="Kind_Click" ToolTip="Вид записи: все, без фильтра"
+                    AutomationProperties.Name="Вид записи: все"/>
+        </Grid>
 
-        <Border x:Name="PinnedBackground" Grid.Row="2" Background="Transparent" Visibility="Collapsed"
+        <!-- InfoBar: пауза записи, подтверждение очистки, итог «Сжать промпт», ошибки. Раскрывается по высоте -->
+        <Border x:Name="InfoBar" Grid.Row="2" Margin="0,0,6,8" CornerRadius="4" BorderThickness="1" BorderBrush="{DynamicResource CardStroke}"
+                Padding="12,9,8,9" Visibility="Collapsed" ClipToBounds="True">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Border x:Name="InfoIcon" Width="16" Height="16" CornerRadius="8" Margin="0,1,10,0" VerticalAlignment="Top" RenderTransformOrigin="0.5,0.5">
+                    <TextBlock x:Name="InfoGlyph" FontFamily="{StaticResource IconFont}" FontSize="9" FontWeight="Bold"
+                               Foreground="{DynamicResource InfoGlyph}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                </Border>
+                <TextBlock Grid.Column="1" FontSize="13" LineHeight="18" LineStackingStrategy="BlockLineHeight" TextWrapping="Wrap"
+                           VerticalAlignment="Center"><Run x:Name="InfoTitle" FontWeight="SemiBold"/><Run x:Name="InfoMessage"/></TextBlock>
+                <Button x:Name="InfoClose" Grid.Column="2" Style="{StaticResource SubtleIconButton}" Focusable="True" Width="24" Height="24" Margin="6,-3,0,-3"
+                        VerticalAlignment="Top" FontSize="10" Content="&#xE711;" Click="InfoClose_Click"
+                        ToolTip="Закрыть" AutomationProperties.Name="Закрыть сообщение"/>
+                <StackPanel x:Name="InfoActions" Grid.Row="1" Grid.ColumnSpan="3" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,0,0">
+                    <Button x:Name="InfoPrimary" Style="{StaticResource AccentButton}" Height="28" FontSize="13" Click="InfoPrimary_Click"/>
+                    <Button x:Name="InfoSecondary" Style="{StaticResource StandardButton}" Height="28" FontSize="13" Margin="8,0,0,0" Click="InfoSecondary_Click"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <Border x:Name="PinnedBackground" Grid.Row="3" Background="Transparent" Visibility="Collapsed"
                 MouseRightButtonUp="Pinned_EmptyRightClick"/>
 
-        <ListBox x:Name="List" Grid.Row="2" Focusable="False"
+        <ListBox x:Name="List" Grid.Row="3" Focusable="False"
                  Background="Transparent" BorderThickness="0" Padding="0"
                  ItemContainerStyle="{StaticResource ClipItemContainer}"
+                 AllowDrop="True" PreviewMouseLeftButtonDown="Pinned_MouseDown" PreviewMouseMove="Pinned_MouseMove"
+                 DragOver="Values_DragOver" DragLeave="Pinned_DragLeave" Drop="Values_Drop"
+                 MouseMove="Text_PeekMove" MouseLeave="Text_PeekLeave" PreviewMouseWheel="Text_PeekWheel"
                  ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                  ScrollViewer.CanContentScroll="True"
                  VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.VirtualizationMode="Recycling"
                  VirtualizingPanel.ScrollUnit="Pixel"
+                 SelectionChanged="List_SelectionChanged"
                  AutomationProperties.Name="Записи">
             <ListBox.ItemTemplate>
                 <DataTemplate>
-                    <Grid>
+                    <Grid ToolTip="{Binding SourceApp}">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="Auto"/>
@@ -86,10 +391,14 @@
                         <StackPanel x:Name="GraphPreview" Visibility="Collapsed" Margin="0,2,8,2" HorizontalAlignment="Left">
                             <TextBlock Text="{Binding GraphLabel}" FontSize="11" Foreground="{DynamicResource TextSecondary}" Margin="0,0,0,3"/>
                             <Grid>
+                                <!-- Вектор из сотен нод и подписей: кэшируем растром, чтобы анимация панели не перерисовывала его каждый кадр -->
                                 <Image Source="{Binding GraphPreview, IsAsync=True}" Width="260" Height="100" Stretch="Uniform"
                                        MouseEnter="Image_MouseEnter" MouseLeave="Image_MouseLeave" Unloaded="Image_Unloaded"
                                        ToolTipService.IsEnabled="False" RenderOptions.BitmapScalingMode="HighQuality"
                                        AutomationProperties.Name="Схема нод">
+                                    <Image.CacheMode>
+                                        <BitmapCache RenderAtScale="2"/>
+                                    </Image.CacheMode>
                                     <Image.ToolTip>
                                         <ToolTip Placement="Center" Padding="0" BorderThickness="0" Background="Transparent"
                                                  HasDropShadow="False" IsHitTestVisible="False" StaysOpen="True">
@@ -168,9 +477,13 @@
                             <Button x:Name="GraphButton" Style="{StaticResource SubtleIconButton}" Content="&#xE8A7;"
                                     Visibility="Collapsed" Click="Graph_Click" ToolTip="Открыть граф" AutomationProperties.Name="Открыть граф нод"/>
                             <Button x:Name="PinButton" Style="{StaticResource SubtleIconButton}" Content="&#xE718;"
-                                    Click="Pin_Click" ToolTip="Закрепить" AutomationProperties.Name="Закрепить"/>
-                            <Button Style="{StaticResource SubtleIconButton}" Content="&#xE712;"
-                                    Click="More_Click" ToolTip="Ещё" AutomationProperties.Name="Ещё"/>
+                                    Click="Pin_Click" ToolTip="Закрепить (Ctrl+P)" AutomationProperties.Name="Закрепить"/>
+                            <StackPanel x:Name="ImageActions" Orientation="Horizontal" Visibility="Collapsed">
+                                <Button Style="{StaticResource SubtleIconButton}" Content="&#xE8D2;" Click="Ocr_Click"
+                                        ToolTip="Распознать текст" AutomationProperties.Name="Распознать текст"/>
+                                <Button Style="{StaticResource SubtleIconButton}" Content="&#xE8C1;" Click="TranslateImage_Click"
+                                        ToolTip="Перевести надписи на картинке (локально)" AutomationProperties.Name="Перевести надписи на картинке"/>
+                            </StackPanel>
                         </StackPanel>
                         <!-- В покое: едва заметное время попадания в буфер (и булавка у закреплённых); при наведении место занимают кнопки -->
                         <StackPanel x:Name="Idle" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right"
@@ -184,9 +497,20 @@
                         </StackPanel>
                     </Grid>
                     <DataTemplate.Triggers>
+                        <DataTrigger Binding="{Binding IsMono}" Value="True">
+                            <Setter TargetName="TextPreview" Property="FontFamily" Value="{StaticResource MonoFont}"/>
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding IsMapLink}" Value="True">
+                            <Setter TargetName="TextPreview" Property="MaxHeight" Value="Infinity"/>
+                            <Setter TargetName="TextPreview" Property="TextTrimming" Value="None"/>
+                        </DataTrigger>
                         <DataTrigger Binding="{Binding IsImage}" Value="True">
                             <Setter TargetName="TextPreview" Property="Visibility" Value="Collapsed"/>
                             <Setter TargetName="ImagePreview" Property="Visibility" Value="Visible"/>
+                            <Setter TargetName="ImageActions" Property="Visibility" Value="Visible"/>
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding Recognizing}" Value="True">
+                            <Setter TargetName="ImageActions" Property="IsEnabled" Value="False"/>
                         </DataTrigger>
                         <DataTrigger Binding="{Binding IsGif}" Value="True">
                             <Setter TargetName="GifBadge" Property="Visibility" Value="Visible"/>
@@ -200,10 +524,13 @@
                             <Setter TargetName="TextPreview" Property="Visibility" Value="Collapsed"/>
                             <Setter TargetName="MediaRow" Property="Visibility" Value="Visible"/>
                         </DataTrigger>
+                        <DataTrigger Binding="{Binding IsFolder}" Value="True">
+                            <Setter TargetName="MediaRow" Property="ToolTip" Value="{Binding Text}"/>
+                        </DataTrigger>
                         <DataTrigger Binding="{Binding Pinned}" Value="True">
                             <Setter TargetName="PinnedMark" Property="Visibility" Value="Visible"/>
                             <Setter TargetName="PinButton" Property="Content" Value="&#xE77A;"/>
-                            <Setter TargetName="PinButton" Property="ToolTip" Value="Открепить"/>
+                            <Setter TargetName="PinButton" Property="ToolTip" Value="Открепить (Ctrl+P)"/>
                             <Setter TargetName="PinButton" Property="AutomationProperties.Name" Value="Открепить"/>
                         </DataTrigger>
                         <DataTrigger Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType=ListBoxItem}}" Value="True">
@@ -219,75 +546,21 @@
             </ListBox.ItemTemplate>
         </ListBox>
 
-        <!-- Закреплённые: плитка в 3 столбца -->
-        <ListBox x:Name="PinnedList" Grid.Row="2" Focusable="False" Visibility="Collapsed"
-                 Background="Transparent" BorderThickness="0" Padding="0" Margin="-2,-2,0,0"
+        <!-- Закреплённые: плитки 3 в ряд или список (ViewButton); шаблоны и контейнеры меняет ApplyPinnedView -->
+        <ListBox x:Name="PinnedList" Grid.Row="3" Focusable="False" Visibility="Collapsed"
+                 Background="Transparent" BorderThickness="0" Padding="0" Margin="-3,-3,0,0"
                  ItemContainerStyle="{StaticResource PinTileContainer}"
+                 ItemTemplate="{StaticResource PinTileTemplate}"
+                 ItemsPanel="{StaticResource PinTilePanel}"
                  AllowDrop="True" PreviewMouseLeftButtonDown="Pinned_MouseDown" PreviewMouseMove="Pinned_MouseMove"
+                 MouseMove="Text_PeekMove" MouseLeave="Text_PeekLeave" PreviewMouseWheel="Text_PeekWheel"
                  DragOver="Pinned_DragOver" DragLeave="Pinned_DragLeave" Drop="Pinned_Drop"
                  ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                  ScrollViewer.CanContentScroll="False"
-                 AutomationProperties.Name="Закреплённые записи">
-            <ListBox.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <WrapPanel VerticalAlignment="Top"/>
-                </ItemsPanelTemplate>
-            </ListBox.ItemsPanel>
-            <ListBox.ItemTemplate>
-                <DataTemplate>
-                    <Grid>
-                        <Grid x:Name="TileBody">
-                        <TextBlock x:Name="TextPreview" Text="{Binding Preview}" FontSize="12" TextWrapping="Wrap"
-                                   TextTrimming="CharacterEllipsis" LineStackingStrategy="BlockLineHeight" LineHeight="16"
-                                   VerticalAlignment="Top"/>
-                        <Image x:Name="ImagePreview" Source="{Binding Thumbnail, IsAsync=True}" Visibility="Collapsed"
-                               MouseEnter="Image_MouseEnter" MouseLeave="Image_MouseLeave"
-                               Stretch="Uniform" RenderOptions.BitmapScalingMode="HighQuality"/>
-                        <Border x:Name="GifBadge" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="0" Padding="5,1,5,2"
-                                CornerRadius="4" Background="#B3000000" Visibility="Collapsed" IsHitTestVisible="False">
-                            <TextBlock Text="{Binding Badge}" FontSize="10" FontWeight="SemiBold" Foreground="White"/>
-                        </Border>
-                        <!-- Открепить: появляется при наведении/выборе, на подложке — чтобы читалась и поверх картинки -->
-                        <Border x:Name="UnpinWrap" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,-2,-4,0"
-                                CornerRadius="4" Background="{DynamicResource MenuSurface}" Opacity="0">
-                            <Button Style="{StaticResource SubtleIconButton}" Width="24" Height="24" FontSize="11"
-                                    Content="&#xE77A;" Click="Pin_Click" ToolTip="Открепить" AutomationProperties.Name="Открепить"/>
-                        </Border>
-                        </Grid>
-                        <Grid x:Name="GroupBody" Visibility="Collapsed" ToolTip="Перетащите плитку сюда · правая кнопка — параметры группы">
-                            <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
-                            <TextBlock Text="{Binding Name}" FontSize="12" FontWeight="SemiBold" VerticalAlignment="Center"
-                                       Foreground="{DynamicResource TextSecondary}" Margin="4,0,10,0"/>
-                            <Border Grid.Column="1" Height="1" VerticalAlignment="Center" Background="{DynamicResource WindowStroke}"/>
-                            <TextBlock Grid.Column="2" Text="&#xE10C;" FontFamily="{StaticResource IconFont}" FontSize="12"
-                                       Foreground="{DynamicResource TextDisabled}" VerticalAlignment="Center" Margin="10,0,4,0"/>
-                        </Grid>
-                    </Grid>
-                    <DataTemplate.Triggers>
-                        <DataTrigger Binding="{Binding IsGroupHeader}" Value="True">
-                            <Setter TargetName="TileBody" Property="Visibility" Value="Collapsed"/>
-                            <Setter TargetName="GroupBody" Property="Visibility" Value="Visible"/>
-                        </DataTrigger>
-                        <DataTrigger Binding="{Binding ShowTileImage}" Value="True">
-                            <Setter TargetName="TextPreview" Property="Visibility" Value="Collapsed"/>
-                            <Setter TargetName="ImagePreview" Property="Visibility" Value="Visible"/>
-                        </DataTrigger>
-                        <DataTrigger Binding="{Binding HasBadge}" Value="True">
-                            <Setter TargetName="GifBadge" Property="Visibility" Value="Visible"/>
-                        </DataTrigger>
-                        <DataTrigger Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType=ListBoxItem}}" Value="True">
-                            <Setter TargetName="UnpinWrap" Property="Opacity" Value="1"/>
-                        </DataTrigger>
-                        <DataTrigger Binding="{Binding IsSelected, RelativeSource={RelativeSource AncestorType=ListBoxItem}}" Value="True">
-                            <Setter TargetName="UnpinWrap" Property="Opacity" Value="1"/>
-                        </DataTrigger>
-                    </DataTemplate.Triggers>
-                </DataTemplate>
-            </ListBox.ItemTemplate>
-        </ListBox>
+                 AutomationProperties.Name="Закреплённые записи"/>
 
         <!-- Символы: группы (закреплённые сверху), внутри — сетка клеток -->
-        <ListBox x:Name="SymbolList" Grid.Row="2" Focusable="False" Visibility="Collapsed"
+        <ListBox x:Name="SymbolList" Grid.Row="3" Focusable="False" Visibility="Collapsed"
                  Background="Transparent" BorderThickness="0" Padding="0" Margin="-1,0,0,0"
                  ItemContainerStyle="{StaticResource SymbolCell}"
                  ScrollViewer.HorizontalScrollBarVisibility="Disabled"
@@ -311,7 +584,7 @@
         </ListBox>
 
         <!-- Пустое состояние -->
-        <StackPanel x:Name="Empty" Grid.Row="2" VerticalAlignment="Center" HorizontalAlignment="Center"
+        <StackPanel x:Name="Empty" Grid.Row="3" VerticalAlignment="Center" HorizontalAlignment="Center"
                     Margin="24,0,30,24" Visibility="Collapsed" MouseRightButtonUp="Pinned_EmptyRightClick">
             <TextBlock Text="&#xE77F;" FontFamily="{StaticResource IconFont}" FontSize="28" HorizontalAlignment="Center"
                        Foreground="{DynamicResource TextSecondary}" Margin="0,0,0,12"/>
@@ -319,88 +592,465 @@
             <TextBlock x:Name="EmptyHint" Margin="0,4,0,0" FontSize="13" TextAlignment="Center" TextWrapping="Wrap"
                        Foreground="{DynamicResource TextSecondary}"/>
         </StackPanel>
-        <Border x:Name="SettingsFlyout" Grid.RowSpan="3" Panel.ZIndex="10" Visibility="Collapsed"
-                HorizontalAlignment="Right" VerticalAlignment="Top" Width="236" Margin="0,34,4,0" Padding="14,12"
+
+        <Border x:Name="SeriesBar" Grid.Row="4" Margin="0,8,6,0" Padding="0,8,0,0" BorderThickness="0,1,0,0"
+                BorderBrush="{DynamicResource WindowStroke}" Visibility="Collapsed">
+            <StackPanel>
+                <DockPanel Margin="0,0,0,5">
+                    <Button x:Name="SeriesClear" DockPanel.Dock="Right" Style="{StaticResource SubtleIconButton}" Width="22" Height="22"
+                            Content="&#xE711;" FontSize="10" Click="SeriesClear_Click" ToolTip="Снять все отметки" AutomationProperties.Name="Снять все отметки картинок и видео"/>
+                    <TextBlock x:Name="SeriesStatus" FontSize="12" FontWeight="SemiBold" VerticalAlignment="Center"
+                               AutomationProperties.LiveSetting="Polite"/>
+                </DockPanel>
+                <ListBox x:Name="SeriesQueue" Height="60" Margin="0,0,0,5" Padding="0" BorderThickness="0" Background="Transparent"
+                         ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Disabled"
+                         ScrollViewer.CanContentScroll="False" AllowDrop="True" SelectionChanged="SeriesQueue_SelectionChanged"
+                         PreviewMouseLeftButtonDown="SeriesQueue_MouseDown" PreviewMouseMove="SeriesQueue_MouseMove"
+                         DragOver="SeriesQueue_DragOver" DragLeave="SeriesQueue_DragLeave" Drop="SeriesQueue_Drop"
+                         AutomationProperties.Name="Порядок выбранных картинок и видео" ToolTip="Перетащите миниатюру для смены порядка. Ctrl+←/→ — переставить, Delete — снять отметку.">
+                    <ListBox.ItemsPanel><ItemsPanelTemplate><StackPanel Orientation="Horizontal"/></ItemsPanelTemplate></ListBox.ItemsPanel>
+                    <ListBox.ItemContainerStyle>
+                        <Style TargetType="ListBoxItem">
+                            <Setter Property="Margin" Value="0,0,4,0"/>
+                            <Setter Property="AutomationProperties.Name" Value="{Binding SeriesNumber, StringFormat=Файл {0}}"/>
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="ListBoxItem">
+                                        <Grid>
+                                            <Border x:Name="Card" Width="54" Height="44" CornerRadius="4" BorderThickness="2"
+                                                    BorderBrush="{DynamicResource CardStroke}" Background="{DynamicResource CardFill}">
+                                                <ContentPresenter/>
+                                            </Border>
+                                            <Border x:Name="Before" Width="2" HorizontalAlignment="Left" Background="{DynamicResource Accent}" Visibility="Collapsed"/>
+                                            <Border x:Name="After" Width="2" HorizontalAlignment="Right" Background="{DynamicResource Accent}" Visibility="Collapsed"/>
+                                        </Grid>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsSelected" Value="True"><Setter TargetName="Card" Property="BorderBrush" Value="{DynamicResource Accent}"/></Trigger>
+                                            <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="Card" Property="Background" Value="{DynamicResource CardHover}"/></Trigger>
+                                            <Trigger Property="Tag" Value="Before"><Setter TargetName="Before" Property="Visibility" Value="Visible"/></Trigger>
+                                            <Trigger Property="Tag" Value="After"><Setter TargetName="After" Property="Visibility" Value="Visible"/></Trigger>
+                                            <DataTrigger Binding="{Binding SeriesInserted}" Value="True"><Setter TargetName="Card" Property="Opacity" Value="0.45"/></DataTrigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </ListBox.ItemContainerStyle>
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Grid>
+                                <Image Source="{Binding Thumbnail, IsAsync=True}" Stretch="Uniform" RenderOptions.BitmapScalingMode="HighQuality"/>
+                                <TextBlock Text="{Binding Glyph}" FontFamily="{StaticResource IconFont}" FontSize="22"
+                                           HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{DynamicResource TextSecondary}">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                            <Style.Triggers><DataTrigger Binding="{Binding ShowTileImage}" Value="False"><Setter Property="Visibility" Value="Visible"/></DataTrigger></Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                                <Border Background="{DynamicResource MenuSurface}" CornerRadius="3" Padding="3,0" Margin="2"
+                                        HorizontalAlignment="Left" VerticalAlignment="Top">
+                                    <TextBlock Text="{Binding SeriesNumber}" FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimary}"/>
+                                </Border>
+                            </Grid>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+                <TextBlock x:Name="SeriesHint" FontSize="11" TextWrapping="Wrap" Foreground="{DynamicResource TextSecondary}" Margin="0,0,0,7"/>
+                <Grid>
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                    <Button x:Name="SeriesNext" Style="{StaticResource StandardButton}" Height="32" Margin="0,0,4,0" Click="SeriesNext_Click"
+                            Padding="6,0" FontSize="12" ToolTip="Вставить следующую выбранную картинку или видео" AutomationProperties.Name="Вставить следующий выбранный файл"/>
+                    <Button x:Name="SeriesAll" Grid.Column="1" Style="{StaticResource AccentButton}" Height="32" Margin="4,0,0,0" Click="SeriesAll_Click"
+                            Padding="6,0" FontSize="12" ToolTip="Вставить все оставшиеся картинки и видео одной пачкой в порядке очереди (Ctrl+Enter). Чат должен поддерживать вставку нескольких файлов."
+                            AutomationProperties.Name="Вставить все оставшиеся картинки и видео"/>
+                </Grid>
+            </StackPanel>
+        </Border>
+
+        <!-- Строка-подсказка: сочетания, которые иначе знает только автор. Выключается в настройках -->
+        <Border x:Name="KeyHints" Grid.Row="4" Margin="0,8,6,0" Padding="0,8,0,0" BorderThickness="0,1,0,0"
+                BorderBrush="{DynamicResource WindowStroke}" TextElement.FontSize="11">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel Orientation="Horizontal">
+                    <Border Style="{StaticResource KeyCap}"><TextBlock Text="Enter"/></Border>
+                    <TextBlock Text="вставить" Foreground="{DynamicResource TextSecondary}" VerticalAlignment="Center"/>
+                </StackPanel>
+                <StackPanel Grid.Column="2" Orientation="Horizontal">
+                    <Border Style="{StaticResource KeyCap}"><TextBlock Text="Alt+клик"/></Border>
+                    <TextBlock Text="выбрать" Foreground="{DynamicResource TextSecondary}" VerticalAlignment="Center" ToolTip="Alt+клик — начать выбор текстов или картинок и видео. Дальше отмечайте обычными кликами. Alt+пробел — с клавиатуры."/>
+                </StackPanel>
+                <StackPanel Grid.Column="4" Orientation="Horizontal">
+                    <Border Style="{StaticResource KeyCap}"><TextBlock Text="Ctrl+1-9"/></Border>
+                    <TextBlock Text="быстро" Foreground="{DynamicResource TextSecondary}" VerticalAlignment="Center"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!--
+            Просмотр текста при наведении — как увеличение картинок, но для текста: карточка рядом с панелью
+            (не закрывает соседние плитки), полный текст, колесо мыши прокручивает, внизу текст тает.
+        -->
+        <Popup x:Name="TextPeek" AllowsTransparency="True" Placement="Custom" StaysOpen="True" Focusable="False"
+               IsHitTestVisible="False" PopupAnimation="None">
+            <Border x:Name="PeekCard" Margin="12,4,12,16" Width="380" CornerRadius="8" BorderThickness="1"
+                    Background="{DynamicResource MenuSurface}" BorderBrush="{DynamicResource WindowStroke}"
+                    TextElement.Foreground="{DynamicResource TextPrimary}" TextElement.FontFamily="{StaticResource TextFont}">
+                <Border.Effect>
+                    <DropShadowEffect BlurRadius="24" ShadowDepth="6" Direction="270" Opacity="0.35"/>
+                </Border.Effect>
+                <Grid>
+                    <Border x:Name="PeekBand" Height="3" VerticalAlignment="Top" CornerRadius="7,7,0,0"/>
+                    <StackPanel Margin="16,13,16,14">
+                        <DockPanel Margin="0,0,0,8">
+                            <TextBlock x:Name="PeekMeta" DockPanel.Dock="Right" FontSize="12" Foreground="{DynamicResource TextSecondary}"/>
+                            <TextBlock x:Name="PeekKind" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource TextSecondary}"/>
+                        </DockPanel>
+                        <TextBlock x:Name="PeekTitle" FontSize="16" FontWeight="SemiBold" TextWrapping="Wrap" Margin="0,0,0,6" Visibility="Collapsed"/>
+                        <Border Background="{DynamicResource WindowSurface}" CornerRadius="4" Padding="8,6">
+                            <ScrollViewer x:Name="PeekScroll" MaxHeight="360" VerticalScrollBarVisibility="Hidden" Focusable="False"
+                                          ScrollChanged="PeekScroll_ScrollChanged">
+                                <TextBlock x:Name="PeekText" FontSize="13" LineHeight="20" LineStackingStrategy="BlockLineHeight" TextWrapping="Wrap"/>
+                            </ScrollViewer>
+                        </Border>
+                        <TextBlock x:Name="PeekHint" Text="Колесо мыши: прокрутка" FontSize="11" Margin="0,8,0,0"
+                                   Foreground="{DynamicResource TextSecondary}" Visibility="Collapsed"/>
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </Popup>
+
+        <Popup x:Name="DragGhost" AllowsTransparency="True" Placement="Relative" StaysOpen="True"
+               Focusable="False" IsHitTestVisible="False" PopupAnimation="None">
+            <Border x:Name="DragGhostCard" Width="244" Margin="16" Padding="14,11" CornerRadius="8" CacheMode="BitmapCache"
+                    Background="{DynamicResource MenuSurface}" BorderBrush="{DynamicResource Accent}" BorderThickness="1"
+                    TextElement.Foreground="{DynamicResource TextPrimary}" TextElement.FontFamily="{StaticResource TextFont}"
+                    RenderTransformOrigin="0.5,0.5">
+                <Border.Effect><DropShadowEffect BlurRadius="24" ShadowDepth="8" Opacity="0.3"/></Border.Effect>
+                <Border.RenderTransform>
+                    <TransformGroup>
+                        <ScaleTransform x:Name="DragGhostScale"/>
+                        <RotateTransform x:Name="DragGhostTilt"/>
+                        <TranslateTransform x:Name="DragGhostShift"/>
+                    </TransformGroup>
+                </Border.RenderTransform>
+                <StackPanel>
+                    <TextBlock x:Name="DragGhostText" FontSize="14" TextWrapping="Wrap" MaxHeight="44"
+                               TextTrimming="CharacterEllipsis" LineHeight="20"/>
+                    <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                        <TextBlock x:Name="DragGhostGlyph" FontFamily="{StaticResource IconFont}" FontSize="12"
+                                   Foreground="{DynamicResource Accent}" Margin="0,1,7,0"/>
+                        <TextBlock x:Name="DragGhostStatus" FontSize="11" Foreground="{DynamicResource TextSecondary}"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </Popup>
+
+        <Popup x:Name="ValueDrop" AllowsTransparency="True" Placement="Custom" StaysOpen="True"
+               PopupAnimation="None" Focusable="False">
+            <Border x:Name="ValueDropCard" Width="380" Margin="8,4,8,12" Padding="16" CornerRadius="8"
+                    BorderThickness="1" BorderBrush="{DynamicResource Accent}" Background="{DynamicResource MenuSurface}"
+                    TextElement.Foreground="{DynamicResource TextPrimary}" TextElement.FontFamily="{StaticResource TextFont}">
+                <StackPanel>
+                    <TextBlock x:Name="ValueDropTitle" Text="Заменить значение" FontSize="16" FontWeight="SemiBold"/>
+                    <TextBlock x:Name="ValueDropHint" TextWrapping="Wrap" FontSize="12" Margin="0,6,0,12"
+                               Foreground="{DynamicResource TextSecondary}" AutomationProperties.LiveSetting="Polite"/>
+                    <ScrollViewer x:Name="ValueScroll" MaxHeight="320" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                        <ItemsControl x:Name="ValueChoices" AutomationProperties.Name="Значения для замены">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Button x:Name="ValueChoice" Margin="0,0,3,10" Padding="12,11" Height="Auto" MinHeight="48"
+                                            HorizontalContentAlignment="Stretch"
+                                            IsEnabled="{Binding CanApply}"
+                                            AllowDrop="True" PreviewDragOver="ValueChoice_DragOver" PreviewDrop="ValueChoice_Drop"
+                                            PreviewDragLeave="ValueChoice_DragLeave"
+                                            Click="ValueChoice_Click" AutomationProperties.Name="{Binding Description}">
+                                        <Button.Style>
+                                            <Style TargetType="Button" BasedOn="{StaticResource StandardButton}">
+                                                <Setter Property="Template">
+                                                    <Setter.Value>
+                                                        <ControlTemplate TargetType="Button">
+                                                            <Border x:Name="Frame" CornerRadius="6" Padding="{TemplateBinding Padding}"
+                                                                    Background="{DynamicResource WindowSurface}" BorderBrush="{DynamicResource WindowStroke}" BorderThickness="1">
+                                                                <ContentPresenter HorizontalAlignment="Stretch"/>
+                                                            </Border>
+                                                            <ControlTemplate.Triggers>
+                                                                <Trigger Property="IsMouseOver" Value="True">
+                                                                    <Setter TargetName="Frame" Property="BorderBrush" Value="{DynamicResource DropValueText}"/>
+                                                                    <Setter TargetName="Frame" Property="Background" Value="{DynamicResource DropValueFill}"/>
+                                                                </Trigger>
+                                                                <Trigger Property="IsKeyboardFocused" Value="True">
+                                                                    <Setter TargetName="Frame" Property="BorderBrush" Value="{DynamicResource DropValueText}"/>
+                                                                    <Setter TargetName="Frame" Property="Background" Value="{DynamicResource DropValueFill}"/>
+                                                                </Trigger>
+                                                                <Trigger Property="Tag" Value="Ready">
+                                                                    <Setter TargetName="Frame" Property="BorderBrush" Value="{DynamicResource DropValueText}"/>
+                                                                    <Setter TargetName="Frame" Property="Background" Value="{DynamicResource DropValueFill}"/>
+                                                                </Trigger>
+                                                                <Trigger Property="IsPressed" Value="True">
+                                                                    <Setter TargetName="Frame" Property="Opacity" Value="0.85"/>
+                                                                </Trigger>
+                                                                <Trigger Property="IsEnabled" Value="False">
+                                                                    <Setter TargetName="Frame" Property="Opacity" Value="0.45"/>
+                                                                </Trigger>
+                                                            </ControlTemplate.Triggers>
+                                                        </ControlTemplate>
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </Style>
+                                        </Button.Style>
+                                        <StackPanel>
+                                            <TextBlock Text="{Binding Caption}" Foreground="{DynamicResource TextSecondary}" FontSize="11"
+                                                       TextTrimming="CharacterEllipsis" Margin="0,0,0,8"/>
+                                            <TextBlock x:Name="CommandPreview" TextWrapping="Wrap" FontFamily="{StaticResource MonoFont}" FontSize="12" LineHeight="19"
+                                                       Foreground="{DynamicResource TextSecondary}"><Run Text="{Binding Before}"/><Run Text="{Binding Inserted}" Foreground="{DynamicResource DropValueText}" FontWeight="SemiBold"/><Run Text="{Binding After}"/></TextBlock>
+                                            <TextBlock Margin="0,9,0,0" FontSize="11" Foreground="{DynamicResource DropValueText}">
+                                                <TextBlock.Style>
+                                                    <Style TargetType="TextBlock">
+                                                        <Setter Property="Text" Value="Итог команды"/>
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding Tag, RelativeSource={RelativeSource AncestorType=Button}}" Value="Ready">
+                                                                <Setter Property="Text" Value="Отпустите — подставить сюда"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </TextBlock.Style>
+                                            </TextBlock>
+                                        </StackPanel>
+                                    </Button>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+                    <TextBlock Text="Esc — отменить · Ctrl+Z — отменить замену" FontSize="11"
+                               Foreground="{DynamicResource TextSecondary}" TextWrapping="Wrap"/>
+                </StackPanel>
+            </Border>
+        </Popup>
+
+        <Border x:Name="SettingsFlyout" Grid.RowSpan="5" Panel.ZIndex="10" Visibility="Collapsed"
+                HorizontalAlignment="Right" VerticalAlignment="Top" Width="300" Margin="0,34,4,0"
                 CornerRadius="8" Background="{DynamicResource MenuSurface}"
                 BorderBrush="{DynamicResource WindowStroke}" BorderThickness="1">
             <Border.Effect>
                 <DropShadowEffect BlurRadius="18" ShadowDepth="4" Direction="270" Opacity="0.3"/>
             </Border.Effect>
-            <StackPanel>
-                <TextBlock Text="Анимация окна" FontWeight="SemiBold" Margin="0,0,0,12"/>
-                <Grid>
-                    <TextBlock Text="Появление"/>
-                    <TextBlock x:Name="ShowTimingValue" HorizontalAlignment="Right" Foreground="{DynamicResource TextSecondary}" Text="100 мс"/>
+            <Grid>
+                <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
+                <Grid Margin="12,12,12,4">
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="*"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                    <Button x:Name="VisualSettingsTab" Content="Вид" Style="{StaticResource AccentButton}" Margin="0,0,4,0"
+                            Click="ShowVisualSettings_Click" AutomationProperties.Name="Настройки вида"/>
+                    <Button x:Name="StorageSettingsTab" Grid.Column="1" Content="Хранение" Style="{StaticResource StandardButton}"
+                            Margin="4,0,4,0" Click="ShowStorageSettings_Click" AutomationProperties.Name="Настройки хранения данных"/>
+                    <Button x:Name="VfxSettingsTab" Grid.Column="2" Content="VFX" Style="{StaticResource StandardButton}"
+                            Margin="4,0,0,0" Click="ShowVfxSettings_Click" AutomationProperties.Name="Настройки эффектов рамки"/>
                 </Grid>
-                <Slider x:Name="ShowTiming" Minimum="0" Maximum="1000" Value="100" TickFrequency="10"
-                        IsSnapToTickEnabled="True" Margin="0,3,0,14" ValueChanged="Timing_ValueChanged"
-                        AutomationProperties.Name="Длительность появления, миллисекунды"/>
-                <Grid>
-                    <TextBlock Text="Исчезновение"/>
-                    <TextBlock x:Name="HideTimingValue" HorizontalAlignment="Right" Foreground="{DynamicResource TextSecondary}" Text="100 мс"/>
-                </Grid>
-                <Slider x:Name="HideTiming" Minimum="0" Maximum="1000" Value="100" TickFrequency="10"
-                        IsSnapToTickEnabled="True" Margin="0,3,0,0" ValueChanged="Timing_ValueChanged"
-                        AutomationProperties.Name="Длительность исчезновения, миллисекунды"/>
-                <Border Height="1" Background="{DynamicResource WindowStroke}" Margin="0,14,0,12"/>
-                <Grid>
-                    <TextBlock Text="Увеличение картинки"/>
-                    <TextBlock x:Name="ZoomDelayValue" HorizontalAlignment="Right" Foreground="{DynamicResource TextSecondary}" Text="1 с"/>
-                </Grid>
-                <Slider x:Name="ZoomDelaySlider" Minimum="100" Maximum="3000" Value="1000" TickFrequency="100"
-                        IsSnapToTickEnabled="True" Margin="0,3,0,12" ValueChanged="ZoomDelay_ValueChanged"
-                        AutomationProperties.Name="Задержка увеличения картинки, миллисекунды"/>
-                <Grid>
-                    <TextBlock Text="Общий размер"/>
-                    <TextBlock x:Name="ZoomScaleValue" HorizontalAlignment="Right" Foreground="{DynamicResource TextSecondary}" Text="780 × 360"/>
-                </Grid>
-                <Slider x:Name="ZoomScaleSlider" Minimum="1" Maximum="5" Value="3" TickFrequency="1"
-                        IsSnapToTickEnabled="True" Margin="0,3,0,0" ValueChanged="ZoomScale_ValueChanged"
-                        AutomationProperties.Name="Общий размер просмотра картинки"/>
-                <Border Height="1" Background="{DynamicResource WindowStroke}" Margin="0,14,0,12"/>
-                <ToggleButton x:Name="OutsideHideToggle" IsChecked="True" Cursor="Hand"
-                              Checked="OutsideHideToggle_Changed" Unchecked="OutsideHideToggle_Changed"
-                              AutomationProperties.Name="Скрывать, когда курсор вне окна">
-                    <ToggleButton.Content>
-                        <TextBlock Text="Скрывать вне окна" TextWrapping="Wrap" FontSize="13"/>
-                    </ToggleButton.Content>
-                    <ToggleButton.Template>
-                        <ControlTemplate TargetType="ToggleButton">
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                </Grid.ColumnDefinitions>
-                                <ContentPresenter VerticalAlignment="Center" Margin="0,0,8,0"/>
-                                <Border x:Name="Track" Grid.Column="1" Width="38" Height="20" CornerRadius="10"
-                                        Background="{DynamicResource TextDisabled}" VerticalAlignment="Center">
-                                    <Ellipse x:Name="Thumb" Width="14" Height="14" Fill="White"
-                                             HorizontalAlignment="Left" Margin="3,0,0,0"/>
-                                </Border>
-                            </Grid>
-                            <ControlTemplate.Triggers>
-                                <Trigger Property="IsChecked" Value="True">
-                                    <Setter TargetName="Track" Property="Background" Value="{DynamicResource Accent}"/>
-                                    <Setter TargetName="Thumb" Property="HorizontalAlignment" Value="Right"/>
-                                    <Setter TargetName="Thumb" Property="Margin" Value="0,0,3,0"/>
-                                </Trigger>
-                                <Trigger Property="IsKeyboardFocused" Value="True">
-                                    <Setter TargetName="Track" Property="BorderBrush" Value="{DynamicResource Accent}"/>
-                                    <Setter TargetName="Track" Property="BorderThickness" Value="1"/>
-                                </Trigger>
-                            </ControlTemplate.Triggers>
-                        </ControlTemplate>
-                    </ToggleButton.Template>
-                </ToggleButton>
-                <Grid Margin="0,12,0,0">
-                    <TextBlock Text="Задержка скрытия"/>
-                    <TextBlock x:Name="OutsideHideValue" HorizontalAlignment="Right" Foreground="{DynamicResource TextSecondary}" Text="3 с"/>
-                </Grid>
-                <Slider x:Name="OutsideHideSlider" Minimum="500" Maximum="10000" Value="3000" TickFrequency="500"
-                        IsSnapToTickEnabled="True" Margin="0,3,0,0" ValueChanged="OutsideHideDelay_ValueChanged"
-                        IsEnabled="{Binding IsChecked, ElementName=OutsideHideToggle}"
-                        AutomationProperties.Name="Задержка скрытия вне окна, миллисекунды"/>
-            </StackPanel>
+            <ScrollViewer x:Name="VisualSettingsView" Grid.Row="1" VerticalScrollBarVisibility="Auto" MaxHeight="388" Focusable="False" Padding="16,8,6,8">
+                <StackPanel Margin="0,0,6,0">
+                    <ToggleButton x:Name="AnimationsToggle" Style="{StaticResource ToggleSwitch}" IsChecked="True"
+                                  Checked="AnimationsToggle_Changed" Unchecked="AnimationsToggle_Changed"
+                                  AutomationProperties.Name="Анимация окна">
+                        <TextBlock Text="Анимация окна" FontWeight="SemiBold"/>
+                    </ToggleButton>
+                    <StackPanel Margin="0,10,0,0" IsEnabled="{Binding IsChecked, ElementName=AnimationsToggle}">
+                        <Grid>
+                            <TextBlock Text="Появление"/>
+                            <TextBlock x:Name="ShowTimingValue" HorizontalAlignment="Right" FontSize="13" Foreground="{DynamicResource TextSecondary}" Text="100 мс"/>
+                        </Grid>
+                        <Slider x:Name="ShowTiming" Minimum="0" Maximum="1000" Value="100" TickFrequency="10"
+                                IsSnapToTickEnabled="True" Margin="0,4,0,10" ValueChanged="Timing_ValueChanged"
+                                AutomationProperties.Name="Длительность появления, миллисекунды"/>
+                        <Grid>
+                            <TextBlock Text="Исчезновение"/>
+                            <TextBlock x:Name="HideTimingValue" HorizontalAlignment="Right" FontSize="13" Foreground="{DynamicResource TextSecondary}" Text="100 мс"/>
+                        </Grid>
+                        <Slider x:Name="HideTiming" Minimum="0" Maximum="1000" Value="100" TickFrequency="10"
+                                IsSnapToTickEnabled="True" Margin="0,4,0,0" ValueChanged="Timing_ValueChanged"
+                                AutomationProperties.Name="Длительность исчезновения, миллисекунды"/>
+                    </StackPanel>
+                    <Border Height="1" Background="{DynamicResource WindowStroke}" Margin="0,12,0,12"/>
+                    <TextBlock Text="Увеличение картинок" FontWeight="SemiBold" Margin="0,0,0,10"/>
+                    <Grid>
+                        <TextBlock Text="Задержка"/>
+                        <TextBlock x:Name="ZoomDelayValue" HorizontalAlignment="Right" FontSize="13" Foreground="{DynamicResource TextSecondary}" Text="1 с"/>
+                    </Grid>
+                    <Slider x:Name="ZoomDelaySlider" Minimum="100" Maximum="3000" Value="1000" TickFrequency="100"
+                            IsSnapToTickEnabled="True" Margin="0,4,0,10" ValueChanged="ZoomDelay_ValueChanged"
+                            AutomationProperties.Name="Задержка увеличения картинки, миллисекунды"/>
+                    <Grid>
+                        <TextBlock Text="Размер картинки"/>
+                        <TextBlock x:Name="ZoomScaleValue" HorizontalAlignment="Right" FontSize="13" Foreground="{DynamicResource TextSecondary}" Text="780 × 360"/>
+                    </Grid>
+                    <Slider x:Name="ZoomScaleSlider" Minimum="1" Maximum="5" Value="3" TickFrequency="1"
+                            IsSnapToTickEnabled="True" Margin="0,4,0,0" ValueChanged="ZoomScale_ValueChanged"
+                            AutomationProperties.Name="Размер просмотра картинки"/>
+                    <Border Height="1" Background="{DynamicResource WindowStroke}" Margin="0,12,0,12"/>
+                    <ToggleButton x:Name="TextPeekToggle" Style="{StaticResource ToggleSwitch}" IsChecked="True"
+                                  Checked="TextPeekToggle_Changed" Unchecked="TextPeekToggle_Changed"
+                                  AutomationProperties.Name="Просмотр длинного текста при наведении">
+                        <TextBlock Text="Просмотр длинного текста" FontWeight="SemiBold" TextWrapping="Wrap"/>
+                    </ToggleButton>
+                    <StackPanel Margin="0,10,0,0" IsEnabled="{Binding IsChecked, ElementName=TextPeekToggle}">
+                        <Grid>
+                            <TextBlock Text="Задержка"/>
+                            <TextBlock x:Name="TextPeekDelayValue" HorizontalAlignment="Right" FontSize="13" Foreground="{DynamicResource TextSecondary}" Text="0,6 с"/>
+                        </Grid>
+                        <Slider x:Name="TextPeekDelaySlider" Minimum="100" Maximum="3000" Value="600" TickFrequency="100"
+                                IsSnapToTickEnabled="True" Margin="0,4,0,10" ValueChanged="TextPeekDelay_ValueChanged"
+                                AutomationProperties.Name="Задержка просмотра текста, миллисекунды"/>
+                        <Grid>
+                            <TextBlock Text="Ширина карточки"/>
+                            <TextBlock x:Name="TextPeekWidthValue" HorizontalAlignment="Right" FontSize="13" Foreground="{DynamicResource TextSecondary}" Text="380 px"/>
+                        </Grid>
+                        <Slider x:Name="TextPeekWidthSlider" Minimum="300" Maximum="640" Value="380" TickFrequency="20"
+                                IsSnapToTickEnabled="True" Margin="0,4,0,0" ValueChanged="TextPeekWidth_ValueChanged"
+                                AutomationProperties.Name="Ширина карточки просмотра текста"/>
+                    </StackPanel>
+                    <Border Height="1" Background="{DynamicResource WindowStroke}" Margin="0,12,0,12"/>
+                    <ToggleButton x:Name="OutsideHideToggle" Style="{StaticResource ToggleSwitch}" IsChecked="True"
+                                  Checked="OutsideHideToggle_Changed" Unchecked="OutsideHideToggle_Changed"
+                                  AutomationProperties.Name="Скрывать панель, когда курсор ушёл">
+                        <TextBlock Text="Скрывать, когда курсор ушёл" FontWeight="SemiBold" TextWrapping="Wrap"/>
+                    </ToggleButton>
+                    <Grid Margin="0,10,0,0">
+                        <TextBlock Text="Через"/>
+                        <TextBlock x:Name="OutsideHideValue" HorizontalAlignment="Right" FontSize="13" Foreground="{DynamicResource TextSecondary}" Text="3 с"/>
+                    </Grid>
+                    <Slider x:Name="OutsideHideSlider" Minimum="500" Maximum="10000" Value="3000" TickFrequency="500"
+                            IsSnapToTickEnabled="True" Margin="0,4,0,0" ValueChanged="OutsideHideDelay_ValueChanged"
+                            IsEnabled="{Binding IsChecked, ElementName=OutsideHideToggle}"
+                            AutomationProperties.Name="Задержка скрытия вне окна, миллисекунды"/>
+                    <Border Height="1" Background="{DynamicResource WindowStroke}" Margin="0,12,0,12"/>
+                    <ToggleButton x:Name="KeyHintsToggle" Style="{StaticResource ToggleSwitch}" IsChecked="True"
+                                  Checked="KeyHintsToggle_Changed" Unchecked="KeyHintsToggle_Changed"
+                                  AutomationProperties.Name="Подсказки клавиш внизу панели">
+                        <TextBlock Text="Подсказки клавиш внизу" TextWrapping="Wrap"/>
+                    </ToggleButton>
+                    <Border Height="1" Background="{DynamicResource WindowStroke}" Margin="0,16,0,12"/>
+                    <TextBlock Text="Обновления" FontSize="15" FontWeight="SemiBold" Margin="0,0,0,4"/>
+                    <TextBlock x:Name="UpdateVersion" Foreground="{DynamicResource TextSecondary}" FontSize="12" Margin="0,0,0,10"/>
+                    <ToggleButton x:Name="AutoUpdateToggle" Style="{StaticResource ToggleSwitch}" IsChecked="True"
+                                  Checked="AutoUpdateToggle_Changed" Unchecked="AutoUpdateToggle_Changed"
+                                  AutomationProperties.Name="Обновлять автоматически">
+                        <TextBlock Text="Обновлять автоматически" TextWrapping="Wrap"/>
+                    </ToggleButton>
+                    <TextBlock Text="Установим в фоне, когда панель закрыта и операции завершены."
+                               TextWrapping="Wrap" FontSize="11" Foreground="{DynamicResource TextSecondary}" Margin="0,6,0,10"/>
+                    <TextBlock x:Name="UpdateStatus" TextWrapping="Wrap" FontSize="12" Margin="0,0,0,10"/>
+                    <Button x:Name="UpdateButton" Content="Проверить обновления" Style="{StaticResource StandardButton}"
+                            HorizontalAlignment="Stretch" Click="UpdateButton_Click"/>
+                </StackPanel>
+            </ScrollViewer>
+            <ScrollViewer x:Name="VfxSettingsView" Grid.Row="1" Visibility="Collapsed" VerticalScrollBarVisibility="Auto"
+                          MaxHeight="388" Focusable="False" Padding="16,8,16,16">
+                <StackPanel>
+                    <ToggleButton x:Name="VfxToggle" Style="{StaticResource ToggleSwitch}" IsChecked="True"
+                                  Checked="Vfx_Changed" Unchecked="Vfx_Changed" AutomationProperties.Name="Эффект по краям окна">
+                        <TextBlock Text="Эффект по краям окна" FontWeight="SemiBold"/>
+                    </ToggleButton>
+                    <TextBlock Text="Nether" FontSize="15" FontWeight="SemiBold" Margin="0,16,0,2"/>
+                    <TextBlock Text="Призрачное пламя из Moment Player" FontSize="12" TextWrapping="Wrap"
+                               Foreground="{DynamicResource TextSecondary}"/>
+                    <Grid Height="156" Margin="0,6,0,10" IsHitTestVisible="False">
+                        <Border Margin="32" CornerRadius="8" Background="{DynamicResource WindowSurface}"
+                                BorderBrush="{DynamicResource WindowStroke}" BorderThickness="1">
+                            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                                <TextBlock Text="Буфер обмена" FontWeight="SemiBold" HorizontalAlignment="Center"/>
+                                <TextBlock Text="Пламя остаётся снаружи" FontSize="11" Foreground="{DynamicResource TextSecondary}"/>
+                            </StackPanel>
+                        </Border>
+                        <local:NetherBorder x:Name="VfxPreview" Inset="32"/>
+                    </Grid>
+                    <StackPanel IsEnabled="{Binding IsChecked, ElementName=VfxToggle}">
+                        <Grid><TextBlock Text="Интенсивность"/>
+                            <TextBlock x:Name="VfxOpacityValue" HorizontalAlignment="Right" Foreground="{DynamicResource TextSecondary}"/></Grid>
+                        <Slider x:Name="VfxOpacitySlider" Minimum="10" Maximum="100" Value="85" TickFrequency="5" IsSnapToTickEnabled="True"
+                                Margin="0,4,0,12" ValueChanged="Vfx_ValueChanged" AutomationProperties.Name="Интенсивность эффекта, процентов"/>
+                        <Grid><TextBlock Text="Скорость"/>
+                            <TextBlock x:Name="VfxSpeedValue" HorizontalAlignment="Right" Foreground="{DynamicResource TextSecondary}"/></Grid>
+                        <Slider x:Name="VfxSpeedSlider" Minimum="25" Maximum="200" Value="100" TickFrequency="5" IsSnapToTickEnabled="True"
+                                Margin="0,4,0,10" ValueChanged="Vfx_ValueChanged" AutomationProperties.Name="Скорость эффекта, процентов"/>
+                    </StackPanel>
+                    <TextBlock x:Name="VfxStatus" FontSize="12" TextWrapping="Wrap" Foreground="{DynamicResource TextSecondary}"
+                               AutomationProperties.LiveSetting="Polite"/>
+                    <TextBlock Text="При выключенной анимации окна пламя замирает. В скрытом окне эффект не воспроизводится."
+                               Margin="0,8,0,0" FontSize="11" TextWrapping="Wrap" Foreground="{DynamicResource TextSecondary}"/>
+                </StackPanel>
+            </ScrollViewer>
+            <ScrollViewer x:Name="StorageSettingsView" Grid.Row="1" Visibility="Collapsed" VerticalScrollBarVisibility="Auto"
+                          MaxHeight="388" Focusable="False" Padding="16,8,6,12">
+                <StackPanel Margin="0,0,6,0">
+                    <TextBlock Text="История" FontSize="15" FontWeight="SemiBold" Margin="0,0,0,4"/>
+                    <TextBlock Text="Закреплённые записи хранятся до удаления вручную." TextWrapping="Wrap"
+                               FontSize="11" Foreground="{DynamicResource TextSecondary}" Margin="0,0,0,10"/>
+                    <Grid><TextBlock Text="Незакреплённых записей"/>
+                        <TextBlock x:Name="HistoryCountValue" HorizontalAlignment="Right" Foreground="{DynamicResource TextSecondary}"/></Grid>
+                    <Slider x:Name="HistoryCountSlider" Minimum="20" Maximum="1000" Value="100" TickFrequency="10" IsSnapToTickEnabled="True"
+                            Margin="0,4,0,10" ValueChanged="Storage_ValueChanged" AutomationProperties.Name="Максимум незакреплённых записей"/>
+                    <Grid><TextBlock Text="Обычные записи"/>
+                        <TextBlock x:Name="HistoryDaysValue" HorizontalAlignment="Right" Foreground="{DynamicResource TextSecondary}"/></Grid>
+                    <Slider x:Name="HistoryDaysSlider" Minimum="1" Maximum="90" Value="7" TickFrequency="1" IsSnapToTickEnabled="True"
+                            Margin="0,4,0,10" ValueChanged="Storage_ValueChanged" AutomationProperties.Name="Срок хранения обычных записей, дней"/>
+                    <Grid><TextBlock Text="GIF, аудио и файлы"/>
+                        <TextBlock x:Name="MediaDaysValue" HorizontalAlignment="Right" Foreground="{DynamicResource TextSecondary}"/></Grid>
+                    <Slider x:Name="MediaDaysSlider" Minimum="1" Maximum="30" Value="1" TickFrequency="1" IsSnapToTickEnabled="True"
+                            Margin="0,4,0,0" ValueChanged="Storage_ValueChanged" AutomationProperties.Name="Срок хранения медиа и файлов, дней"/>
+
+                    <Border Height="1" Background="{DynamicResource WindowStroke}" Margin="0,14,0,12"/>
+                    <TextBlock Text="Лимиты захвата" FontSize="15" FontWeight="SemiBold" Margin="0,0,0,10"/>
+                    <Grid><TextBlock Text="Текст каждого формата"/>
+                        <TextBlock x:Name="TextLimitValue" HorizontalAlignment="Right" Foreground="{DynamicResource TextSecondary}"/></Grid>
+                    <Slider x:Name="TextLimitSlider" Minimum="10" Maximum="2000" Value="1000" TickFrequency="10" IsSnapToTickEnabled="True"
+                            Margin="0,4,0,10" ValueChanged="Storage_ValueChanged" AutomationProperties.Name="Лимит символов текста, тысяч"/>
+                    <Grid><TextBlock Text="Изображение"/>
+                        <TextBlock x:Name="ImageLimitValue" HorizontalAlignment="Right" Foreground="{DynamicResource TextSecondary}"/></Grid>
+                    <Slider x:Name="ImageLimitSlider" Minimum="1" Maximum="80" Value="40" TickFrequency="1" IsSnapToTickEnabled="True"
+                            Margin="0,4,0,10" ValueChanged="Storage_ValueChanged" AutomationProperties.Name="Лимит пикселей изображения, мегапикселей"/>
+                    <Grid><TextBlock Text="Миниатюра"/>
+                        <TextBlock x:Name="ThumbnailValue" HorizontalAlignment="Right" Foreground="{DynamicResource TextSecondary}"/></Grid>
+                    <Slider x:Name="ThumbnailSlider" Minimum="160" Maximum="640" Value="320" TickFrequency="16" IsSnapToTickEnabled="True"
+                            Margin="0,4,0,2" ValueChanged="Storage_ValueChanged" AutomationProperties.Name="Длинная сторона миниатюры, пикселей"/>
+                    <TextBlock Text="Для новых записей" FontSize="11" Foreground="{DynamicResource TextSecondary}" Margin="0,0,0,10"/>
+                    <Grid><TextBlock Text="Файл или пакет"/>
+                        <TextBlock x:Name="FileSizeValue" HorizontalAlignment="Right" Foreground="{DynamicResource TextSecondary}"/></Grid>
+                    <Slider x:Name="FileSizeSlider" Minimum="10" Maximum="200" Value="100" TickFrequency="10" IsSnapToTickEnabled="True"
+                            Margin="0,4,0,10" ValueChanged="Storage_ValueChanged" AutomationProperties.Name="Лимит размера файла или пакета, мегабайт"/>
+                    <Grid><TextBlock Text="Файлов в пакете"/>
+                        <TextBlock x:Name="FileCountValue" HorizontalAlignment="Right" Foreground="{DynamicResource TextSecondary}"/></Grid>
+                    <Slider x:Name="FileCountSlider" Minimum="2" Maximum="100" Value="100" TickFrequency="1" IsSnapToTickEnabled="True"
+                            Margin="0,4,0,0" ValueChanged="Storage_ValueChanged" AutomationProperties.Name="Лимит количества файлов в пакете"/>
+
+                    <Border Height="1" Background="{DynamicResource WindowStroke}" Margin="0,14,0,12"/>
+                    <TextBlock Text="Временные файлы" FontSize="15" FontWeight="SemiBold" Margin="0,0,0,4"/>
+                    <TextBlock Text="Расшифрованные копии для вставки удаляются при запуске и раз в час." TextWrapping="Wrap"
+                               FontSize="11" Foreground="{DynamicResource TextSecondary}" Margin="0,0,0,10"/>
+                    <Grid><TextBlock Text="Срок очистки"/>
+                        <TextBlock x:Name="TempDaysValue" HorizontalAlignment="Right" Foreground="{DynamicResource TextSecondary}"/></Grid>
+                    <Slider x:Name="TempDaysSlider" Minimum="1" Maximum="7" Value="1" TickFrequency="1" IsSnapToTickEnabled="True"
+                            Margin="0,4,0,0" ValueChanged="Storage_ValueChanged" AutomationProperties.Name="Срок очистки временных файлов, дней"/>
+
+                    <Border Height="1" Background="{DynamicResource WindowStroke}" Margin="0,14,0,12"/>
+                    <TextBlock Text="Расположение и защита" FontSize="15" FontWeight="SemiBold" Margin="0,0,0,4"/>
+                    <TextBlock Text="История: %LOCALAPPDATA%\ArkCopyBuffer. Файлы защищены Windows для текущей учётной записи."
+                               TextWrapping="Wrap" FontSize="11" Foreground="{DynamicResource TextSecondary}" Margin="0,0,0,12"/>
+                    <TextBlock Text="Сокращение сроков или количества удалит лишние незакреплённые записи при применении."
+                               TextWrapping="Wrap" FontSize="11" Foreground="{DynamicResource TextSecondary}" Margin="0,0,0,10"/>
+                    <Button x:Name="StorageApplyButton" Content="Применить" Style="{StaticResource AccentButton}"
+                            Click="StorageApply_Click" AutomationProperties.Name="Применить настройки хранения"/>
+                    <TextBlock x:Name="StorageStatus" Text="Настройки сохранены" TextWrapping="Wrap" FontSize="11"
+                               Foreground="{DynamicResource TextSecondary}" Margin="0,8,0,0"/>
+                </StackPanel>
+            </ScrollViewer>
+            </Grid>
         </Border>
     </Grid>
         </Border>

@@ -1,0 +1,10 @@
+[package]
+name = "copybuffalo-ocr"
+version = "0.1.0"
+edition = "2021"
+license = "Apache-2.0"
+
+[dependencies]
+pure-onnx-ocr = { path = "../../.cache/ocr/vendor/pure-onnx-ocr-59a6c2c33c72e4dc8e7e5500f544d6674b0e6643" }
+image = "=0.25.8"
+serde_json = "1"

@@ -266,7 +266,7 @@ static class UnrealGraph
     {
         if (value.Length > 24) value = value[..23] + "…";
         var text = new FormattedText(value, CultureInfo.InvariantCulture, FlowDirection.LeftToRight,
-            new Typeface("Segoe UI"), size, color, 1) { MaxTextWidth = maxWidth, Trimming = TextTrimming.CharacterEllipsis };
+            App.TextTypeface, size, color, 1) { MaxTextWidth = maxWidth, Trimming = TextTrimming.CharacterEllipsis };
         dc.DrawText(text, new Point(right ? x - text.Width : x, y));
     }
 
@@ -357,6 +357,10 @@ static class UnrealGraph
         catch (Exception ex) { App.Trace($"Node graph preview: {ex.Message}"); return null; }
     }
 
+    /// <summary>
+    /// Полный просмотр: тёмная рамка (граф всегда тёмный), перетаскивание и колесо мгновенно,
+    /// плавающая панель масштаба (минус, процент, плюс, вписать) — плавно. Esc закрывает, Ctrl+0 вписывает.
+    /// </summary>
     public static void Open(ClipItem item)
     {
         if (item.GraphPreview is not DrawingImage graph) return;
@@ -372,26 +376,92 @@ static class UnrealGraph
         System.Windows.Automation.AutomationProperties.SetName(image, item.GraphLabel);
         var viewport = new Canvas { Background = Background, ClipToBounds = true, Cursor = Cursors.Hand };
         viewport.Children.Add(image);
-        var hint = new TextBlock { Text = "ЛКМ — перемещение · колесо — масштаб", Foreground = Subtle,
-            Background = NodeFill, Padding = new Thickness(12, 8, 12, 8), FontSize = 12 };
-        DockPanel.SetDock(hint, Dock.Top);
-        var layout = new DockPanel();
-        layout.Children.Add(hint);
-        layout.Children.Add(viewport);
-        var window = new Window { Title = item.GraphLabel, Width = Math.Min(1100, SystemParameters.WorkArea.Width - 80),
-            Height = Math.Min(750, SystemParameters.WorkArea.Height - 80), WindowStartupLocation = WindowStartupLocation.CenterScreen,
-            Background = Background, Content = layout };
-        window.Loaded += (_, _) =>
+
+        var percent = new TextBlock { Text = "100 %", FontFamily = (FontFamily)Application.Current.FindResource("TextFont"), FontSize = 13 };
+        void Settle()
         {
+            Motion.Settle(zoom, ScaleTransform.ScaleXProperty);
+            Motion.Settle(zoom, ScaleTransform.ScaleYProperty);
+            Motion.Settle(pan, TranslateTransform.XProperty);
+            Motion.Settle(pan, TranslateTransform.YProperty);
+        }
+        // ponytail: масштаб и сдвиг идут одной кривой, точка под курсором на полпути чуть «плывёт»; для 250 мс незаметно.
+        void Set(double scale, double x, double y, bool animate)
+        {
+            int ms = animate ? Motion.Slow : 0;
+            Motion.To(zoom, ScaleTransform.ScaleXProperty, scale, ms);
+            Motion.To(zoom, ScaleTransform.ScaleYProperty, scale, ms);
+            Motion.To(pan, TranslateTransform.XProperty, x, ms);
+            Motion.To(pan, TranslateTransform.YProperty, y, ms);
+            percent.Text = $"{scale * 100:0} %";
+        }
+        void ZoomAt(double next, Point at, bool animate)
+        {
+            Settle();
+            double old = zoom.ScaleX;
+            next = Math.Clamp(next, 0.1, 3);
+            Set(next, at.X - (at.X - pan.X) * next / old, at.Y - (at.Y - pan.Y) * next / old, animate);
+        }
+        Point Center() => new(viewport.ActualWidth / 2, viewport.ActualHeight / 2);
+        void Fit(bool animate)
+        {
+            Settle();
             double fit = Math.Clamp(Math.Min((viewport.ActualWidth - 40) / bounds.Width,
                 (viewport.ActualHeight - 40) / bounds.Height), 0.1, 1);
-            zoom.ScaleX = zoom.ScaleY = fit;
-            pan.X = (viewport.ActualWidth - bounds.Width * fit) / 2;
-            pan.Y = (viewport.ActualHeight - bounds.Height * fit) / 2;
+            Set(fit, (viewport.ActualWidth - bounds.Width * fit) / 2, (viewport.ActualHeight - bounds.Height * fit) / 2, animate);
+        }
+
+        Button Tool(object content, string name, Action click)
+        {
+            var button = new Button { Content = content, ToolTip = name, Style = (Style)Application.Current.FindResource("GraphToolButton") };
+            System.Windows.Automation.AutomationProperties.SetName(button, name);
+            button.Click += (_, _) => click();
+            return button;
+        }
+        var tools = new StackPanel { Orientation = Orientation.Horizontal };
+        tools.Children.Add(Tool("\uE738", "Уменьшить (Ctrl+−)", () => ZoomAt(zoom.ScaleX / 1.25, Center(), true)));
+        tools.Children.Add(Tool(percent, "Масштаб 100 %", () => ZoomAt(1, Center(), true)));
+        tools.Children.Add(Tool("\uE710", "Увеличить (Ctrl++)", () => ZoomAt(zoom.ScaleX * 1.25, Center(), true)));
+        tools.Children.Add(new Border { Width = 1, Height = 20, Margin = new Thickness(4, 0, 4, 0), Background = Brush(58, 58, 58) });
+        tools.Children.Add(Tool("\uE9A6", "Вписать в окно (Ctrl+0)", () => Fit(true)));
+        var toolbar = new Border
+        {
+            Child = tools, Padding = new Thickness(4), CornerRadius = new CornerRadius(8), Margin = new Thickness(16),
+            Background = Brush(44, 44, 44), BorderBrush = Brush(58, 58, 58), BorderThickness = new Thickness(1),
+            HorizontalAlignment = HorizontalAlignment.Right, VerticalAlignment = VerticalAlignment.Bottom,
+            Effect = new System.Windows.Media.Effects.DropShadowEffect { BlurRadius = 24, ShadowDepth = 8, Direction = 270, Opacity = 0.4 }
+        };
+        var hints = new StackPanel { Orientation = Orientation.Horizontal, Margin = new Thickness(16, 0, 0, 24), Opacity = 0.8,
+            HorizontalAlignment = HorizontalAlignment.Left, VerticalAlignment = VerticalAlignment.Bottom, IsHitTestVisible = false };
+        foreach (var hint in new[] { "Колесо: масштаб", "Перетаскивание: сдвиг", "Esc: закрыть" })
+            hints.Children.Add(new TextBlock { Text = hint, Foreground = Subtle, FontSize = 12, Margin = new Thickness(0, 0, 16, 0) });
+        var layout = new System.Windows.Controls.Grid(); // Grid — имя поля-кисти в этом классе
+        layout.Children.Add(viewport);
+        layout.Children.Add(hints);
+        layout.Children.Add(toolbar);
+
+        var window = new Window { Title = item.GraphLabel, Width = Math.Min(1100, SystemParameters.WorkArea.Width - 80),
+            Height = Math.Min(750, SystemParameters.WorkArea.Height - 80), WindowStartupLocation = WindowStartupLocation.CenterScreen,
+            Background = Background, Content = layout, FontFamily = (FontFamily)Application.Current.FindResource("TextFont"),
+            UseLayoutRounding = true };
+        TextOptions.SetTextFormattingMode(window, TextFormattingMode.Display);
+        // Окно графа всегда тёмное — и системная рамка тоже, иначе светлая полоса над тёмным холстом.
+        window.SourceInitialized += (_, _) => Native.UseDarkTitleBar(new System.Windows.Interop.WindowInteropHelper(window).Handle);
+        window.Loaded += (_, _) => Fit(false);
+        window.PreviewKeyDown += (_, e) =>
+        {
+            bool ctrl = Keyboard.Modifiers.HasFlag(ModifierKeys.Control);
+            if (e.Key == Key.Escape) window.Close();
+            else if (ctrl && e.Key is Key.D0 or Key.NumPad0) Fit(true);
+            else if (ctrl && e.Key is Key.OemPlus or Key.Add) ZoomAt(zoom.ScaleX * 1.25, Center(), true);
+            else if (ctrl && e.Key is Key.OemMinus or Key.Subtract) ZoomAt(zoom.ScaleX / 1.25, Center(), true);
+            else return;
+            e.Handled = true;
         };
         Point last = default;
         viewport.MouseLeftButtonDown += (_, e) =>
         {
+            Settle(); // перетаскивание посреди плавного масштаба — продолжаем с текущего места
             last = e.GetPosition(viewport);
             viewport.CaptureMouse();
             viewport.Cursor = Cursors.SizeAll;
@@ -413,12 +483,7 @@ static class UnrealGraph
         viewport.LostMouseCapture += (_, _) => viewport.Cursor = Cursors.Hand;
         viewport.PreviewMouseWheel += (_, e) =>
         {
-            var point = e.GetPosition(viewport);
-            double old = zoom.ScaleX;
-            double next = Math.Clamp(old * (e.Delta > 0 ? 1.2 : 1 / 1.2), 0.1, 3);
-            pan.X = point.X - (point.X - pan.X) * next / old;
-            pan.Y = point.Y - (point.Y - pan.Y) * next / old;
-            zoom.ScaleX = zoom.ScaleY = next;
+            ZoomAt(zoom.ScaleX * (e.Delta > 0 ? 1.2 : 1 / 1.2), e.GetPosition(viewport), false); // колесо — мгновенно
             e.Handled = true;
         };
         window.Show();
