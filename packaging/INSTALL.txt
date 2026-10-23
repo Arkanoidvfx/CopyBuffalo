@@ -1,0 +1,40 @@
+ArkCopyBuffer 0.2.0
+Windows 10 (1809+) / Windows 11, Intel/AMD x64
+
+DOWNLOAD
+https://github.com/Arkanoidvfx/CopyBuffalo/releases/latest
+
+Standard: download and run ArkCopyBuffer-Setup.exe.
+Includes clipboard history, local OCR, FFmpeg, and .NET.
+No administrator access or separate runtime installation is needed.
+
+Optional AI: download both ArkCopyBuffer-Full-Setup.exe.part1 and
+ArkCopyBuffer-Full-Setup.exe.part2, plus Install-Full.cmd, to one folder.
+Run Install-Full.cmd. It assembles the installer, verifies SHA-256,
+and opens it. Keep all parts together until this finishes.
+Allow about 3.5 GB for the parts, another 3.5 GB for assembly,
+and additional installation space. The full package adds the model
+and CPU/NVIDIA runtime for prompt compression and image translation.
+
+USE
+Copy normally, then press Win+V to find and paste a saved entry.
+The app interface is currently Russian. Settings, pause, and exit
+are available from the tray menu and the panel's three-dot menu.
+Exiting restores the normal Windows Win+V shortcut.
+
+UPDATES
+Automatic updates are enabled by default. They download in the
+background and install when the panel is closed and pending work ends.
+History, settings, autostart, shortcuts, and installed AI files are kept.
+Version 0.1.0 needs one manual installation to gain the updater.
+For a manual installation, exit the app from the tray first.
+
+DATA
+History is stored in %LOCALAPPDATA%\ArkCopyBuffer, encrypted for your
+Windows account. Settings are stored separately from the program.
+OCR and bundled AI run locally. Updates contact GitHub.
+Pause recording when copying sensitive information; encryption does
+not protect history from other programs running as your Windows user.
+
+HELP
+https://github.com/Arkanoidvfx/CopyBuffalo/issues

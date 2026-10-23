@@ -49,6 +49,7 @@ foreach ($notice in @(@('LICENSE', 'FFmpeg-GPLv3.txt'), @('README.txt', 'FFmpeg-
     Copy-Item -LiteralPath $source -Destination (Join-Path $stage ('licenses\' + $notice[1])) -Force
 }
 Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'INSTALL-RU.txt') -Destination $stage -Force
+Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'INSTALL.txt') -Destination $stage -Force
 Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'THIRD-PARTY-NOTICES.txt') -Destination $stage -Force
 foreach ($name in @('Dotnet-LICENSE.txt','Dotnet-THIRD-PARTY-NOTICES.txt')) {
     Copy-Item -LiteralPath (Join-Path $tools $name) -Destination (Join-Path $stage "licenses\$name") -Force
@@ -79,6 +80,7 @@ if ($WithAI) {
     & (Join-Path $PSScriptRoot 'Test-Distribution.ps1')
 }
 Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'INSTALL-RU.txt') -Destination $out -Force
+Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'INSTALL.txt') -Destination $out -Force
 $manifest = [ordered]@{
     version = $version
     platform = 'Windows 10 1809+ / Windows 11, Intel/AMD x64'

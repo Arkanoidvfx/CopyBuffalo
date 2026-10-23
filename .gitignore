@@ -9,3 +9,6 @@ publish/
 .cache/
 dist/
 Assets/Ocr/
+.agents/
+docs/ocr-evaluation-*.md
+docs/ocr-prototype-*.zip

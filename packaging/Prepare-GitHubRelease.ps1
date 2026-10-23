@@ -45,7 +45,7 @@ if errorlevel 1 (
 '@
 $launcher.Replace('__HASH__', $hash).Replace('__PARTS__', $partList).Replace('__SIZE__', "$size") |
     Set-Content -LiteralPath (Join-Path $output 'Install-Full.cmd') -Encoding ascii
-foreach ($name in @('ArkCopyBuffer-Setup.exe', 'INSTALL-RU.txt', 'manifest.json')) {
+foreach ($name in @('ArkCopyBuffer-Setup.exe', 'INSTALL.txt', 'INSTALL-RU.txt', 'manifest.json')) {
     Copy-Item -LiteralPath (Join-Path $Dist $name) -Destination $output -Force
 }
 $sums = @("$hash  ArkCopyBuffer-Full-Setup.exe") + @(Get-ChildItem -LiteralPath $output -File | Where-Object Name -ne 'SHA256SUMS.txt' | ForEach-Object { (Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash.ToLowerInvariant() + '  ' + $_.Name })
