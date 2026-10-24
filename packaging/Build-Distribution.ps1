@@ -81,6 +81,7 @@ if ($WithAI) {
 }
 Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'INSTALL-RU.txt') -Destination $out -Force
 Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'INSTALL.txt') -Destination $out -Force
+Copy-Item -LiteralPath (Join-Path $repo 'LICENSE') -Destination $out -Force
 $manifest = [ordered]@{
     version = $version
     platform = 'Windows 10 1809+ / Windows 11, Intel/AMD x64'

@@ -39,7 +39,7 @@ sealed class ClipboardWatcher : IDisposable
     readonly Dispatcher _ui = Dispatcher.CurrentDispatcher;
     readonly Dispatcher _worker;
     readonly Func<uint> _sequence;
-    readonly Func<(IntPtr owner, IDataObject? data)> _readClipboard;
+    readonly Func<StorageSettings, (uint sequence, IntPtr owner, IDataObject? data)> _readClipboard;
     readonly SemaphoreSlim _heavyGate = new(1, 1);
     HwndSource? _source;
     uint? _lastSequence; // только поток _worker
@@ -48,7 +48,7 @@ sealed class ClipboardWatcher : IDisposable
     internal bool Capturing => Volatile.Read(ref _pendingCaptures) != 0;
     public bool Paused { get => _paused; set => _paused = value; }
 
-    ClipboardWatcher(HistoryStore store, Func<uint> sequence, Func<(IntPtr owner, IDataObject? data)> readClipboard)
+    ClipboardWatcher(HistoryStore store, Func<uint> sequence, Func<StorageSettings, (uint sequence, IntPtr owner, IDataObject? data)> readClipboard)
     {
         _store = store;
         _storage = store.Storage;
@@ -58,7 +58,7 @@ sealed class ClipboardWatcher : IDisposable
     }
 
     public ClipboardWatcher(HistoryStore store)
-        : this(store, Native.GetClipboardSequenceNumber, () => (Native.GetClipboardOwner(), Clipboard.GetDataObject()))
+        : this(store, Native.GetClipboardSequenceNumber, limits => ClipboardSnapshot.Read(limits))
     {
         Dispatcher? worker = null;
         Exception? error = null;
@@ -106,30 +106,31 @@ sealed class ClipboardWatcher : IDisposable
     {
         var limits = Storage; // один набор лимитов для всего копирования
         // Буфер может быть занят записывающим приложением — несколько попыток.
-        for (int attempt = 0; attempt < 5; attempt++)
+        for (int attempt = 0; attempt < 40; attempt++)
         {
             try
             {
                 if (Paused || _sequence() != sequence) return; // не перечитывать новое копирование из старого повтора
-                var (owner, d) = _readClipboard();
+                var (capturedSequence, owner, d) = _readClipboard(limits);
+                _lastSequence = capturedSequence; // Associate the snapshot with its copy, never with a later clipboard change.
                 if (d == null || Excluded(d)) return;
-                if (OwnItem(d) is { } id) { await _ui.InvokeAsync(() => _store.Touch(id, now)); return; }
+                if (OwnItem(d) is { } id) { await RunQueued(async () => await _ui.InvokeAsync(() => _store.Touch(id, now))); return; }
                 var sourceApp = SourceApp(owner);
                 // FileDrop важнее UnicodeText: некоторые приложения отдают оба формата для одного файла.
-                if (ReadFolder(d) is { } folder) { await _ui.InvokeAsync(() => _store.AddFolder(folder, now, sourceApp)); return; }
-                if (ReadFiles(d, limits) is { } paths) { await RunHeavy(() => AddFilesAsync(paths, now, sourceApp, limits)); return; }
-                if (ReadFile(d, limits) is var (path, kind)) { await RunHeavy(() => AddFileAsync(path, kind, now, sourceApp, limits)); return; }
-                if (ReadText(d, limits) is var (text, rtf, html)) { await _ui.InvokeAsync(() => _store.Add(text, rtf, html, now, sourceApp)); return; }
+                if (ReadFolder(d) is { } folder) { await RunQueued(async () => await _ui.InvokeAsync(() => _store.AddFolder(folder, now, sourceApp))); return; }
+                if (ReadFiles(d, limits) is { } paths) { await RunQueued(() => AddFilesAsync(paths, now, sourceApp, limits)); return; }
+                if (ReadFile(d, limits) is var (path, kind)) { await RunQueued(() => AddFileAsync(path, kind, now, sourceApp, limits)); return; }
+                if (ReadText(d, limits) is var (text, rtf, html)) { await RunQueued(async () => await _ui.InvokeAsync(() => _store.Add(text, rtf, html, now, sourceApp))); return; }
                 if (d.GetDataPresent("GIF") && d.GetData("GIF") is MemoryStream { Length: > 0 } gifStream && gifStream.Length <= limits.MaxFileBytes)
                 {
                     var gif = gifStream.ToArray();
-                    await RunHeavy(() => AddGifAsync(gif, now, sourceApp, limits));
+                    await RunQueued(() => AddGifAsync(gif, now, sourceApp, limits));
                     return;
                 }
-                if (ReadImageData(d, limits) is { } image) await RunHeavy(() => AddImageAsync(image, now, sourceApp, limits));
+                if (ReadImageData(d, limits) is { } image) await RunQueued(() => AddImageAsync(image, now, sourceApp, limits));
                 return;
             }
-            catch (ExternalException) { await Task.Delay(40); }
+            catch (ExternalException) { await Task.Delay(5); }
             catch (Exception e) { App.Trace($"capture skipped: {e.GetType().Name}: {e.Message}"); return; } // владелец умер до отложенного рендера и т.п.
         }
     }
@@ -249,8 +250,8 @@ sealed class ClipboardWatcher : IDisposable
         await _ui.InvokeAsync(() => _store.AddMedia(hash, kind, Path.GetFileName(path), bytes.LongLength, hasThumb, now, sourceApp));
     }
 
-    /// <summary>По одной тяжёлой записи за раз (память); ошибка разбора не должна перечитывать буфер заново.</summary>
-    async Task RunHeavy(Func<Task> work)
+    /// <summary>Общая очередь сохраняет порядок всех копирований и ограничивает тяжёлую обработку.</summary>
+    async Task RunQueued(Func<Task> work)
     {
         await _heavyGate.WaitAsync();
         try { await work(); }
@@ -384,7 +385,7 @@ sealed class ClipboardWatcher : IDisposable
         IDataObject current = a.data;
         uint sequence = uint.MaxValue;
         int reads = 0;
-        var watcher = new ClipboardWatcher(store, () => sequence, () => { reads++; return (IntPtr.Zero, current); });
+        var watcher = new ClipboardWatcher(store, () => sequence, _ => { reads++; return (sequence, IntPtr.Zero, current); });
         watcher._heavyGate.Wait(); // Hold image processing while the next screenshots arrive.
         var first = watcher.CaptureCurrent();
         check(watcher.Capturing, "pending clipboard work blocks automatic update shutdown");
@@ -412,11 +413,11 @@ sealed class ClipboardWatcher : IDisposable
         int attempts = 0;
         bool busy = true;
         var retryStore = new HistoryStore(Path.Combine(dir, "capture-retry", "history.dat"));
-        var retry = new ClipboardWatcher(retryStore, () => sequence, () =>
+        var retry = new ClipboardWatcher(retryStore, () => sequence, _ =>
         {
             attempts++;
             if (busy) throw new ExternalException("Synthetic clipboard lock");
-            return (IntPtr.Zero, a.data);
+            return (sequence, IntPtr.Zero, a.data);
         });
         var stale = retry.CaptureCurrent();
         sequence++;
@@ -438,9 +439,73 @@ sealed class ClipboardWatcher : IDisposable
         var ignored = new DataObject();
         ignored.SetData("ExcludeClipboardContentFromMonitorProcessing", true);
         ignored.SetData("PNG", c.data.GetData("PNG"));
-        var excluded = new ClipboardWatcher(retryStore, () => sequence, () => (IntPtr.Zero, ignored));
+        var excluded = new ClipboardWatcher(retryStore, () => sequence, _ => (sequence, IntPtr.Zero, ignored));
         Complete(excluded.CaptureCurrent());
         check(retryStore.Items.Count == 1, "immediate capture still honors clipboard privacy exclusions");
+
+        var burstStore = new HistoryStore(Path.Combine(dir, "mixed-capture", "history.dat"));
+        var burst = new ClipboardWatcher(burstStore, () => sequence, _ => (sequence, IntPtr.Zero, current));
+        var folderPath = Path.Combine(dir, "copied-folder");
+        Directory.CreateDirectory(folderPath);
+        var filePath = Path.Combine(dir, "copied.txt");
+        File.WriteAllText(filePath, "synthetic copied file");
+        var otherPath = Path.Combine(dir, "other.bin");
+        File.WriteAllBytes(otherPath, [1, 2, 3]);
+        static IDataObject Text(string text, string? rtf = null, string? html = null)
+        {
+            var data = new DataObject();
+            data.SetData(DataFormats.UnicodeText, text);
+            if (rtf != null) data.SetData(DataFormats.Rtf, rtf);
+            if (html != null) data.SetData(DataFormats.Html, html);
+            return data;
+        }
+        static IDataObject Files(params string[] paths)
+        {
+            var data = new DataObject();
+            data.SetData(DataFormats.FileDrop, paths);
+            return data;
+        }
+        const string url = "https://github.com/VirusTotal/virustotal-mcp";
+        const string skillUrl = url + "/blob/main/skills/virustotal-threat-intelligence/SKILL.md";
+        const string rich = "Copied rich text";
+        const string rtf = "{\\rtf1 Copied rich text}";
+        const string html = "<b>Copied rich text</b>";
+        var gif = new DataObject();
+        gif.SetData("GIF", new MemoryStream(Convert.FromBase64String("R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7")));
+        IDataObject[] copies = [a.data, Text(url), Text(skillUrl), b.data, Text(rich, rtf, html),
+            Files(folderPath), Files(filePath), Files(filePath, otherPath), gif, Text("    code\n\tvalue"), c.data];
+        burst._heavyGate.Wait();
+        var tasks = new List<Task>();
+        foreach (var copy in copies)
+        {
+            current = copy;
+            sequence++;
+            tasks.Add(burst.CaptureCurrent());
+        }
+        check(burstStore.Items.Count == 0 && tasks.All(t => !t.IsCompleted),
+            "all clipboard kinds snapshot immediately and share the busy processing queue");
+        burst._heavyGate.Release();
+        Complete(Task.WhenAll(tasks));
+        check(burstStore.Items.Count == copies.Length, "mixed rapid burst loses no URL, text, PNG, DIB, GIF, folder, file or bundle");
+        var items = burstStore.Items.Reverse().ToArray();
+        check(items[1].Text == url && items[2].Text == skillUrl,
+            "both reported VirusTotal URLs survive rapid copying with a common prefix");
+        check(items[0].ImageHash == a.hash && items[3].ImageHash == b.hash && items[^1].ImageHash == c.hash
+            && items[4].Text == rich && items[4].Rtf == rtf && items[4].Html == html
+            && items[5].MediaKind == "folder" && items[6].MediaKind == "text" && items[7].MediaKind == "files"
+            && items[8].IsGif && items[9].Text == "    code\n\tvalue",
+            "mixed clipboard payloads retain copy order, formatting, paths and exact code whitespace");
+        burstStore.Save();
+        var burstLoaded = new HistoryStore(Path.Combine(dir, "mixed-capture", "history.dat"));
+        burstLoaded.Load(DateTime.UtcNow);
+        check(burstLoaded.Items.Select(i => i.Id).SequenceEqual(burstStore.Items.Select(i => i.Id))
+            && burstLoaded.Items.Any(i => i.Text == url) && burstLoaded.Items.Any(i => i.Text == skillUrl),
+            "every mixed burst entry survives encrypted save and reload in copy order");
+
+        var rendered = new ClipboardWatcher(burstStore, () => sequence, _ => { sequence++; return (sequence, IntPtr.Zero, Text("delayed render")); });
+        Complete(rendered.CaptureCurrent());
+        check(rendered.CaptureCurrent().IsCompleted && burstStore.Items.Count == copies.Length + 1,
+            "delayed rendering sequence changes do not capture the same payload twice");
     }
 
     /// <summary>Не ждём: поток может висеть в отложенном рендере чужого приложения, а выход не должен.</summary>

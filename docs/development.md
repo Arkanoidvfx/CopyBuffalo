@@ -4,6 +4,8 @@ CopyBuffalo is a Windows x64 WPF app targeting .NET 10. Application code and XAM
 
 The public product name is CopyBuffalo. The `ArkCopyBuffer` project/assembly, executable and release asset names, installer identity, registry/data paths, clipboard formats and encryption identifiers remain stable for compatibility. Keep those technical names when building, publishing or accessing existing data.
 
+CopyBuffalo's original code uses the MIT license in the root `LICENSE`, which is included in published app files, installers and prepared GitHub assets. Third-party components keep their own licenses. FFmpeg is a separate GPLv3 executable; public redistributions must also provide its complete corresponding source and enabled-library sources as required by the GPL, as described in `packaging/THIRD-PARTY-NOTICES.txt`.
+
 ## Build
 
 Use Windows and a .NET 10 SDK. A normal development build does not require the OCR bundle:
@@ -22,6 +24,8 @@ dotnet publish -c Release
 The OCR build downloads pinned sources and models and requires the Rust toolchain and Windows C++ build tools. See [OCR](ocr.md). Release publishing produces a self-contained x64 build in `publish/`; no system .NET runtime is needed on the destination computer. Publishing refuses an incomplete OCR bundle.
 
 ## Checks
+
+Rapid clipboard capture uses a single `OleGetClipboard` attempt, detached format snapshots, and asynchronous retries at 5 ms while the sequence stays current. Avoid WPF's blocking `Clipboard.GetDataObject` retry loop or holding `OpenClipboard` across delayed OLE rendering. All supported item kinds use one processing queue. Synthetic regression checks cover mixed bursts, common-prefix URLs, formatting, sequence changes, privacy exclusions, and encrypted save/reload.
 
 ```powershell
 .\publish\ArkCopyBuffer.exe --selftest

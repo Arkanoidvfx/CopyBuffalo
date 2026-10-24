@@ -1,5 +1,5 @@
 #ifndef AppVersion
-  #define AppVersion "0.2.2"
+  #define AppVersion "0.2.3"
 #endif
 
 [Setup]
@@ -14,6 +14,7 @@ DefaultDirName={localappdata}\Programs\ArkCopyBuffer
 AppVersion={#AppVersion}
 AppPublisher=Arkanoidvfx
 AppPublisherURL=https://github.com/Arkanoidvfx/CopyBuffalo
+LicenseFile=..\LICENSE
 AppMutex=Local\ArkCopyBuffer
 SetupMutex=ArkCopyBuffer-Setup
 PrivilegesRequired=lowest

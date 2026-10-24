@@ -1,4 +1,8 @@
-ArkCopyBuffer distribution components
+CopyBuffalo distribution components
+
+CopyBuffalo's original source code is licensed under the MIT License;
+see LICENSE. Bundled third-party components retain their own licenses
+and notices below. The MIT license does not replace those terms.
 
 Microsoft .NET 10.0.12, Windows Desktop Runtime: Microsoft license / MIT notices.
 https://github.com/dotnet/runtime

@@ -3,10 +3,11 @@
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net10.0-windows</TargetFramework>
-    <Version>0.2.2</Version>
+    <Version>0.2.3</Version>
     <Product>CopyBuffalo</Product>
     <AssemblyTitle>CopyBuffalo</AssemblyTitle>
     <Description>CopyBuffalo clipboard history for Windows</Description>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
@@ -36,6 +37,7 @@
 
   <ItemGroup>
     <EmbeddedResource Include="Assets\App.ico" />
+    <Content Include="LICENSE" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" ExcludeFromSingleFile="true" />
     <EmbeddedResource Include="Assets\Vfx\Nether\*.png" />
     <Resource Include="Assets\Fonts\*.ttf;Assets\Fonts\*.ttc;Assets\Fonts\*-OFL.txt" />
     <Content Include="Assets\Fonts\IBM-Plex-OFL.txt" Link="licenses\IBM-Plex-OFL.txt"

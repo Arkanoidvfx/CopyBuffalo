@@ -14,6 +14,10 @@ function Check-Process([string]$Exe, [string[]]$Arguments) {
 try {
     $env:PATH = "$env:SystemRoot\System32;$env:SystemRoot"
     $exe = Join-Path $StageRoot 'main\ArkCopyBuffer.exe'
+    $product = [Diagnostics.FileVersionInfo]::GetVersionInfo($exe)
+    if ($product.ProductName -ne 'CopyBuffalo' -or $product.FileDescription -ne 'CopyBuffalo') { throw 'Incorrect app branding.' }
+    $license = Join-Path $StageRoot 'main\LICENSE'
+    if (!(Test-Path -LiteralPath $license) -or (Get-Content -LiteralPath $license -Raw) -notmatch 'MIT License[\s\S]+Copyright \(c\) 2026 Arkanoidvfx') { throw 'Missing CopyBuffalo MIT license.' }
     Check-Process $exe @('--selftest')
     $audioDir = Join-Path $StageRoot 'audio-check'
     Check-Process $exe @('--audio-selftest', ('"' + $audioDir + '"'))

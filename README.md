@@ -53,3 +53,7 @@ History stays in `%LOCALAPPDATA%\ArkCopyBuffer`, encrypted for your Windows acco
 Clipboard history can contain sensitive information. Pause recording from the tray menu when needed. Encryption does not hide it from other programs running as your Windows user.
 
 For builds, tests, and release packaging, see [Development](docs/development.md).
+
+## License
+
+CopyBuffalo's original source code is available under the [MIT License](LICENSE), allowing commercial use, modification, and redistribution with the copyright and license notice retained. Bundled components retain their own licenses; see [Third-party notices](packaging/THIRD-PARTY-NOTICES.txt).
