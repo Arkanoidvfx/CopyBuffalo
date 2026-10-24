@@ -6,10 +6,16 @@ https://github.com/dotnet/wpf
 Included license and third-party notices are in licenses/.
 
 IBM Plex Sans and IBM Plex Mono (static Regular/SemiBold): SIL Open Font License 1.1.
+IBM Plex Sans Devanagari (static Regular/SemiBold) uses the same license and source revision.
 Copyright 2017 IBM Corp., Reserved Font Name "Plex".
 https://github.com/IBM/plex/tree/763c36ef9117782905ae010056dfbe8fd2653a25
 The unmodified fonts and their license are embedded in ArkCopyBuffer.exe;
 the readable license is also included as licenses/IBM-Plex-OFL.txt.
+
+Noto Sans CJK (unmodified static Regular/Bold collections): SIL Open Font License 1.1.
+Source: https://github.com/notofonts/noto-cjk/tree/523d033d6cb47f4a80c58a35753646f5c3608a78
+The collections provide regional Chinese/Japanese glyph forms and are embedded in the app.
+The original license is included as licenses/Noto-OFL.txt.
 
 FFmpeg 9.0.1 full static Windows build by Gyan Doshi: GPLv3.
 FFmpeg is launched as a separate executable, without linking to the app.

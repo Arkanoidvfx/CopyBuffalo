@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
   <resheader name="resmimetype">
     <value>text/microsoft-resx</value>
@@ -257,7 +257,7 @@
     <comment>Не удалось запустить обновление.</comment>
   </data>
   <data name="S1BD44106B532CEF3" xml:space="preserve">
-    <value>The local AI component is not installed. Run the full ArkCopyBuffer installer and select the local AI component; it is also needed for image translation.</value>
+    <value>The local AI component is not installed. Run the full CopyBuffalo installer and select the local AI component; it is also needed for image translation.</value>
     <comment>Не установлен компонент локальной модели. Запустите ArkCopyBuffer-Full-Setup.exe и выберите «Сжатие промптов» (он также нужен для перевода).</comment>
   </data>
   <data name="S1C386BD08B121ED9" xml:space="preserve">
@@ -512,9 +512,9 @@
     <value>Unity Shader Graph nodes</value>
     <comment>Ноды Unity Shader Graph</comment>
   </data>
-  <data name="S3BB9A69F792BE44D" xml:space="preserve">
-    <value>Merge text — ArkCopyBuffer</value>
-    <comment>Объединить тексты — ArkCopyBuffer</comment>
+  <data name="S55435886F76E0E6A" xml:space="preserve">
+    <value>Merge text — CopyBuffalo</value>
+    <comment>Объединить тексты — CopyBuffalo</comment>
   </data>
   <data name="S3C1540238FF55BA4" xml:space="preserve">
     <value>Update and restart</value>
@@ -792,11 +792,11 @@
     <value>Try pasting again.</value>
     <comment>Повторите вставку.</comment>
   </data>
-  <data name="S5E9AFC55B36287CB" xml:space="preserve">
-    <value>ArkCopyBuffer could not start: {0}
+  <data name="S36DBB75284131879" xml:space="preserve">
+    <value>CopyBuffalo could not start: {0}
 
 Details: {1}</value>
-    <comment>ArkCopyBuffer не запустился: {0}
+    <comment>CopyBuffalo не запустился: {0}
 
 Подробности: {1}</comment>
   </data>
@@ -852,9 +852,9 @@ Details: {1}</value>
     <value>Text exceeds {0:N0} characters, which is too much for the local model.</value>
     <comment>Текст длиннее {0:N0} символов: для локальной модели слишком много.</comment>
   </data>
-  <data name="S648AFEBEACA460CA" xml:space="preserve">
-    <value>Edit text — ArkCopyBuffer</value>
-    <comment>Редактировать текст — ArkCopyBuffer</comment>
+  <data name="S2A5C6674412AA2ED" xml:space="preserve">
+    <value>Edit text — CopyBuffalo</value>
+    <comment>Редактировать текст — CopyBuffalo</comment>
   </data>
   <data name="S65339243BCD582FB" xml:space="preserve">
     <value>A path with compatible quotes is required here</value>
@@ -1105,7 +1105,7 @@ Details: {1}</value>
     <comment>Кириллица</comment>
   </data>
   <data name="S887BBD174DA42C24" xml:space="preserve">
-    <value>The OCR bundle is missing. Install a recent ArkCopyBuffer build with its ocr folder.</value>
+    <value>The OCR bundle is missing. Install a recent CopyBuffalo build with its ocr folder.</value>
     <comment>Не найден комплект OCR. Установите свежую сборку CopyBuffalo с папкой ocr.</comment>
   </data>
   <data name="S8965271D3C97C79D" xml:space="preserve">
@@ -1172,9 +1172,9 @@ Details: {1}</value>
     <value>route</value>
     <comment>маршрут</comment>
   </data>
-  <data name="S8F2A584EA196F9C9" xml:space="preserve">
-    <value>ArkCopyBuffer: recording paused</value>
-    <comment>ArkCopyBuffer: запись на паузе</comment>
+  <data name="SCD873A143F2D64D0" xml:space="preserve">
+    <value>CopyBuffalo: recording paused</value>
+    <comment>CopyBuffalo: запись на паузе</comment>
   </data>
   <data name="S8F54CAD240DBD90C" xml:space="preserve">
     <value>The clipboard is busy.</value>
@@ -1637,7 +1637,7 @@ Details: {1}</value>
     <comment>Задержка скрытия вне окна, миллисекунды</comment>
   </data>
   <data name="SBE4E0E5FAD95B940" xml:space="preserve">
-    <value>Restart ArkCopyBuffer to apply this language.</value>
+    <value>Restart CopyBuffalo to apply this language.</value>
     <comment>Язык изменится после перезапуска.</comment>
   </data>
   <data name="SBE99B13612015A48" xml:space="preserve">
@@ -2239,5 +2239,17 @@ Details: {1}</value>
   <data name="SFFC0E927541DA0CD" xml:space="preserve">
     <value> Clipboard unchanged — copy the text from history.</value>
     <comment> Буфер не изменён — скопируйте текст из истории.</comment>
+  </data>
+  <data name="S1EA87AEA0A4F1C25" xml:space="preserve">
+    <value>Cut</value>
+    <comment>Вырезать</comment>
+  </data>
+  <data name="S694DF0097FDEFE5A" xml:space="preserve">
+    <value>Select all</value>
+    <comment>Выделить всё</comment>
+  </data>
+  <data name="SBDFCC3728F54DD8D" xml:space="preserve">
+    <value>Replace “{0}”</value>
+    <comment>Заменить «{0}»</comment>
   </data>
 </root>

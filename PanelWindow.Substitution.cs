@@ -45,7 +45,7 @@ partial class PanelWindow
         if (original.Length - end > 80) after += "…";
         // Only the view is shortened; the drop always applies the complete Change.
         if (inserted.Length > 240) inserted = inserted[..112] + "…" + inserted[^112..];
-        string label = change.Label.Length == 0 ? UiText.T("Пустые кавычки") : UiText.T("Заменить «") + Short(change.Label) + "»";
+        string label = change.Label.Length == 0 ? UiText.T("Пустые кавычки") : UiText.F($"Заменить «{Short(change.Label)}»");
         return new(change, (number > 0 ? number + " · " : "") + label, Flat(before), Flat(inserted), Flat(after));
 
         static string Flat(string text) => text.Replace('\r', ' ').Replace('\n', ' ').Replace('\t', ' ');

@@ -1270,7 +1270,7 @@ public sealed class HistoryStore
             sym2.TogglePin("→");
             Check(new SymbolCatalog(symPath).Items.Count(i => i.Group == SymbolCatalog.PinnedGroup) == 1, "открепление сохраняется");
             var dash = sym2.Items.First(i => i.Char == "—");
-            Check(SymbolCatalog.Matches(dash, "2014") && SymbolCatalog.Matches(dash, "U+2014") && SymbolCatalog.Matches(dash, UiText.IsEnglish ? "punct" : "пункт")
+            Check(SymbolCatalog.Matches(dash, "2014") && SymbolCatalog.Matches(dash, "U+2014") && SymbolCatalog.Matches(dash, UiText.T("Пунктуация"))
                   && !SymbolCatalog.Matches(dash, "валют"), "поиск символа по коду и группе");
 
             File.WriteAllText(s._path, "мусор");

@@ -268,7 +268,7 @@ partial class TextMergeWindow : Window
         _saving = true; Sheet.IsEnabled = false; SetStatus(UiText.T("Сохраняется…"));
         try
         {
-            _store.Add(text, null, null, DateTime.UtcNow, "ArkCopyBuffer"); await _store.SaveAsync();
+            _store.Add(text, null, null, DateTime.UtcNow, "CopyBuffalo"); await _store.SaveAsync();
             if (copy) Paster.CopyText(text);
             SetStatus(copy ? UiText.T("Результат сохранён и скопирован.") : UiText.T("Результат сохранён.")); return true;
         }
@@ -333,7 +333,9 @@ partial class TextMergeWindow : Window
             var bitmap = new System.Windows.Media.Imaging.RenderTargetBitmap(1132, 584, 96, 96, PixelFormats.Pbgra32); bitmap.Render(preview.Sheet);
             var encoder = new System.Windows.Media.Imaging.PngBitmapEncoder(); encoder.Frames.Add(System.Windows.Media.Imaging.BitmapFrame.Create(bitmap));
             using var file = System.IO.File.Create(System.IO.Path.Combine(AppContext.BaseDirectory, "merge-preview.png")); encoder.Save(file);
-            check(preview.Sources.ItemContainerGenerator.ContainerFromIndex(0) != null && preview.Result.ActualWidth > 250 && preview.MergeButton.ActualWidth > 120,
+            var buttonPosition = preview.MergeButton.TranslatePoint(new Point(), preview.Sheet);
+            check(preview.Sources.ItemContainerGenerator.ContainerFromIndex(0) != null && preview.Result.ActualWidth > 250
+                && preview.MergeButton.ActualWidth > 0 && buttonPosition.X >= 0 && buttonPosition.X + preview.MergeButton.ActualWidth <= preview.Sheet.ActualWidth + 1,
                 "merge layout: три колонки и кнопка помещаются; offscreen PNG создан без фокуса и управления");
         }
         finally { preview.Close(); }

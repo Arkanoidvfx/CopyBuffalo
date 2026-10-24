@@ -52,12 +52,12 @@ public partial class App : Application
             System.Runtime.InteropServices.RuntimeInformation.OSArchitecture != System.Runtime.InteropServices.Architecture.X64)
         {
             MessageBox.Show(UiText.T("Нужна Windows 10 (1809 или новее) либо Windows 11, 64-битный процессор Intel/AMD."),
-                "ArkCopyBuffer", MessageBoxButton.OK, MessageBoxImage.Information);
+                "CopyBuffalo", MessageBoxButton.OK, MessageBoxImage.Information);
             Shutdown(1);
             return;
         }
 
-        if (e.Args is ["--localization-selftest", var localeDirectory, var language] && language is "en" or "ru")
+        if (e.Args is ["--localization-selftest", var localeDirectory, var language] && UiText.Languages.Contains(language))
         {
             UiText.Language = language;
             System.Windows.Media.RenderOptions.ProcessRenderMode = RenderMode.SoftwareOnly;
@@ -90,7 +90,7 @@ public partial class App : Application
 
         if (e.Args.Contains("--selftest"))
         {
-            if (e.Args is ["--selftest", _, var testLanguage] && testLanguage is "en" or "ru") UiText.Language = testLanguage;
+            if (e.Args is ["--selftest", _, var testLanguage] && UiText.Languages.Contains(testLanguage)) UiText.Language = testLanguage;
             System.Windows.Media.RenderOptions.ProcessRenderMode = RenderMode.SoftwareOnly;
             ApplyTheme(); // Offscreen layout tests need the same brushes as the running app.
             string log = e.Args.Length >= 2 ? Path.Combine(Path.GetFullPath(e.Args[1]), "selftest.log") : Path.Combine(DataDir, "selftest.log");
@@ -124,8 +124,8 @@ public partial class App : Application
             ex.Handled = true;
             if (_started) return;
             // Не запустились (история не читается, буфер не слушается): не висим невидимкой без трея, держа мьютекс.
-            MessageBox.Show(UiText.F($"ArkCopyBuffer не запустился: {ex.Exception.Message}\n\nПодробности: {Path.Combine(DataDir, "error.log")}"),
-                "ArkCopyBuffer", MessageBoxButton.OK, MessageBoxImage.Error);
+            MessageBox.Show(UiText.F($"CopyBuffalo не запустился: {ex.Exception.Message}\n\nПодробности: {Path.Combine(DataDir, "error.log")}"),
+                "CopyBuffalo", MessageBoxButton.OK, MessageBoxImage.Error);
             Shutdown(1);
         };
 
@@ -268,7 +268,7 @@ public partial class App : Application
         catch (Exception ex)
         {
             Log(ex);
-            _tray.ShowBalloonTip(5000, "ArkCopyBuffer", UiText.T("Не удалось перехватить Win+V. История пишется, открыть можно из трея."), Forms.ToolTipIcon.Warning);
+            _tray.ShowBalloonTip(5000, "CopyBuffalo", UiText.T("Не удалось перехватить Win+V. История пишется, открыть можно из трея."), Forms.ToolTipIcon.Warning);
         }
         _started = true;
         InitializeUpdates();
@@ -661,7 +661,7 @@ public partial class App : Application
     Forms.NotifyIcon CreateTray()
     {
         _trayMenu = CreateTrayMenu();
-        var tray = new Forms.NotifyIcon { Text = "ArkCopyBuffer: Win+V", Icon = CreateTrayIcon(), Visible = true };
+        var tray = new Forms.NotifyIcon { Text = "CopyBuffalo: Win+V", Icon = CreateTrayIcon(), Visible = true };
         tray.MouseClick += (_, e) =>
         {
             if (e.Button == Forms.MouseButtons.Left) OpenFromTray();
@@ -683,7 +683,7 @@ public partial class App : Application
         var menu = new ContextMenu();
         _trayStatus = new TextBlock { FontSize = 12, Margin = new Thickness(0, 2, 0, 0) };
         _trayStatus.SetResourceReference(TextBlock.ForegroundProperty, "TextSecondary");
-        var header = new StackPanel { Children = { new TextBlock { Text = "ArkCopyBuffer", FontSize = 13, FontWeight = FontWeights.SemiBold }, _trayStatus } };
+        var header = new StackPanel { Children = { new TextBlock { Text = "CopyBuffalo", FontSize = 13, FontWeight = FontWeights.SemiBold }, _trayStatus } };
         menu.Items.Add(new MenuItem { Header = header, Focusable = false, IsHitTestVisible = false });
         menu.Items.Add(new Separator());
         menu.Items.Add(PanelWindow.Entry(UiText.T("Открыть историю"), "\uE77F", OpenFromTray, "Win+V"));
@@ -724,7 +724,7 @@ public partial class App : Application
     {
         _watcher.Paused = paused;
         _tray.Icon = paused ? PausedTrayIcon() : CreateTrayIcon();
-        _tray.Text = paused ? UiText.T("ArkCopyBuffer: запись на паузе") : "ArkCopyBuffer: Win+V";
+        _tray.Text = paused ? UiText.T("CopyBuffalo: запись на паузе") : "CopyBuffalo: Win+V";
         UpdateTrayStatus();
         _panel.SetPaused(paused);
     }

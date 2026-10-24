@@ -1,0 +1,2255 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms</value>
+  </resheader>
+  <data name="S001F75C6B3F4631A" xml:space="preserve">
+    <value>अन्य</value>
+    <comment>Другое</comment>
+  </data>
+  <data name="S00E525F2D9657182" xml:space="preserve">
+    <value>100 मिलीसेकंड</value>
+    <comment>100 мс</comment>
+  </data>
+  <data name="S01C9518EFEFA5B99" xml:space="preserve">
+    <value>माउस रखने पर लंबे पाठ का पूर्वावलोकन</value>
+    <comment>Просмотр длинного текста при наведении</comment>
+  </data>
+  <data name="S02242562D3F8C60C" xml:space="preserve">
+    <value>अभी यहाँ कुछ नहीं है</value>
+    <comment>Здесь пока пусто</comment>
+  </data>
+  <data name="S0273B95E0EE75CA8" xml:space="preserve">
+    <value>पूर्ववत करें (Ctrl+Z)</value>
+    <comment>Отменить (Ctrl+Z)</comment>
+  </data>
+  <data name="S0296E4B0A06954B1" xml:space="preserve">
+    <value>सहेजा जा रहा है…</value>
+    <comment>Сохраняется…</comment>
+  </data>
+  <data name="S03498AEA7B5A98E8" xml:space="preserve">
+    <value>प्रॉम्प्ट संक्षिप्त नहीं किया जा सका।</value>
+    <comment>Не удалось сжать промпт.</comment>
+  </data>
+  <data name="S034C71AC10A3A1FE" xml:space="preserve">
+    <value>3 सेकंड</value>
+    <comment>3 с</comment>
+  </data>
+  <data name="S03BE041FDB716223" xml:space="preserve">
+    <value>बदलाव लागू नहीं किए गए</value>
+    <comment>Изменения не применены</comment>
+  </data>
+  <data name="S0537BA6A692444BF" xml:space="preserve">
+    <value>क्रम बदल दिया गया।</value>
+    <comment>Порядок изменён.</comment>
+  </data>
+  <data name="S053C6742C1336B2C" xml:space="preserve">
+    <value>अपडेट नहीं मिला।</value>
+    <comment>Обновление не найдено.</comment>
+  </data>
+  <data name="S05F86AE8582FFC3E" xml:space="preserve">
+    <value>प्रभाव की तीव्रता, प्रतिशत</value>
+    <comment>Интенсивность эффекта, процентов</comment>
+  </data>
+  <data name="S0607D283433EA448" xml:space="preserve">
+    <value>क्लिपबोर्ड व्यस्त है। इतिहास से ऑडियो प्रविष्टि कॉपी करें।</value>
+    <comment>Буфер обмена занят. Скопируйте аудиозапись из истории.</comment>
+  </data>
+  <data name="S0770CA9F56216DF8" xml:space="preserve">
+    <value>इतिहास से कोई प्रविष्टि चुनें</value>
+    <comment>Выберите запись из истории</comment>
+  </data>
+  <data name="S07C5DCE2B8F8A267" xml:space="preserve">
+    <value>अपडेट अभी तैयार नहीं है।</value>
+    <comment>Обновление ещё не готово.</comment>
+  </data>
+  <data name="S07C7B8B8142D494F" xml:space="preserve">
+    <value>रिकॉर्डिंग फिर शुरू करें</value>
+    <comment>Возобновить</comment>
+  </data>
+  <data name="S07E09CAA765B2F65" xml:space="preserve">
+    <value>परिणाम चुनें। हरा रंग जोड़ा जाने वाला भाग दिखाता है।</value>
+    <comment>Выберите результат. Зелёным — вставка.</comment>
+  </data>
+  <data name="S087397F71C86359B" xml:space="preserve">
+    <value>माउस व्हील: स्क्रॉल</value>
+    <comment>Колесо мыши: прокрутка</comment>
+  </data>
+  <data name="S087494FACE13C38A" xml:space="preserve">
+    <value>कोई ऑडियो ट्रैक नहीं मिला।</value>
+    <comment>Звуковые дорожки не найдены.</comment>
+  </data>
+  <data name="S08C05789F573BA9F" xml:space="preserve">
+    <value>अगला</value>
+    <comment>Следующая</comment>
+  </data>
+  <data name="S08F7803BADAA6487" xml:space="preserve">
+    <value>Intel/AMD x64 प्रोसेसर पर Windows 10 (1809 या बाद का संस्करण) या Windows 11 आवश्यक है।</value>
+    <comment>Нужна Windows 10 (1809 или новее) либо Windows 11, 64-битный процессор Intel/AMD.</comment>
+  </data>
+  <data name="S0918B4BA92684EAA" xml:space="preserve">
+    <value>नाम</value>
+    <comment>Название</comment>
+  </data>
+  <data name="S099904B55F08001B" xml:space="preserve">
+    <value>क्लिपबोर्ड</value>
+    <comment>Буфер</comment>
+  </data>
+  <data name="S0B9F6A92306B93DC" xml:space="preserve">
+    <value>आकृतियाँ</value>
+    <comment>Фигуры</comment>
+  </data>
+  <data name="S0CB790718ED018BD" xml:space="preserve">
+    <value>50 पाठ प्रविष्टियाँ चुनी गईं</value>
+    <comment>Выбрано 50 текстов</comment>
+  </data>
+  <data name="S0D724DEBF038BC1E" xml:space="preserve">
+    <value>पाठ पहचाना नहीं जा सका। मूल छवि सुरक्षित है।</value>
+    <comment>Не удалось распознать текст. Исходное изображение сохранено.</comment>
+  </data>
+  <data name="S0D94E4F5CCA0EB0B" xml:space="preserve">
+    <value>डिस्क पर सहेजा नहीं गया</value>
+    <comment>Не сохранено на диск</comment>
+  </data>
+  <data name="S0E0919E465C9EE1A" xml:space="preserve">
+    <value>चयन हटाएँ</value>
+    <comment>Снять отметку</comment>
+  </data>
+  <data name="S0EE457E59ADE53DE" xml:space="preserve">
+    <value>समूह समेटें</value>
+    <comment>Свернуть группу</comment>
+  </data>
+  <data name="S0EED34A07ED2D4A2" xml:space="preserve">
+    <value>ऑडियो निकाला जा रहा है…</value>
+    <comment>Извлекается звук…</comment>
+  </data>
+  <data name="S0EF264281CE208FB" xml:space="preserve">
+    <value>प्रविष्टि मर्ज से हटा दी गई। वह इतिहास में बनी रहेगी।</value>
+    <comment>Запись убрана из объединения. В истории она осталась.</comment>
+  </data>
+  <data name="S0F4D5C50A07B577B" xml:space="preserve">
+    <value>दिखाएँ</value>
+    <comment>Появление</comment>
+  </data>
+  <data name="S10371AF4DD53166E" xml:space="preserve">
+    <value>अनुवाद के दौरान छवि का आकार बदल गया।</value>
+    <comment>Размер изображения изменился во время перевода.</comment>
+  </data>
+  <data name="S104FE8A2AA075597" xml:space="preserve">
+    <value>थंबनेल</value>
+    <comment>Миниатюра</comment>
+  </data>
+  <data name="S116D8B3F5BF6561E" xml:space="preserve">
+    <value>व्हील: ज़ूम</value>
+    <comment>Колесо: масштаб</comment>
+  </data>
+  <data name="S1174A37A5AB4982C" xml:space="preserve">
+    <value>नीलहरित</value>
+    <comment>Бирюзовый</comment>
+  </data>
+  <data name="S11763D9F26B7FA4C" xml:space="preserve">
+    <value>पथ क्रम से जोड़ें</value>
+    <comment>Пути в слоты по порядку</comment>
+  </data>
+  <data name="S12A261F559875E9B" xml:space="preserve">
+    <value>Unreal Engine नोड</value>
+    <comment>Ноды Unreal Engine</comment>
+  </data>
+  <data name="S12C618201D6A5F25" xml:space="preserve">
+    <value>OCR छवि को संसाधित नहीं कर सका। छोटा क्षेत्र या दूसरी स्क्रीनशॉट छवि आज़माएँ।</value>
+    <comment>OCR не смог обработать изображение. Попробуйте выделить меньшую область или другой снимок.</comment>
+  </data>
+  <data name="S12D5AB1441BA29CB" xml:space="preserve">
+    <value>संपादन फिर करें</value>
+    <comment>Повторить правку</comment>
+  </data>
+  <data name="S12E06B51495C93E8" xml:space="preserve">
+    <value>दूसरी स्क्रीनशॉट छवि या बड़े अक्षरों वाला पाठ आज़माएँ।</value>
+    <comment>Попробуйте другой снимок или более крупный текст.</comment>
+  </data>
+  <data name="S13AF1DAE7C4494CB" xml:space="preserve">
+    <value>मान</value>
+    <comment>значение</comment>
+  </data>
+  <data name="S1417B7792D57BBB7" xml:space="preserve">
+    <value>इतिहास</value>
+    <comment>История</comment>
+  </data>
+  <data name="S14387E4467F2FCC7" xml:space="preserve">
+    <value>अस्थायी फ़ाइलें</value>
+    <comment>Временные файлы</comment>
+  </data>
+  <data name="S143D34B4EE416F6A" xml:space="preserve">
+    <value>कम से कम एक ऐसी पाठ प्रविष्टि जोड़ें जो खाली न हो।</value>
+    <comment>Добавьте хотя бы один непустой текст.</comment>
+  </data>
+  <data name="S143DC498F38A256A" xml:space="preserve">
+    <value>पेस्ट किया जा रहा है…</value>
+    <comment>Вставляем…</comment>
+  </data>
+  <data name="S14E4E1170182FF2B" xml:space="preserve">
+    <value>परिणाम की प्रतीक्षा करें या वर्तमान कार्य रद्द करें।</value>
+    <comment>Дождитесь результата или отмените текущую обработку.</comment>
+  </data>
+  <data name="S1501EFC06EF5F645" xml:space="preserve">
+    <value>छवियों और वीडियो का चयन रद्द करें</value>
+    <comment>Отменить выбор картинок и видео</comment>
+  </data>
+  <data name="S1557CE3ECCC5C994" xml:space="preserve">
+    <value> · स्थान</value>
+    <comment> · место</comment>
+  </data>
+  <data name="S16F8685724EA6A34" xml:space="preserve">
+    <value>जिस फ़ोल्डर का ZIP बनाया जा रहा है, उसके अंदर अस्थायी ZIP नहीं बनाया जा सकता।</value>
+    <comment>Нельзя создать временный ZIP внутри самой архивируемой папки.</comment>
+  </data>
+  <data name="S1718E90D59C50436" xml:space="preserve">
+    <value>ऑडियो</value>
+    <comment>Аудио</comment>
+  </data>
+  <data name="S180F58AB975323F9" xml:space="preserve">
+    <value>खोजें</value>
+    <comment>Поиск</comment>
+  </data>
+  <data name="S186DBA10EE6C9B80" xml:space="preserve">
+    <value>इतिहास में जोड़ने के लिए कोई पाठ या छवि कॉपी करें।</value>
+    <comment>Скопируйте текст или картинку, и они появятся в этом списке.</comment>
+  </data>
+  <data name="S194306E20807E8A7" xml:space="preserve">
+    <value>नाम बदलें</value>
+    <comment>Переименовать</comment>
+  </data>
+  <data name="S196A2550EDE0D02C" xml:space="preserve">
+    <value>पाठ का चयन रद्द करें</value>
+    <comment>Отменить выбор текстов</comment>
+  </data>
+  <data name="S19CE8F92856A9D18" xml:space="preserve">
+    <value>नोड ग्राफ़ खोलें</value>
+    <comment>Открыть граф нод</comment>
+  </data>
+  <data name="S1A9EF6604FE6509C" xml:space="preserve">
+    <value>नई प्रविष्टियों में स्रोत ऐप दिखेगा</value>
+    <comment>Новые записи покажут приложение</comment>
+  </data>
+  <data name="S1AED2C05E0D05E70" xml:space="preserve">
+    <value>बाईं ओर पाठ चुनें ताकि उसे दूसरी प्रविष्टि से बदला जा सके।</value>
+    <comment>Выделите фрагмент слева, чтобы заменить его текстом другой записи.</comment>
+  </data>
+  <data name="S1AF8D8E007EF408C" xml:space="preserve">
+    <value>यहाँ छोड़कर जोड़ें</value>
+    <comment>Отпустите — подставить сюда</comment>
+  </data>
+  <data name="S1B3A63B288A42D4F" xml:space="preserve">
+    <value>कोड</value>
+    <comment>Код</comment>
+  </data>
+  <data name="S1B630B5B6D80E4C7" xml:space="preserve">
+    <value>अपडेट शुरू नहीं किया जा सका।</value>
+    <comment>Не удалось запустить обновление.</comment>
+  </data>
+  <data name="S1BD44106B532CEF3" xml:space="preserve">
+    <value>स्थानीय AI घटक स्थापित नहीं है। CopyBuffalo का पूर्ण इंस्टॉलर चलाकर स्थानीय AI घटक चुनें; छवि अनुवाद के लिए भी यह आवश्यक है।</value>
+    <comment>Не установлен компонент локальной модели. Запустите ArkCopyBuffer-Full-Setup.exe и выберите «Сжатие промптов» (он также нужен для перевода).</comment>
+  </data>
+  <data name="S1C386BD08B121ED9" xml:space="preserve">
+    <value>इस वीडियो में ऑडियो नहीं है।</value>
+    <comment>В видео нет звука.</comment>
+  </data>
+  <data name="S1ECDDF40BFEB28AB" xml:space="preserve">
+    <value>कॉपी करें</value>
+    <comment>Копировать</comment>
+  </data>
+  <data name="S1F9DE09069401BBA" xml:space="preserve">
+    <value>थंबनेल के बीच छोड़ें</value>
+    <comment>Перетащите между миниатюрами</comment>
+  </data>
+  <data name="S201B622D278E1D37" xml:space="preserve">
+    <value>क्षतिग्रस्त प्रविष्टि खोजने के लिए उन्हें एक-एक करके पेस्ट करें।</value>
+    <comment>Вставьте их по одному, чтобы найти повреждённую запись.</comment>
+  </data>
+  <data name="S20D39D27DFBA6104" xml:space="preserve">
+    <value>ZIP बनाया जा रहा है…</value>
+    <comment>Создаётся ZIP…</comment>
+  </data>
+  <data name="S20EF921C0E733A4F" xml:space="preserve">
+    <value>परिणाम पाठ संग्रहण सीमा से बड़ा है। उसे काटा नहीं गया; सेटिंग्स में सीमा बढ़ाएँ।</value>
+    <comment>Полученный текст превышает лимит хранения. Он не был обрезан; увеличьте лимит в настройках.</comment>
+  </data>
+  <data name="S211239C18768F7EA" xml:space="preserve">
+    <value>या बाईं ओर पथ चुनकर स्लॉट पर क्लिक करें। भरे हुए स्लॉट के बीच ले जाने पर उनके पथ आपस में बदल जाते हैं।</value>
+    <comment>Или выберите путь слева и нажмите слот. Перенос между занятыми слотами меняет назначения местами.</comment>
+  </data>
+  <data name="S215816BF42103F1F" xml:space="preserve">
+    <value>सभी</value>
+    <comment>Все</comment>
+  </data>
+  <data name="S21B4D916F3267B6C" xml:space="preserve">
+    <value>लाल</value>
+    <comment>Красный</comment>
+  </data>
+  <data name="S2263DC75D8F9FABF" xml:space="preserve">
+    <value>सामग्री प्रकार: सभी</value>
+    <comment>Вид записи: все</comment>
+  </data>
+  <data name="S2358451A22A7CAEF" xml:space="preserve">
+    <value>अगली फ़ाइल पेस्ट करें: </value>
+    <comment>Вставить следующий файл: </comment>
+  </data>
+  <data name="S239186346F82A841" xml:space="preserve">
+    <value>एक पथ या प्लेसहोल्डर स्वतः बदला जा सकता है</value>
+    <comment>Один путь или маркер — можно заменить автоматически</comment>
+  </data>
+  <data name="S24626711559EDA38" xml:space="preserve">
+    <value>क्लिपबोर्ड इतिहास</value>
+    <comment>История буфера обмена</comment>
+  </data>
+  <data name="S246E10A8E9D25A7D" xml:space="preserve">
+    <value>अनुवाद करने के लिए कोई पाठ नहीं है।</value>
+    <comment>Нет текста для перевода.</comment>
+  </data>
+  <data name="S24CBF0F2B12289FC" xml:space="preserve">
+    <value>छोड़कर स्थान बदलें</value>
+    <comment>Отпустите — переместить</comment>
+  </data>
+  <data name="S253C590ED54240EA" xml:space="preserve">
+    <value>छवि में कोई पाठ नहीं मिला।</value>
+    <comment>Текст на изображении не найден.</comment>
+  </data>
+  <data name="S262C4C9C81BBFBD3" xml:space="preserve">
+    <value>छवियों और वीडियो के लिए अस्थायी डिस्क स्थान पर्याप्त नहीं है।</value>
+    <comment>На диске временных файлов недостаточно места для картинок и видео.</comment>
+  </data>
+  <data name="S2686EEBE90391923" xml:space="preserve">
+    <value>खाली उद्धरण चिह्न</value>
+    <comment>пустые кавычки</comment>
+  </data>
+  <data name="S26D91972810A8D82" xml:space="preserve">
+    <value>तीर</value>
+    <comment>Стрелки</comment>
+  </data>
+  <data name="S2734E4685D892F22" xml:space="preserve">
+    <value>अधिक: रिकॉर्डिंग रोकें, सेटिंग्स, इतिहास साफ़ करें</value>
+    <comment>Ещё: пауза записи, настройки, очистка истории</comment>
+  </data>
+  <data name="S27410FC78B03DDB6" xml:space="preserve">
+    <value>प्रभाव की गति, प्रतिशत</value>
+    <comment>Скорость эффекта, процентов</comment>
+  </data>
+  <data name="S2751C91000182394" xml:space="preserve">
+    <value>नक्शा</value>
+    <comment>Карта</comment>
+  </data>
+  <data name="S277FCF9DB1CC9840" xml:space="preserve">
+    <value>0.6 सेकंड</value>
+    <comment>0,6 с</comment>
+  </data>
+  <data name="S2923E75A55AA53B3" xml:space="preserve">
+    <value>अपडेट का SHA-256 सत्यापन विफल रहा।</value>
+    <comment>Проверка SHA-256 обновления не пройдена.</comment>
+  </data>
+  <data name="S29B06D0B60B7DCF6" xml:space="preserve">
+    <value>थंबनेल का लंबा किनारा, पिक्सेल</value>
+    <comment>Длинная сторона миниатюры, пикселей</comment>
+  </data>
+  <data name="S29FBB6B36971FD46" xml:space="preserve">
+    <value>पिन किया समूह बनाएँ</value>
+    <comment>Создать группу закреплённых</comment>
+  </data>
+  <data name="S2AA26FC72A2E6FCE" xml:space="preserve">
+    <value>अगली चुनी हुई छवि या वीडियो पेस्ट करें</value>
+    <comment>Вставить следующую выбранную картинку или видео</comment>
+  </data>
+  <data name="S2AD63BC83419CC36" xml:space="preserve">
+    <value>अपडेट के लिए जगह पर्याप्त नहीं है: पैकेज के आकार के अलावा 512 MB और रखें।</value>
+    <comment>Недостаточно места для обновления: нужно ещё 512 МБ сверх размера пакета.</comment>
+  </data>
+  <data name="S2B2A9427D51075B7" xml:space="preserve">
+    <value>फ़ाइल या फ़ाइल समूह</value>
+    <comment>Файл или пакет</comment>
+  </data>
+  <data name="S2C12454B6FF51F6B" xml:space="preserve">
+    <value>पथ · स्लॉट में छोड़ें या अलग पंक्ति में रखें</value>
+    <comment>Путь · перетащите в слот или оставьте строкой</comment>
+  </data>
+  <data name="S2C20E0AE88B9F103" xml:space="preserve">
+    <value>फिर दोबारा “अपडेट और पुनः आरंभ” पर क्लिक करें।</value>
+    <comment>Затем нажмите «Обновить и перезапустить» ещё раз.</comment>
+  </data>
+  <data name="S2CCA114C69F11D07" xml:space="preserve">
+    <value>स्रोत ऐप से छाँटें</value>
+    <comment>Фильтр по приложению</comment>
+  </data>
+  <data name="S2D8622A841F69807" xml:space="preserve">
+    <value>अज्ञात सामग्री प्रकार।</value>
+    <comment>Неизвестный вид записи.</comment>
+  </data>
+  <data name="S2DC9E0798C91D2D1" xml:space="preserve">
+    <value>इतिहास खोजें</value>
+    <comment>Поиск по истории</comment>
+  </data>
+  <data name="S2FE8F2FD72439D26" xml:space="preserve">
+    <value>सहेजा गया</value>
+    <comment>Сохранено</comment>
+  </data>
+  <data name="S3005C1BC505F2EAD" xml:space="preserve">
+    <value>फ़ोल्डर</value>
+    <comment>Папки</comment>
+  </data>
+  <data name="S3091ACA226EFA497" xml:space="preserve">
+    <value>पाठ</value>
+    <comment>Текст</comment>
+  </data>
+  <data name="S30D53A158A794F3F" xml:space="preserve">
+    <value>पंक्तियाँ</value>
+    <comment>строки</comment>
+  </data>
+  <data name="S317D2C78ED442353" xml:space="preserve">
+    <value>नीचे कुंजी संकेत दिखाएँ</value>
+    <comment>Подсказки клавиш внизу панели</comment>
+  </data>
+  <data name="S3195519C1940592D" xml:space="preserve">
+    <value>पाठ पहचाना नहीं जा सका।</value>
+    <comment>Не удалось распознать текст.</comment>
+  </data>
+  <data name="S3217E719A9119FC0" xml:space="preserve">
+    <value>अन्य अंशों के लिए पाठ चुनकर प्रतिस्थापन जोड़ें</value>
+    <comment>Для других фрагментов используйте выделение и вставку</comment>
+  </data>
+  <data name="S325E4FA57704410A" xml:space="preserve">
+    <value>मॉडल ने कोई लेबल छोड़ दिया या अमान्य अनुवाद दिया। छवि नहीं बदली गई।</value>
+    <comment>Модель пропустила надпись или вернула некорректный перевод. Картинка не изменена.</comment>
+  </data>
+  <data name="S326C58ACDAEFB1E1" xml:space="preserve">
+    <value>पिछला अपडेट विफल रहा। मैन्युअल जाँच करें; विवरण updates/install-error.txt में है।</value>
+    <comment>Предыдущее обновление не установилось. Проверьте вручную; подробности в updates/install-error.txt.</comment>
+  </data>
+  <data name="S330E7F8A12363B9A" xml:space="preserve">
+    <value>ऑडियो निकालें</value>
+    <comment>Извлечь звук</comment>
+  </data>
+  <data name="S331DCE3192B7B695" xml:space="preserve">
+    <value>कोई खाली उद्धरण या प्लेसहोल्डर नहीं है। प्रविष्टियाँ अलग-अलग पंक्तियों में जोड़ी जाएँगी।</value>
+    <comment>Пустых кавычек и заглушек нет. Тексты объединятся построчно.</comment>
+  </data>
+  <data name="S33C9049C2998664A" xml:space="preserve">
+    <value>समूह फैलाएँ</value>
+    <comment>Развернуть группу</comment>
+  </data>
+  <data name="S340E3C751299C910" xml:space="preserve">
+    <value>पिन करें</value>
+    <comment>Закрепить</comment>
+  </data>
+  <data name="S3413CD1C78698330" xml:space="preserve">
+    <value>ट्रैक {0}</value>
+    <comment>Дорожка {0}</comment>
+  </data>
+  <data name="S344A33BE4B76BFC0" xml:space="preserve">
+    <value>अस्थायी फ़ाइलें रखने की अवधि, दिन</value>
+    <comment>Срок очистки временных файлов, дней</comment>
+  </data>
+  <data name="S344E3EC15B8BA3C3" xml:space="preserve">
+    <value>पॉइंटर बाहर जाने पर छिपाएँ</value>
+    <comment>Скрывать, когда курсор ушёл</comment>
+  </data>
+  <data name="S349065E9C4467894" xml:space="preserve">
+    <value>संग्रहण</value>
+    <comment>Хранение</comment>
+  </data>
+  <data name="S34DFA3C79F0B7C75" xml:space="preserve">
+    <value>बाकी सभी छवियाँ और वीडियो पेस्ट करें</value>
+    <comment>Вставить все оставшиеся картинки и видео</comment>
+  </data>
+  <data name="S3613629A8567FBDD" xml:space="preserve">
+    <value>मिलते-जुलते अक्षर और पंक्तियों का क्रम जाँचें।</value>
+    <comment>Проверьте похожие буквы и порядок строк.</comment>
+  </data>
+  <data name="S36BA2804E029771D" xml:space="preserve">
+    <value>अधिक: रोकें, सेटिंग्स, साफ़ करें (बटन पर जाने के लिए F6)</value>
+    <comment>Ещё: пауза, настройки, очистка (F6 — фокус на кнопки)</comment>
+  </data>
+  <data name="S380FA2FBAAA6699B" xml:space="preserve">
+    <value>इतिहास से लें</value>
+    <comment>Взять из истории</comment>
+  </data>
+  <data name="S3824A1F61B8E6B11" xml:space="preserve">
+    <value>यहाँ पथ छोड़ें</value>
+    <comment>Перетащите сюда путь</comment>
+  </data>
+  <data name="S38264785BF40528B" xml:space="preserve">
+    <value>{0} हज़ार</value>
+    <comment>{0} тыс.</comment>
+  </data>
+  <data name="S38E51CDAC3AF99A2" xml:space="preserve">
+    <value>मर्ज और कॉपी करें</value>
+    <comment>Объединить и скопировать</comment>
+  </data>
+  <data name="S3A4F0128F65CC223" xml:space="preserve">
+    <value>ऑडियो इतिहास में सहेजा गया।</value>
+    <comment>Звук извлечён в историю.</comment>
+  </data>
+  <data name="S3A8599BD655FB873" xml:space="preserve">
+    <value>फिर करें (Ctrl+Y)</value>
+    <comment>Повторить (Ctrl+Y)</comment>
+  </data>
+  <data name="S3AE9AFCEE6F4219A" xml:space="preserve">
+    <value>दूसरा मर्ज शुरू करने से पहले यह मर्ज पूरा करें।</value>
+    <comment>Завершите это объединение, затем можно собрать следующее.</comment>
+  </data>
+  <data name="S3B249DC647CDCE29" xml:space="preserve">
+    <value>पूरा नहीं किया जा सका। </value>
+    <comment>Не удалось завершить. </comment>
+  </data>
+  <data name="S3B9CF4A79A869535" xml:space="preserve">
+    <value>Unity Shader Graph नोड</value>
+    <comment>Ноды Unity Shader Graph</comment>
+  </data>
+  <data name="S55435886F76E0E6A" xml:space="preserve">
+    <value>पाठ मर्ज करें — CopyBuffalo</value>
+    <comment>Объединить тексты — CopyBuffalo</comment>
+  </data>
+  <data name="S3C1540238FF55BA4" xml:space="preserve">
+    <value>अपडेट और पुनः आरंभ</value>
+    <comment>Обновить и перезапустить</comment>
+  </data>
+  <data name="S3CD129EC5EAE282F" xml:space="preserve">
+    <value>Yandex नक्शे</value>
+    <comment>Яндекс Карты</comment>
+  </data>
+  <data name="S3D3419ACCC61723B" xml:space="preserve">
+    <value>सामग्री प्रकार: सभी, कोई फ़िल्टर नहीं</value>
+    <comment>Вид записи: все, без фильтра</comment>
+  </data>
+  <data name="S3D443CEB36624C1B" xml:space="preserve">
+    <value>समूह का नाम दर्ज करें</value>
+    <comment>Введите название группы</comment>
+  </data>
+  <data name="S3E612ADF4D8293FD" xml:space="preserve">
+    <value>नोड ग्राफ़</value>
+    <comment>Граф нод</comment>
+  </data>
+  <data name="S3E795DE749A1EA08" xml:space="preserve">
+    <value>Moment Player की भुतहा लपटें</value>
+    <comment>Призрачное пламя из Moment Player</comment>
+  </data>
+  <data name="S3E81C1D36E7641F2" xml:space="preserve">
+    <value>ऑडियो फ़ाइल संग्रहण सेटिंग्स में तय फ़ाइल सीमा से बड़ी है।</value>
+    <comment>Аудиофайл превышает лимит файлов в настройках хранения.</comment>
+  </data>
+  <data name="S3EEA9DCF2BF6E785" xml:space="preserve">
+    <value>“{0}” नाम का समूह पहले से मौजूद है</value>
+    <comment>Группа «{0}» уже есть</comment>
+  </data>
+  <data name="S3F14FC1EF2A520B0" xml:space="preserve">
+    <value>&lt;value&gt; या {{value}} प्लेसहोल्डर, या कमांड तर्क का उपयोग करें। संपादक खोलने के लिए Ctrl+E दबाएँ।</value>
+    <comment>Используйте маркер &lt;значение&gt;, {{значение}} или аргумент команды. Можно открыть редактор: Ctrl+E.</comment>
+  </data>
+  <data name="S3F995E364A5430C0" xml:space="preserve">
+    <value>कोई रंग नहीं</value>
+    <comment>Без цвета</comment>
+  </data>
+  <data name="S3FCEF58E9C383C20" xml:space="preserve">
+    <value>बदलने का लक्ष्य नहीं मिला</value>
+    <comment>Не найдено значение для замены</comment>
+  </data>
+  <data name="S40CDEF60755C34B3" xml:space="preserve">
+    <value>पिन किए</value>
+    <comment>Закреплённые</comment>
+  </data>
+  <data name="S4150EBF1DB0F7659" xml:space="preserve">
+    <value>छवियाँ</value>
+    <comment>Картинки</comment>
+  </data>
+  <data name="S41B0EFEBC831C3E1" xml:space="preserve">
+    <value>अपडेट की जाँच नहीं हो सकी: {0}</value>
+    <comment>Не удалось проверить обновления: {0}</comment>
+  </data>
+  <data name="S42A7BFE71DE35A15" xml:space="preserve">
+    <value>ऑडियो ट्रैक पढ़े नहीं जा सके।</value>
+    <comment>Не удалось прочитать звуковые дорожки.</comment>
+  </data>
+  <data name="S42B4A2BB3E83EF6A" xml:space="preserve">
+    <value>{0:N0} अक्षर, {1} {2}</value>
+    <comment>{0:N0} симв., {1} {2}</comment>
+  </data>
+  <data name="S42B6424F9D3A2D2C" xml:space="preserve">
+    <value>पंक्तियाँ</value>
+    <comment>строк</comment>
+  </data>
+  <data name="S43E314D2A3F80B8E" xml:space="preserve">
+    <value>प्रविष्टि पहले ही बदली या हटाई जा चुकी है।</value>
+    <comment>Запись уже изменена или удалена.</comment>
+  </data>
+  <data name="S4401E13B4F44ECDA" xml:space="preserve">
+    <value>नई प्रविष्टियों के लिए</value>
+    <comment>Для новых записей</comment>
+  </data>
+  <data name="S44AA9BF03160AA2C" xml:space="preserve">
+    <value>फ़ाइल पथ</value>
+    <comment>Путь к файлу</comment>
+  </data>
+  <data name="S44B2275E6C13558C" xml:space="preserve">
+    <value>मॉडल लोड करते समय llama-server बंद हो गया (कोड {0})।</value>
+    <comment>llama-server завершился при загрузке модели (код {0}).</comment>
+  </data>
+  <data name="S44B6F4A631077779" xml:space="preserve">
+    <value>{0:N0} अक्षर · अलग पाठ</value>
+    <comment>{0:N0} символов · отдельный текст</comment>
+  </data>
+  <data name="S44F2634FD416851A" xml:space="preserve">
+    <value>स्वचालित अपडेट</value>
+    <comment>Обновлять автоматически</comment>
+  </data>
+  <data name="S455471DB0CFB8950" xml:space="preserve">
+    <value>अपडेट</value>
+    <comment>Обновления</comment>
+  </data>
+  <data name="S45E12575218BDE9B" xml:space="preserve">
+    <value>यह पथ स्लॉट के उद्धरण चिह्नों में नहीं बैठता। इसे अलग पंक्ति के रूप में मर्ज किया जा सकता है।</value>
+    <comment>Этот путь не подходит к кавычкам слота. Можно объединить его отдельной строкой.</comment>
+  </data>
+  <data name="S4656443C26C025BD" xml:space="preserve">
+    <value>पाठ में जोड़ें</value>
+    <comment>Вставить в текст</comment>
+  </data>
+  <data name="S46844DEF19E8DC42" xml:space="preserve">
+    <value>अन्य</value>
+    <comment>Прочее</comment>
+  </data>
+  <data name="S47984DF695944191" xml:space="preserve">
+    <value>पाठ मर्ज कर दिया गया</value>
+    <comment>Тексты объединены</comment>
+  </data>
+  <data name="S480FAE1C4BC97F4B" xml:space="preserve">
+    <value>कोई परिणाम नहीं</value>
+    <comment>Ничего не найдено</comment>
+  </data>
+  <data name="S49636D4FD4D754A5" xml:space="preserve">
+    <value>केवल पाठ प्रविष्टियाँ संपादित की जा सकती हैं।</value>
+    <comment>Редактировать можно только текстовые записи.</comment>
+  </data>
+  <data name="S4997A5143D9FA486" xml:space="preserve">
+    <value>परिणाम</value>
+    <comment>Результат</comment>
+  </data>
+  <data name="S49C8352691BF545C" xml:space="preserve">
+    <value>मर्ज किए पाठ का पूर्वावलोकन</value>
+    <comment>Предпросмотр объединённого текста</comment>
+  </data>
+  <data name="S4A64D47B205EBD7F" xml:space="preserve">
+    <value>पाठ पूर्वावलोकन में देरी, मिलीसेकंड</value>
+    <comment>Задержка просмотра текста, миллисекунды</comment>
+  </data>
+  <data name="S4A71BC71DF3007A5" xml:space="preserve">
+    <value>रूसी और अंग्रेज़ी पाठ स्थानीय रूप से पहचानें। परिणाम इतिहास में सहेजा जाएगा और क्लिपबोर्ड न बदला हो तो कॉपी भी होगा।</value>
+    <comment>Распознать русский и английский текст локально. Результат появится в истории и будет скопирован, если буфер не изменился.</comment>
+  </data>
+  <data name="S4AED2CD288DE1810" xml:space="preserve">
+    <value>बैंगनी</value>
+    <comment>Фиолетовый</comment>
+  </data>
+  <data name="S4B055A5A553067DB" xml:space="preserve">
+    <value>छवि संग्रहण सेटिंग्स की आकार सीमा से बड़ी है।</value>
+    <comment>Изображение превышает лимит размера в настройках хранения.</comment>
+  </data>
+  <data name="S4BBB3F269D235FBC" xml:space="preserve">
+    <value>पाठ मर्ज करें</value>
+    <comment>Объединить тексты</comment>
+  </data>
+  <data name="S4CBE758BC22A3C5B" xml:space="preserve">
+    <value>स्लॉट {0} · {1}</value>
+    <comment>Слот {0} · {1}</comment>
+  </data>
+  <data name="S4CFB9987CDA5BFE3" xml:space="preserve">
+    <value>एक लेबल छवि की सीमा से बाहर है।</value>
+    <comment>Надпись находится за границами картинки.</comment>
+  </data>
+  <data name="S4D88BE035A92C555" xml:space="preserve">
+    <value>फ़ोल्डर की वर्तमान सामग्री का ZIP बनाकर फ़ाइल के रूप में पेस्ट करें</value>
+    <comment>Создать ZIP из текущего содержимого папки и вставить как файл</comment>
+  </data>
+  <data name="S4E204E395186D841" xml:space="preserve">
+    <value>ZIP के रूप में भेजें</value>
+    <comment>Отправить архивом .zip</comment>
+  </data>
+  <data name="S4E6171ACEE4847BD" xml:space="preserve">
+    <value>प्रतीक, कोड (2014) या श्रेणी (मुद्रा) से खोजें।</value>
+    <comment>Ищите по символу, коду (2014) или группе («валют»).</comment>
+  </data>
+  <data name="S4EBEB45A877CDD5E" xml:space="preserve">
+    <value>संग्रहण सेटिंग्स</value>
+    <comment>Настройки хранения данных</comment>
+  </data>
+  <data name="S4F7C5BA25115D970" xml:space="preserve">
+    <value>समूह हटाएँ · प्रविष्टियाँ रखें</value>
+    <comment>Удалить группу · плитки останутся</comment>
+  </data>
+  <data name="S50F9A1E3D6E15FA7" xml:space="preserve">
+    <value>स्लॉट में पथ भरें</value>
+    <comment>Подставлять пути в слоты</comment>
+  </data>
+  <data name="S513E85C43BB5B058" xml:space="preserve">
+    <value>फ़ोल्डर · मूल स्थान का लिंक</value>
+    <comment>Папка · ссылка на оригинал</comment>
+  </data>
+  <data name="S5189135A6110BD31" xml:space="preserve">
+    <value>फिर कोशिश करें</value>
+    <comment>Повторить</comment>
+  </data>
+  <data name="S55339A2475B6DD2D" xml:space="preserve">
+    <value>मर्ज फिर करें</value>
+    <comment>Повторить объединение</comment>
+  </data>
+  <data name="S5543508C5EF64551" xml:space="preserve">
+    <value>प्रकार</value>
+    <comment>Виды</comment>
+  </data>
+  <data name="S5730FED63F2FF4F5" xml:space="preserve">
+    <value>क्रम या स्लॉट चुनें</value>
+    <comment>Выберите порядок или слот</comment>
+  </data>
+  <data name="S57AD92DE020B8C62" xml:space="preserve">
+    <value>GIF, ऑडियो और फ़ाइलें</value>
+    <comment>GIF, аудио и файлы</comment>
+  </data>
+  <data name="S586C43A3FF36CEB7" xml:space="preserve">
+    <value>{0} को इच्छित परिणाम पर छोड़ें। हरा रंग जोड़ा जाने वाला भाग दिखाता है।</value>
+    <comment>Перенесите {0} на нужный результат. Зелёным — вставка.</comment>
+  </data>
+  <data name="S58838F1A2610F060" xml:space="preserve">
+    <value>इतिहास से इसे दोबारा कॉपी करें।</value>
+    <comment>Скопируйте её заново из истории.</comment>
+  </data>
+  <data name="S58E1352174CBF44E" xml:space="preserve">
+    <value>रिकॉर्डिंग रुकी हुई है।</value>
+    <comment>Запись на паузе.</comment>
+  </data>
+  <data name="S595FC716D85F07EE" xml:space="preserve">
+    <value>प्रतिस्थापन का पूर्वावलोकन</value>
+    <comment>Так будет после замены</comment>
+  </data>
+  <data name="S596AAD29B8B9BA15" xml:space="preserve">
+    <value>मूल फ़ोल्डर हटाया या ले जाया गया है, या उपलब्ध नहीं है।</value>
+    <comment>Исходная папка перемещена, удалена или недоступна.</comment>
+  </data>
+  <data name="S59F90DFBD572FD09" xml:space="preserve">
+    <value>आपका संस्करण अद्यतित है।</value>
+    <comment>У вас последняя версия.</comment>
+  </data>
+  <data name="S5A33E4A0CDCE618F" xml:space="preserve">
+    <value>{0}{1} · {2:0.#} MB</value>
+    <comment>{0}{1} · {2:0.#} МБ</comment>
+  </data>
+  <data name="S5A3519B294992D05" xml:space="preserve">
+    <value>पाठ पूर्वावलोकन की चौड़ाई</value>
+    <comment>Ширина карточки просмотра текста</comment>
+  </data>
+  <data name="S5A577D90566052BE" xml:space="preserve">
+    <value>बंद</value>
+    <comment>Выключен</comment>
+  </data>
+  <data name="S5B2EF8627A936CD5" xml:space="preserve">
+    <value>फ़ाइल {0}</value>
+    <comment>Файл {0}</comment>
+  </data>
+  <data name="S5B3992519F8BF916" xml:space="preserve">
+    <value>फ़ाइलें स्वीकार करने वाले ऐप में Ctrl+V दबाएँ।</value>
+    <comment>Нажмите Ctrl+V в приложении, принимающем файлы.</comment>
+  </data>
+  <data name="S5B3AABBDC87CD365" xml:space="preserve">
+    <value> परिणाम यहीं है; आप फिर कोशिश कर सकते हैं।</value>
+    <comment> Результат остаётся здесь; можно повторить.</comment>
+  </data>
+  <data name="S5BB1AA8A2FEC3A7D" xml:space="preserve">
+    <value>पाठ पहचानकर कॉपी कर दिया गया।</value>
+    <comment>Текст распознан и скопирован.</comment>
+  </data>
+  <data name="S5BD57038DBADD651" xml:space="preserve">
+    <value>भाषा</value>
+    <comment>Язык</comment>
+  </data>
+  <data name="S5BF473B2FD59A9AA" xml:space="preserve">
+    <value>मीडिया और फ़ाइलें रखने की अवधि, दिन</value>
+    <comment>Срок хранения медиа и файлов, дней</comment>
+  </data>
+  <data name="S5BF5E5AC637507E3" xml:space="preserve">
+    <value>{0} · {1} बाइट</value>
+    <comment>{0} · {1} Б</comment>
+  </data>
+  <data name="S5C51EDD2D64E5120" xml:space="preserve">
+    <value>पाठ संपादित करें</value>
+    <comment>Редактировать текст</comment>
+  </data>
+  <data name="S5E80EC2151C6E297" xml:space="preserve">
+    <value>फिर पेस्ट करें।</value>
+    <comment>Повторите вставку.</comment>
+  </data>
+  <data name="S36DBB75284131879" xml:space="preserve">
+    <value>CopyBuffalo शुरू नहीं हो सका: {0}
+
+विवरण: {1}</value>
+    <comment>CopyBuffalo не запустился: {0}
+
+Подробности: {1}</comment>
+  </data>
+  <data name="S5ECC2549250FD2FE" xml:space="preserve">
+    <value>चुनी हुई छवियों और वीडियो का क्रम</value>
+    <comment>Порядок выбранных картинок и видео</comment>
+  </data>
+  <data name="S5F94B28E71A8B993" xml:space="preserve">
+    <value>क्लिपबोर्ड पर कॉपी नहीं किया जा सका। </value>
+    <comment>Не удалось скопировать в буфер. </comment>
+  </data>
+  <data name="S5FD6BF9467F3A5A1" xml:space="preserve">
+    <value>पथ स्लॉट भरें</value>
+    <comment>Подставлять в слоты</comment>
+  </data>
+  <data name="S602601E628CC43D0" xml:space="preserve">
+    <value>छवि का आकार</value>
+    <comment>Размер картинки</comment>
+  </data>
+  <data name="S6026D2C47F4BCD63" xml:space="preserve">
+    <value>जोड़ा गया पथ अब स्लॉट में नहीं बैठता।</value>
+    <comment>Назначение пути больше не подходит к слоту.</comment>
+  </data>
+  <data name="S6076E7DEACE54EA2" xml:space="preserve">
+    <value>अगली चुनी हुई फ़ाइल पेस्ट करें</value>
+    <comment>Вставить следующий выбранный файл</comment>
+  </data>
+  <data name="S60C53905AD7188CF" xml:space="preserve">
+    <value>इच्छित मान पर छोड़ें</value>
+    <comment>Перетащите на нужное значение</comment>
+  </data>
+  <data name="S6194D998B332B38D" xml:space="preserve">
+    <value>पाठ का क्रम</value>
+    <comment>Порядок текстов</comment>
+  </data>
+  <data name="S61B602CBA70C78A2" xml:space="preserve">
+    <value>ऑडियो निकालकर कॉपी कर दिया गया।</value>
+    <comment>Звук извлечён и скопирован.</comment>
+  </data>
+  <data name="S6209BDD970DB46E4" xml:space="preserve">
+    <value>मॉडल ने उत्तर पूरा नहीं किया। अधूरा परिणाम सहेजा नहीं गया।</value>
+    <comment>Модель не завершила ответ. Неполный результат не сохранён.</comment>
+  </data>
+  <data name="S62C783FB356CEFE6" xml:space="preserve">
+    <value>क्रम बदलने के लिए थंबनेल खींचें। Ctrl+←/→ से स्थान बदलें; Delete से चयन हटाएँ।</value>
+    <comment>Перетащите миниатюру для смены порядка. Ctrl+←/→ — переставить, Delete — снять отметку.</comment>
+  </data>
+  <data name="S6309A92A7273E8C1" xml:space="preserve">
+    <value>बदलाव फिर कर दिया गया।</value>
+    <comment>Изменение повторено.</comment>
+  </data>
+  <data name="S63B71FD3A7034EBB" xml:space="preserve">
+    <value>पाठ में {0:N0} से अधिक अक्षर हैं, जो स्थानीय मॉडल के लिए बहुत ज़्यादा हैं।</value>
+    <comment>Текст длиннее {0:N0} символов: для локальной модели слишком много.</comment>
+  </data>
+  <data name="S2A5C6674412AA2ED" xml:space="preserve">
+    <value>पाठ संपादित करें — CopyBuffalo</value>
+    <comment>Редактировать текст — CopyBuffalo</comment>
+  </data>
+  <data name="S65339243BCD582FB" xml:space="preserve">
+    <value>यहाँ उपयुक्त उद्धरण चिह्नों वाला पथ चाहिए</value>
+    <comment>Здесь нужен путь с подходящими кавычками</comment>
+  </data>
+  <data name="S65D43381EA84041D" xml:space="preserve">
+    <value>संपादन फिर करें (Ctrl+Y)</value>
+    <comment>Повторить правку (Ctrl+Y)</comment>
+  </data>
+  <data name="S65E2281FBA14A72F" xml:space="preserve">
+    <value>पाठ {0}, स्लॉट {1} में जोड़ा गया</value>
+    <comment>Подставлен в текст {0}, слот {1}</comment>
+  </data>
+  <data name="S663C52481DA0D6E3" xml:space="preserve">
+    <value>समूह बनाएँ</value>
+    <comment>Создать группу</comment>
+  </data>
+  <data name="S66D12FB99282A24A" xml:space="preserve">
+    <value>नीला</value>
+    <comment>Синий</comment>
+  </data>
+  <data name="S6791BBFBFE97992A" xml:space="preserve">
+    <value>कार्ड के क्रम से पथ जोड़ दिए गए। आप कोई भी जोड़ बदल सकते हैं।</value>
+    <comment>Пути назначены по порядку карточек. Любое назначение можно изменить.</comment>
+  </data>
+  <data name="S6941B3680C4BD461" xml:space="preserve">
+    <value>पथ स्लॉट</value>
+    <comment>Слоты для путей</comment>
+  </data>
+  <data name="S69DE26B2E6D554AA" xml:space="preserve">
+    <value>ZIP के रूप में फिर भेजें।</value>
+    <comment>Повторите отправку архивом.</comment>
+  </data>
+  <data name="S6A20ADC3B99637AE" xml:space="preserve">
+    <value>छवि ज़ूम</value>
+    <comment>Увеличение картинок</comment>
+  </data>
+  <data name="S6B07FBC6C23BDADF" xml:space="preserve">
+    <value>छवि स्थानीय रूप से संसाधित हो रही है; आप काम जारी रख सकते हैं।</value>
+    <comment>Можно продолжать работу — изображение обрабатывается локально.</comment>
+  </data>
+  <data name="S6B38B68B028F998C" xml:space="preserve">
+    <value>मूल प्रविष्टियाँ इतिहास में रहेंगी · Ctrl+Enter से मर्ज · Esc से बंद</value>
+    <comment>Исходные записи останутся в истории · Ctrl+Enter — объединить · Esc — закрыть</comment>
+  </data>
+  <data name="S6BA853EF91841053" xml:space="preserve">
+    <value>मूल फ़ोल्डर इतिहास में बना रहेगा।</value>
+    <comment>Исходная папка сохранена в истории.</comment>
+  </data>
+  <data name="S6C0A472DEC7A960C" xml:space="preserve">
+    <value>अनुवाद के लिए पाठ बहुत ज़्यादा है। छवि का छोटा क्षेत्र चुनें।</value>
+    <comment>Слишком много текста для перевода. Выделите меньшую область изображения.</comment>
+  </data>
+  <data name="S6CEB21D5A7DEFF82" xml:space="preserve">
+    <value>{0} MB</value>
+    <comment>{0} МБ</comment>
+  </data>
+  <data name="S6D8C85CCC69C391B" xml:space="preserve">
+    <value>ज़ूम इन (Ctrl++)</value>
+    <comment>Увеличить (Ctrl++)</comment>
+  </data>
+  <data name="S6DA140FDD4BE0189" xml:space="preserve">
+    <value>रूसी</value>
+    <comment>Русский</comment>
+  </data>
+  <data name="S6E1F7BAA472FCFBB" xml:space="preserve">
+    <value>खोज साफ़ करें</value>
+    <comment>Очистить поиск</comment>
+  </data>
+  <data name="S701E13AB41F1357B" xml:space="preserve">
+    <value>टैब: प्रतीक</value>
+    <comment>Вкладка: символы</comment>
+  </data>
+  <data name="S7048F8453E3CA395" xml:space="preserve">
+    <value>समूह {0}</value>
+    <comment>Группа {0}</comment>
+  </data>
+  <data name="S704922C5E68A8605" xml:space="preserve">
+    <value>यह इस सत्र के इतिहास में है। सहेजने के लिए कार्य दोबारा चलाएँ।</value>
+    <comment>Он остаётся в истории этой сессии. Повторите обработку, чтобы сохранить его.</comment>
+  </data>
+  <data name="S7095452CEC085316" xml:space="preserve">
+    <value>यूनानी</value>
+    <comment>Греческий</comment>
+  </data>
+  <data name="S70E98E32147CF4EC" xml:space="preserve">
+    <value>गति</value>
+    <comment>Скорость</comment>
+  </data>
+  <data name="S70EEB56C0B462E42" xml:space="preserve">
+    <value>नोड ग्राफ़</value>
+    <comment>Схема нод</comment>
+  </data>
+  <data name="S7148F1C5E86E4F94" xml:space="preserve">
+    <value>पेस्ट करने के लिए चुना गया</value>
+    <comment>Выбрано для вставки</comment>
+  </data>
+  <data name="S720903101412B099" xml:space="preserve">
+    <value>चयन साफ़ करें</value>
+    <comment>Снять все отметки</comment>
+  </data>
+  <data name="S73229ED810CE43C4" xml:space="preserve">
+    <value> · {0} फ़ाइलें</value>
+    <comment> · {0} шт.</comment>
+  </data>
+  <data name="S73A0F69D548DF647" xml:space="preserve">
+    <value>फ़ोल्डर</value>
+    <comment>Папка</comment>
+  </data>
+  <data name="S73D5A91D62E6A9B0" xml:space="preserve">
+    <value>विंडो किनारा प्रभाव</value>
+    <comment>Эффект по краям окна</comment>
+  </data>
+  <data name="S7422F45938E3A37C" xml:space="preserve">
+    <value>प्रविष्टि</value>
+    <comment>запись</comment>
+  </data>
+  <data name="S7548E9A8CBDB3F6D" xml:space="preserve">
+    <value>फ़ोल्डर में लिंक या क्लाउड फ़ाइल है: {0}। पहले उसकी सामान्य स्थानीय प्रति तैयार करें।</value>
+    <comment>В папке есть ссылка или облачный файл: {0}. Подготовьте обычную локальную копию.</comment>
+  </data>
+  <data name="S75CD24C315D4591C" xml:space="preserve">
+    <value>बाहर निकलें</value>
+    <comment>Выход</comment>
+  </data>
+  <data name="S770911A6DF4F3697" xml:space="preserve">
+    <value>Google नक्शे</value>
+    <comment>Google Карты</comment>
+  </data>
+  <data name="S77B488C62D006327" xml:space="preserve">
+    <value>इस रिलीज़ में ArkCopyBuffer-Setup.exe मौजूद नहीं है।</value>
+    <comment>В релизе нет установщика ArkCopyBuffer-Setup.exe.</comment>
+  </data>
+  <data name="S78B7A9E85FF0C74F" xml:space="preserve">
+    <value>पाठ प्रविष्टियाँ</value>
+    <comment>Обычные записи</comment>
+  </data>
+  <data name="S78EE5E545DA882DD" xml:space="preserve">
+    <value>1 सेकंड</value>
+    <comment>1 с</comment>
+  </data>
+  <data name="S79932A3467F4288A" xml:space="preserve">
+    <value>विराम चिह्न</value>
+    <comment>Пунктуация</comment>
+  </data>
+  <data name="S7A7D4120C3A5CBC3" xml:space="preserve">
+    <value>फ़ाइल या फ़ाइल समूह की आकार सीमा, मेगाबाइट</value>
+    <comment>Лимит размера файла или пакета, мегабайт</comment>
+  </data>
+  <data name="S7B9A494CECC2D7A9" xml:space="preserve">
+    <value>प्रविष्टि की फ़ाइल नहीं मिली या क्षतिग्रस्त है।</value>
+    <comment>Файл записи повреждён или не найден.</comment>
+  </data>
+  <data name="S7BD88BAC413F49F4" xml:space="preserve">
+    <value>अनुवाद पठनीय रूप में नहीं समा रहा। छोटा क्षेत्र चुनें या छवि बड़ी करें।</value>
+    <comment>Перевод не помещается на картинке без потери читаемости. Выделите меньшую область или увеличьте изображение.</comment>
+  </data>
+  <data name="S7C47F7292BA4F2AE" xml:space="preserve">
+    <value>रद्द करें</value>
+    <comment>Отменить</comment>
+  </data>
+  <data name="S7C4A78C664492EDD" xml:space="preserve">
+    <value>पाठ पहचाना जा रहा है…</value>
+    <comment>Распознаётся текст…</comment>
+  </data>
+  <data name="S7CD2C8973CFF782E" xml:space="preserve">
+    <value>पैनल बंद होने और चल रहे कार्य पूरे होने पर पृष्ठभूमि में स्थापित होगा।</value>
+    <comment>Установим в фоне, когда панель закрыта и операции завершены.</comment>
+  </data>
+  <data name="S7CD2F0FF40822259" xml:space="preserve">
+    <value>अपडेट की जाँच हो रही है…</value>
+    <comment>Проверяем обновления…</comment>
+  </data>
+  <data name="S7D8BA97711BAE422" xml:space="preserve">
+    <value>यह सेटिंग सहेजी नहीं जा सकी।</value>
+    <comment>Настройка не сохранена.</comment>
+  </data>
+  <data name="S7DBAD55F568ABCDC" xml:space="preserve">
+    <value>प्रतिस्थापन मान</value>
+    <comment>Значения для замены</comment>
+  </data>
+  <data name="S7E3BECFF8AF12D2F" xml:space="preserve">
+    <value>पाठ या छवियाँ और वीडियो चुनना शुरू करने के लिए Alt+क्लिक करें। फिर और चुनने के लिए साधारण क्लिक करें। कीबोर्ड से Alt+Space दबाएँ।</value>
+    <comment>Alt+клик — начать выбор текстов или картинок и видео. Дальше отмечайте обычными кликами. Alt+пробел — с клавиатуры.</comment>
+  </data>
+  <data name="S7E84EEA1C96A15E8" xml:space="preserve">
+    <value>पंक्ति</value>
+    <comment>строка</comment>
+  </data>
+  <data name="S7F7E31F38DCB2F5C" xml:space="preserve">
+    <value>इतिहास साफ़ करें…</value>
+    <comment>Очистить историю…</comment>
+  </data>
+  <data name="S7FCFECECCCEB1F47" xml:space="preserve">
+    <value>चुने गए: {0}</value>
+    <comment>Выбрано: {0}</comment>
+  </data>
+  <data name="S7FF0AC825C58BEF9" xml:space="preserve">
+    <value>रिकॉर्डिंग रोकें</value>
+    <comment>Пауза записи</comment>
+  </data>
+  <data name="S81035A17B26F978A" xml:space="preserve">
+    <value>छवि के अंदर के लेबल रूसी में अनुवाद करें। नई छवि इतिहास में सहेजी और क्लिपबोर्ड पर कॉपी की जाएगी।</value>
+    <comment>Перевести надписи прямо на картинке. Новое изображение сохранится в истории и скопируется в буфер.</comment>
+  </data>
+  <data name="S8209F325277FEA91" xml:space="preserve">
+    <value>अपडेट स्थापित नहीं हुआ।</value>
+    <comment>Обновление не установлено.</comment>
+  </data>
+  <data name="S824CEE50BFE32C38" xml:space="preserve">
+    <value>Esc से रद्द · Ctrl+Z से प्रतिस्थापन पूर्ववत</value>
+    <comment>Esc — отменить · Ctrl+Z — отменить замену</comment>
+  </data>
+  <data name="S82EF5D7398CA83BB" xml:space="preserve">
+    <value> · मार्ग</value>
+    <comment> · маршрут</comment>
+  </data>
+  <data name="S83C7951973894CBF" xml:space="preserve">
+    <value>इतिहास में पाठ खोजें</value>
+    <comment>Поиск текста в истории</comment>
+  </data>
+  <data name="S8422C616A28F5F16" xml:space="preserve">
+    <value>संग्रहण सेटिंग्स लागू करें</value>
+    <comment>Применить настройки хранения</comment>
+  </data>
+  <data name="S843EAF6AA73BC3D2" xml:space="preserve">
+    <value>पाठ फ़ाइल</value>
+    <comment>Текстовый файл</comment>
+  </data>
+  <data name="S854F62197C052034" xml:space="preserve">
+    <value>{0} से</value>
+    <comment>От {0}</comment>
+  </data>
+  <data name="S858AD7688ABF60CF" xml:space="preserve">
+    <value>इतिहास खोजें</value>
+    <comment>Поиск в истории</comment>
+  </data>
+  <data name="S8593A09889BF93D1" xml:space="preserve">
+    <value>प्रकार ▾</value>
+    <comment>Виды ▾</comment>
+  </data>
+  <data name="S86F7E7EE269E386C" xml:space="preserve">
+    <value>भाषा की पसंद सहेजी नहीं जा सकी।</value>
+    <comment>Не удалось сохранить язык.</comment>
+  </data>
+  <data name="S87711C1317DBB949" xml:space="preserve">
+    <value>सिरिलिक</value>
+    <comment>Кириллица</comment>
+  </data>
+  <data name="S887BBD174DA42C24" xml:space="preserve">
+    <value>OCR घटक नहीं मिला। ocr फ़ोल्डर सहित CopyBuffalo का नया संस्करण स्थापित करें।</value>
+    <comment>Не найден комплект OCR. Установите свежую сборку CopyBuffalo с папкой ocr.</comment>
+  </data>
+  <data name="S8965271D3C97C79D" xml:space="preserve">
+    <value>साफ़ करें</value>
+    <comment>Очистить</comment>
+  </data>
+  <data name="S8A04D5904428F535" xml:space="preserve">
+    <value>खाली छोड़ने पर “{0}” इस्तेमाल होगा</value>
+    <comment>Если оставить пустым, будет «{0}»</comment>
+  </data>
+  <data name="S8A7DEA5194EB5DDF" xml:space="preserve">
+    <value>प्रविष्टियाँ</value>
+    <comment>Записи</comment>
+  </data>
+  <data name="S8AD94270BCF2F92E" xml:space="preserve">
+    <value>छवि का संदर्भ अमान्य है।</value>
+    <comment>Некорректная ссылка на изображение.</comment>
+  </data>
+  <data name="S8AFE320208B00A49" xml:space="preserve">
+    <value>ZIP के लिए अस्थायी डिस्क स्थान पर्याप्त नहीं है।</value>
+    <comment>На диске временных файлов недостаточно места для ZIP.</comment>
+  </data>
+  <data name="S8B0115A30AB9AAC8" xml:space="preserve">
+    <value>परिणाम डिस्क पर सहेजा नहीं गया।</value>
+    <comment>Результат не сохранён на диск.</comment>
+  </data>
+  <data name="S8B97A912B02AE689" xml:space="preserve">
+    <value>छवि आकार सीमा, मेगापिक्सेल</value>
+    <comment>Лимит пикселей изображения, мегапикселей</comment>
+  </data>
+  <data name="S8BB025FE357CF04A" xml:space="preserve">
+    <value>प्रविष्टि बदल गई</value>
+    <comment>Запись изменилась</comment>
+  </data>
+  <data name="S8CC6819B724691A2" xml:space="preserve">
+    <value>मर्ज से हटाएँ</value>
+    <comment>Убрать из объединения</comment>
+  </data>
+  <data name="S8D6D99E130FEDBB6" xml:space="preserve">
+    <value>कार्ड खींचकर क्रम बदलें; पथ सही स्लॉट में छोड़ें।</value>
+    <comment>Перетащите карточки для порядка, пути — в нужные слоты.</comment>
+  </data>
+  <data name="S8DBF01AE706F3996" xml:space="preserve">
+    <value>पाठ अक्षर सीमा, हज़ार में</value>
+    <comment>Лимит символов текста, тысяч</comment>
+  </data>
+  <data name="S8E111B8549D33DBB" xml:space="preserve">
+    <value>पूर्ववत नहीं किया जा सकता</value>
+    <comment>Отмена недоступна</comment>
+  </data>
+  <data name="S8EED6432DE060A3C" xml:space="preserve">
+    <value>रिकॉर्डिंग रुकी हुई है</value>
+    <comment>Запись на паузе</comment>
+  </data>
+  <data name="S8EF99396D284012F" xml:space="preserve">
+    <value>पिन की गई प्रविष्टियाँ हटाए जाने तक रखी जाती हैं।</value>
+    <comment>Закреплённые записи хранятся до удаления вручную.</comment>
+  </data>
+  <data name="S8F1DCFC7B5F303FE" xml:space="preserve">
+    <value>{0} {1} हटाएँ?</value>
+    <comment>Удалить {0} {1}?</comment>
+  </data>
+  <data name="S8F215472D1DFB55D" xml:space="preserve">
+    <value>मार्ग</value>
+    <comment>маршрут</comment>
+  </data>
+  <data name="SCD873A143F2D64D0" xml:space="preserve">
+    <value>CopyBuffalo: रिकॉर्डिंग रुकी हुई है</value>
+    <comment>CopyBuffalo: запись на паузе</comment>
+  </data>
+  <data name="S8F54CAD240DBD90C" xml:space="preserve">
+    <value>क्लिपबोर्ड व्यस्त है।</value>
+    <comment>Буфер обмена занят.</comment>
+  </data>
+  <data name="S8FBE9B75CBDFBFA6" xml:space="preserve">
+    <value>रद्द करें</value>
+    <comment>Отмена</comment>
+  </data>
+  <data name="S9022BA3739723A99" xml:space="preserve">
+    <value>दृश्य</value>
+    <comment>Вид</comment>
+  </data>
+  <data name="S90443F0455695A6A" xml:space="preserve">
+    <value>संपादन पूर्ववत करें (Ctrl+Z)</value>
+    <comment>Отменить правку (Ctrl+Z)</comment>
+  </data>
+  <data name="S9088CA9C0DE94FFD" xml:space="preserve">
+    <value>फ़ाइलें</value>
+    <comment>Файлы</comment>
+  </data>
+  <data name="S9089A73112CC819E" xml:space="preserve">
+    <value>इंटरफ़ेस की भाषा</value>
+    <comment>Язык интерфейса</comment>
+  </data>
+  <data name="S90DF1C173662989B" xml:space="preserve">
+    <value>llama-server शुरू नहीं हुआ।</value>
+    <comment>llama-server не запустился.</comment>
+  </data>
+  <data name="S919A05861572CEF5" xml:space="preserve">
+    <value> लेबल जाँचें।</value>
+    <comment> Проверьте надписи.</comment>
+  </data>
+  <data name="S91C14BB346727ECC" xml:space="preserve">
+    <value>छिपाने की अवधि, मिलीसेकंड</value>
+    <comment>Длительность исчезновения, миллисекунды</comment>
+  </data>
+  <data name="S91D81CD2107795C1" xml:space="preserve">
+    <value>प्रविष्टि हटा दी गई।</value>
+    <comment>Запись удалена.</comment>
+  </data>
+  <data name="S920E3E44376C13EC" xml:space="preserve">
+    <value>{0} मेगापिक्सेल</value>
+    <comment>{0} Мп</comment>
+  </data>
+  <data name="S92AB62AD6F3C1E6B" xml:space="preserve">
+    <value>रंग</value>
+    <comment>Цвет</comment>
+  </data>
+  <data name="S92EF5964A8216B47" xml:space="preserve">
+    <value>मान बदल दिया गया</value>
+    <comment>Значение заменено</comment>
+  </data>
+  <data name="S931330FBEB019D09" xml:space="preserve">
+    <value>लैटिन</value>
+    <comment>Латиница</comment>
+  </data>
+  <data name="S935E004F83BF55A3" xml:space="preserve">
+    <value>संदेश बंद करें</value>
+    <comment>Закрыть сообщение</comment>
+  </data>
+  <data name="S93962C98A0A2E4FE" xml:space="preserve">
+    <value>किसी लेबल का अनुवाद खाली है।</value>
+    <comment>Перевод надписи пуст.</comment>
+  </data>
+  <data name="S93B08F7B14651B6D" xml:space="preserve">
+    <value>अपडेट जाँचें</value>
+    <comment>Проверить обновления</comment>
+  </data>
+  <data name="S93D5D12D7854EAF9" xml:space="preserve">
+    <value>परिणाम इतिहास और क्लिपबोर्ड में है।</value>
+    <comment>Результат в истории и буфере обмена.</comment>
+  </data>
+  <data name="S9403BA7C2C43DDF0" xml:space="preserve">
+    <value>पेस्ट करने से पहले मिलते-जुलते अक्षर और पंक्तियों का क्रम जाँचें।</value>
+    <comment>Проверьте похожие буквы и порядок строк перед вставкой.</comment>
+  </data>
+  <data name="S941EC143615E4C26" xml:space="preserve">
+    <value>Ctrl+क्लिक</value>
+    <comment>Ctrl+клик</comment>
+  </data>
+  <data name="S95333A53FC99C364" xml:space="preserve">
+    <value>सूची के रूप में दिखाएँ</value>
+    <comment>Показать списком</comment>
+  </data>
+  <data name="S956BD916BE29903C" xml:space="preserve">
+    <value>अपडेट का आकार घोषित सीमा से अधिक है।</value>
+    <comment>Размер обновления превышает заявленный.</comment>
+  </data>
+  <data name="S95E1B243A48FD248" xml:space="preserve">
+    <value>बिना पिन की प्रविष्टियों की अधिकतम संख्या</value>
+    <comment>Максимум незакреплённых записей</comment>
+  </data>
+  <data name="S95E78A1D4D447198" xml:space="preserve">
+    <value>वर्तमान कार्य पूरा करें।</value>
+    <comment>Завершите текущую операцию.</comment>
+  </data>
+  <data name="S96A1585933EB100F" xml:space="preserve">
+    <value>संक्षिप्त प्रॉम्प्ट इतिहास में सहेजा गया,</value>
+    <comment>Сжатый промпт в истории,</comment>
+  </data>
+  <data name="S96B08FD22A102451" xml:space="preserve">
+    <value>पथ जोड़ दिया गया। पूर्वावलोकन अद्यतित है।</value>
+    <comment>Путь подставлен. Предпросмотр обновлён.</comment>
+  </data>
+  <data name="S96DB220EF58CDC1C" xml:space="preserve">
+    <value>लक्षित विंडो में टाइप नहीं किया जा सका। Ctrl+V दबाएँ।</value>
+    <comment>Не удалось напечатать в нужном окне. Нажмите Ctrl+V.</comment>
+  </data>
+  <data name="S970068E69DFA17DB" xml:space="preserve">
+    <value>मॉडल {0} नहीं मिला। HKCU\Software\ArkCopyBuffer के LlamaModel मान में उसका पथ सेट करें।</value>
+    <comment>Не найдена модель {0}. Укажите путь в HKCU\Software\ArkCopyBuffer, значение LlamaModel.</comment>
+  </data>
+  <data name="S973C76436EE0ECD9" xml:space="preserve">
+    <value>सहेजने की प्रतीक्षा…</value>
+    <comment>Ожидает сохранения…</comment>
+  </data>
+  <data name="S979D82EF47D80B46" xml:space="preserve">
+    <value>यह प्रविष्टि इतिहास से हटाई जा चुकी है। विंडो बंद करने से पहले उसका पाठ कॉपी करें।</value>
+    <comment>Запись уже удалена из истории. Скопируйте текст перед закрытием окна.</comment>
+  </data>
+  <data name="S985B5E0F2CCF1BA0" xml:space="preserve">
+    <value>सेटिंग्स</value>
+    <comment>Настройки</comment>
+  </data>
+  <data name="S98C1BFB8F849D1CC" xml:space="preserve">
+    <value>छवि के लेबल रूसी में अनुवाद करें</value>
+    <comment>Перевести надписи на картинке</comment>
+  </data>
+  <data name="S98D7177BC056FE6A" xml:space="preserve">
+    <value>चालू · 64 फ़्रेम · केवल पैनल के बाहर</value>
+    <comment>Включён · 64 кадра · только по краям</comment>
+  </data>
+  <data name="S99AE3F6C8BA208D7" xml:space="preserve">
+    <value>इसे हटाया या ले जाया गया हो सकता है, या यह डिस्क अभी जुड़ी नहीं है।</value>
+    <comment>Она могла быть перемещена, удалена или находиться на отключённом диске.</comment>
+  </data>
+  <data name="S99B320DBCC4298F8" xml:space="preserve">
+    <value>बदलें “</value>
+    <comment>Заменить «</comment>
+  </data>
+  <data name="S99F307953C162CBC" xml:space="preserve">
+    <value>डाउनलोड किया पैकेज क्षतिग्रस्त है। अपडेट दोबारा जाँचें।</value>
+    <comment>Скачанный пакет повреждён. Проверьте обновления ещё раз.</comment>
+  </data>
+  <data name="S9A1484169DEB3C22" xml:space="preserve">
+    <value>Esc: बंद करें</value>
+    <comment>Esc: закрыть</comment>
+  </data>
+  <data name="S9AC21D6D0240EB55" xml:space="preserve">
+    <value>छवियाँ और वीडियो कतार के क्रम में साथ पेस्ट करें (Ctrl+Enter)। पूरी कतार सफल होने पर चयन हट जाएगा।</value>
+    <comment>Вставить картинки и видео одной пачкой по порядку (Ctrl+Enter). Успешная вставка всей очереди завершит выбор.</comment>
+  </data>
+  <data name="S9AE3804BD96F4224" xml:space="preserve">
+    <value>कैप्चर सीमाएँ</value>
+    <comment>Лимиты захвата</comment>
+  </data>
+  <data name="S9B45DFE62C689B6E" xml:space="preserve">
+    <value>पाठ पहचानें</value>
+    <comment>Распознать текст</comment>
+  </data>
+  <data name="S9B9AFE8614173671" xml:space="preserve">
+    <value>अगला · {0}/{1}</value>
+    <comment>Следующая · {0}/{1}</comment>
+  </data>
+  <data name="S9BA58A95D26C5145" xml:space="preserve">
+    <value>कॉपी किया गया।</value>
+    <comment>Скопировано.</comment>
+  </data>
+  <data name="S9BE2593183510FD5" xml:space="preserve">
+    <value>आउटपुट फ़ाइल पहले से मौजूद है।</value>
+    <comment>Выходной файл уже существует.</comment>
+  </data>
+  <data name="S9C2C7EEB439EC648" xml:space="preserve">
+    <value>मार्ग</value>
+    <comment>Маршрут</comment>
+  </data>
+  <data name="S9CF249E2A8814616" xml:space="preserve">
+    <value>चुना गया</value>
+    <comment>Выбрано</comment>
+  </data>
+  <data name="S9D0A624F76B27F77" xml:space="preserve">
+    <value>रिकॉर्डिंग चालू है</value>
+    <comment>Запись идёт</comment>
+  </data>
+  <data name="S9E321BAA21805962" xml:space="preserve">
+    <value>ऐप शुरू होने पर और हर 15 मिनट में जाँच होती है।</value>
+    <comment>Проверка при запуске и каждые 15 минут.</comment>
+  </data>
+  <data name="S9E5972D3C6ACEAD7" xml:space="preserve">
+    <value>अनुवाद को छवि से मिलाया नहीं जा सका।</value>
+    <comment>Не удалось сопоставить перевод с изображением.</comment>
+  </data>
+  <data name="S9E8DA657754935F8" xml:space="preserve">
+    <value>स्थानीय मॉडल अनुवाद कर रहा है। आप काम जारी रख सकते हैं।</value>
+    <comment>Перевод выполняется локальной моделью. Можно продолжать работу.</comment>
+  </data>
+  <data name="S9EC2B3590DF12BB8" xml:space="preserve">
+    <value>OCR पहले से चल रहा है।</value>
+    <comment>OCR уже работает.</comment>
+  </data>
+  <data name="S9EC66A4B43AF3A91" xml:space="preserve">
+    <value>फ़ाइलें: {0:N0} · {1:0.#} MB</value>
+    <comment>Файлов: {0:N0} · {1:0.#} МБ</comment>
+  </data>
+  <data name="S9ED5AECDD190AF4C" xml:space="preserve">
+    <value>बिना समूह</value>
+    <comment>Без группы</comment>
+  </data>
+  <data name="S9FB423FBC9181142" xml:space="preserve">
+    <value>पिन हटाएँ</value>
+    <comment>Открепить</comment>
+  </data>
+  <data name="S9FDD724556947C5B" xml:space="preserve">
+    <value>{0} मिलीसेकंड</value>
+    <comment>{0} мс</comment>
+  </data>
+  <data name="S9FFBBD70A78F8A77" xml:space="preserve">
+    <value>कमांड में पथ</value>
+    <comment>Пути в команде</comment>
+  </data>
+  <data name="SA02B63A100DB5278" xml:space="preserve">
+    <value>प्रविष्टि के पिन पर क्लिक करें या उसे यहाँ रखने के लिए Ctrl+P दबाएँ।</value>
+    <comment>Нажмите на булавку у записи или Ctrl+P, и она появится здесь.</comment>
+  </data>
+  <data name="SA0F7A780FB6B8F8A" xml:space="preserve">
+    <value>{0} · {1:0.#} KB</value>
+    <comment>{0} · {1:0.#} КБ</comment>
+  </data>
+  <data name="SA1037CAFE3AB0283" xml:space="preserve">
+    <value>मॉडल 2 मिनट में लोड नहीं हुआ।</value>
+    <comment>Модель не загрузилась за 2 минуты.</comment>
+  </data>
+  <data name="SA12E235260500B01" xml:space="preserve">
+    <value>क्लिक करके चुनें या चयन हटाएँ। Ctrl+Enter से सभी पेस्ट करें। Esc से रद्द करें।</value>
+    <comment>Клик — выбрать или снять отметку. Ctrl+Enter — вставить все. Esc — отменить.</comment>
+  </data>
+  <data name="SA41341EE9230073F" xml:space="preserve">
+    <value>Win+V पंजीकृत नहीं हो सका। इतिहास रिकॉर्ड हो रहा है; उसे ट्रे से खोलें।</value>
+    <comment>Не удалось перехватить Win+V. История пишется, открыть можно из трея.</comment>
+  </data>
+  <data name="SA4BB19E1436FD3FC" xml:space="preserve">
+    <value>हरा</value>
+    <comment>Зелёный</comment>
+  </data>
+  <data name="SA553A46B539C9D63" xml:space="preserve">
+    <value>पुनः आरंभ करें</value>
+    <comment>Перезапустить</comment>
+  </data>
+  <data name="SA5B067C45F8FAE4E" xml:space="preserve">
+    <value>अन्य पाठ प्रविष्टियाँ नहीं हैं</value>
+    <comment>Других текстовых записей нет</comment>
+  </data>
+  <data name="SA5B50FE0EDBA1058" xml:space="preserve">
+    <value>पथ पेस्ट करें</value>
+    <comment>Вставить путь</comment>
+  </data>
+  <data name="SA5CD0F3DD54DF28A" xml:space="preserve">
+    <value>गणित</value>
+    <comment>Математика</comment>
+  </data>
+  <data name="SA62D71F3DBA4F2BF" xml:space="preserve">
+    <value>ऑडियो निकाला नहीं जा सका।</value>
+    <comment>Не удалось извлечь звук.</comment>
+  </data>
+  <data name="SA67617147E81BB23" xml:space="preserve">
+    <value>पाठ नीचे ले जाएँ</value>
+    <comment>Опустить текст</comment>
+  </data>
+  <data name="SA6C7799F7C457683" xml:space="preserve">
+    <value>बाईं ओर पथ चुनें, फिर सही स्लॉट पर क्लिक करें। पथ खींचकर भी जोड़ सकते हैं।</value>
+    <comment>Выберите путь слева, затем нажмите нужный слот. Можно также перетащить путь.</comment>
+  </data>
+  <data name="SA785E7AC6CE76655" xml:space="preserve">
+    <value>समूह का नाम बदलें</value>
+    <comment>Переименовать группу</comment>
+  </data>
+  <data name="SA7A4033657E89FC9" xml:space="preserve">
+    <value>बंद करें</value>
+    <comment>Закрыть</comment>
+  </data>
+  <data name="SA8F576F608D69D5E" xml:space="preserve">
+    <value>कुंजी संकेत</value>
+    <comment>Подсказки клавиш внизу</comment>
+  </data>
+  <data name="SA933661A8716DDEF" xml:space="preserve">
+    <value>OCR के लिए छवि फ़ाइल 128 MB से बड़ी नहीं होनी चाहिए।</value>
+    <comment>Для OCR нужен файл изображения не больше 128 МБ.</comment>
+  </data>
+  <data name="SA94D16AFE71C0322" xml:space="preserve">
+    <value>हर फ़ाइल समूह में अधिकतम फ़ाइलें</value>
+    <comment>Лимит количества файлов в пакете</comment>
+  </data>
+  <data name="SA9A1762BA2E80189" xml:space="preserve">
+    <value>सभी ▾</value>
+    <comment>Все ▾</comment>
+  </data>
+  <data name="SA9C61AE59CA81A48" xml:space="preserve">
+    <value>Alt+क्लिक</value>
+    <comment>Alt+клик</comment>
+  </data>
+  <data name="SA9E2FC1FF43D16B4" xml:space="preserve">
+    <value>प्रतीक</value>
+    <comment>Символы</comment>
+  </data>
+  <data name="SAA04BABD944704D1" xml:space="preserve">
+    <value>{0} प्रविष्टियाँ · {1:N0} अक्षर</value>
+    <comment>{0} записей · {1:N0} символов</comment>
+  </data>
+  <data name="SAB0223427DE616F9" xml:space="preserve">
+    <value>परिणाम सहेजकर कॉपी कर दिया गया।</value>
+    <comment>Результат сохранён и скопирован.</comment>
+  </data>
+  <data name="SABC1AE6FFC4AC4E3" xml:space="preserve">
+    <value>फिर कोशिश करें।</value>
+    <comment>Повторите действие.</comment>
+  </data>
+  <data name="SAD5F60BF00740719" xml:space="preserve">
+    <value>OCR एक मिनट में पूरा नहीं हुआ। छोटा क्षेत्र आज़माएँ।</value>
+    <comment>OCR не завершился за минуту. Попробуйте меньшую область изображения.</comment>
+  </data>
+  <data name="SAD854F606699D782" xml:space="preserve">
+    <value>सभी ऐप</value>
+    <comment>Все приложения</comment>
+  </data>
+  <data name="SADA542BEF1796D6D" xml:space="preserve">
+    <value>अन्य पाठ प्रविष्टियाँ</value>
+    <comment>Другие текстовые записи</comment>
+  </data>
+  <data name="SADC41711D61237AC" xml:space="preserve">
+    <value>पेस्ट</value>
+    <comment>вставить</comment>
+  </data>
+  <data name="SAE13D787B8BF58A8" xml:space="preserve">
+    <value>प्रभाव लोड नहीं हुआ। ऐप पुनः आरंभ करके देखें।</value>
+    <comment>Не удалось загрузить эффект. Попробуйте перезапустить приложение.</comment>
+  </data>
+  <data name="SAE72320093557240" xml:space="preserve">
+    <value>ऑडियो ट्रैक खाली है।</value>
+    <comment>Звуковая дорожка пуста.</comment>
+  </data>
+  <data name="SAE808FBEC3BA384C" xml:space="preserve">
+    <value>कल</value>
+    <comment>вчера</comment>
+  </data>
+  <data name="SAEACF2A62793D2EE" xml:space="preserve">
+    <value>सहेजा नहीं गया। </value>
+    <comment>Не сохранено. </comment>
+  </data>
+  <data name="SAEF3A78E959942CE" xml:space="preserve">
+    <value>इतिहास: %LOCALAPPDATA%\ArkCopyBuffer। Windows फ़ाइलों को आपके वर्तमान उपयोगकर्ता खाते के लिए सुरक्षित रखता है।</value>
+    <comment>История: %LOCALAPPDATA%\ArkCopyBuffer. Файлы защищены Windows для текущей учётной записи.</comment>
+  </data>
+  <data name="SB00809428FAB2FF2" xml:space="preserve">
+    <value>सभी — कोई फ़िल्टर नहीं</value>
+    <comment>Все — без фильтра</comment>
+  </data>
+  <data name="SB0373949564ED80B" xml:space="preserve">
+    <value>{0} — ट्रैक {1}{2}</value>
+    <comment>{0} — дорожка {1}{2}</comment>
+  </data>
+  <data name="SB051F39468122ABD" xml:space="preserve">
+    <value>देरी</value>
+    <comment>Задержка</comment>
+  </data>
+  <data name="SB0A46B8454D3F9BC" xml:space="preserve">
+    <value>प्रॉम्प्ट संक्षिप्त हुआ:</value>
+    <comment>Промпт сжат:</comment>
+  </data>
+  <data name="SB0DA3441F3AB1067" xml:space="preserve">
+    <value>छोड़कर क्रम बदलें</value>
+    <comment>Отпустите — изменить порядок</comment>
+  </data>
+  <data name="SB0DDA07DAF03AFBF" xml:space="preserve">
+    <value>पेस्ट करने के लिए फ़ाइल तैयार नहीं हो सकी।</value>
+    <comment>Не удалось подготовить файл для вставки.</comment>
+  </data>
+  <data name="SB0EA613921C4927B" xml:space="preserve">
+    <value>संपादन रुके 1 सेकंड होने पर और बंद करते समय सहेजा जाता है</value>
+    <comment>Автосохранение после 1 секунды паузы и при закрытии</comment>
+  </data>
+  <data name="SB312F5A75919C1C0" xml:space="preserve">
+    <value>Windows के साथ शुरू करें</value>
+    <comment>Запускать вместе с Windows</comment>
+  </data>
+  <data name="SB381C35C9F1987D4" xml:space="preserve">
+    <value>नारंगी</value>
+    <comment>Оранжевый</comment>
+  </data>
+  <data name="SB3A8CC9AF902DE91" xml:space="preserve">
+    <value>सामग्री प्रकार: </value>
+    <comment>Вид записи: </comment>
+  </data>
+  <data name="SB3CADA3734215334" xml:space="preserve">
+    <value>Tab: अगला टैब</value>
+    <comment>Tab: следующая вкладка</comment>
+  </data>
+  <data name="SB456DF5236660C61" xml:space="preserve">
+    <value>संस्करण {0} स्थापित करने के लिए तैयार है।</value>
+    <comment>Версия {0} готова к установке.</comment>
+  </data>
+  <data name="SB4D30CAE52894CF0" xml:space="preserve">
+    <value>सहेजें</value>
+    <comment>Сохранить</comment>
+  </data>
+  <data name="SB5957D9B1329C1D0" xml:space="preserve">
+    <value>स्रोत ऐप: सभी</value>
+    <comment>Приложение: все</comment>
+  </data>
+  <data name="SB5A318BE6EC5C751" xml:space="preserve">
+    <value>लपटें पैनल के बाहर रहती हैं</value>
+    <comment>Пламя остаётся снаружи</comment>
+  </data>
+  <data name="SB6A4E0A9D54E2FF1" xml:space="preserve">
+    <value>{0} नहीं मिला। FFmpeg (ffmpeg और ffprobe) को PATH में या ArkCopyBuffer.exe के पास रखें।</value>
+    <comment>Не найден {0}. Установите FFmpeg (ffmpeg и ffprobe) в PATH или рядом с ArkCopyBuffer.exe.</comment>
+  </data>
+  <data name="SB6D5CEAD8ACD978C" xml:space="preserve">
+    <value>पाठ मर्ज खोलें (Ctrl+Enter)। सफल मर्ज के बाद चयन हट जाएगा।</value>
+    <comment>Открыть окно объединения текстов (Ctrl+Enter). Успешное объединение завершит выбор.</comment>
+  </data>
+  <data name="SB7589F4759192C47" xml:space="preserve">
+    <value>प्रविष्टि पर माउस रखें</value>
+    <comment>Наведите на карточку</comment>
+  </data>
+  <data name="SB80CF78B9970A398" xml:space="preserve">
+    <value>पिन की प्रविष्टियाँ सूची में दिखाएँ</value>
+    <comment>Показать закреплённые списком</comment>
+  </data>
+  <data name="SB9AFE508167D6A90" xml:space="preserve">
+    <value>ZIP बनाकर कॉपी कर दिया गया।</value>
+    <comment>ZIP готов и скопирован.</comment>
+  </data>
+  <data name="SBABDB58139BE97EA" xml:space="preserve">
+    <value>सेटिंग्स सहेजी गईं</value>
+    <comment>Настройки сохранены</comment>
+  </data>
+  <data name="SBB728E0D3FA62A9E" xml:space="preserve">
+    <value>प्रत्येक प्रारूप का पाठ</value>
+    <comment>Текст каждого формата</comment>
+  </data>
+  <data name="SBB87B9CAF7D6D1C0" xml:space="preserve">
+    <value>कार्ड को उसके पाठ या हैंडल से खींचें।</value>
+    <comment>Тяните карточки за текст или ручку.</comment>
+  </data>
+  <data name="SBC0BF8CCD975604D" xml:space="preserve">
+    <value>पाठ सीमा {0:N0} अक्षर है। पाठ छोटा करें या सीमा बढ़ाएँ।</value>
+    <comment>Лимит текста в настройках: {0:N0} символов. Сократите текст или увеличьте лимит.</comment>
+  </data>
+  <data name="SBCA6D1C64F7FA4BF" xml:space="preserve">
+    <value>नीचे ले जाएँ (Alt+↓)</value>
+    <comment>Ниже (Alt+↓)</comment>
+  </data>
+  <data name="SBCBA3C921BEAAF74" xml:space="preserve">
+    <value>बाद में फिर कोशिश करें।</value>
+    <comment>Повторите позже.</comment>
+  </data>
+  <data name="SBE300BBC861DE97D" xml:space="preserve">
+    <value>पॉइंटर बाहर जाने के बाद छिपाने में देरी, मिलीसेकंड</value>
+    <comment>Задержка скрытия вне окна, миллисекунды</comment>
+  </data>
+  <data name="SBE4E0E5FAD95B940" xml:space="preserve">
+    <value>इस भाषा को लागू करने के लिए CopyBuffalo पुनः आरंभ करें।</value>
+    <comment>Язык изменится после перезапуска.</comment>
+  </data>
+  <data name="SBE99B13612015A48" xml:space="preserve">
+    <value>हटाएँ</value>
+    <comment>Удалить</comment>
+  </data>
+  <data name="SBF4D6267A5A07968" xml:space="preserve">
+    <value>छवि पूर्वावलोकन का आकार</value>
+    <comment>Размер просмотра картинки</comment>
+  </data>
+  <data name="SC0101BB2769CBF52" xml:space="preserve">
+    <value>{0:N0} → {1:N0} अक्षर। क्लिपबोर्ड पर कॉपी कर दिया गया।</value>
+    <comment>{0:N0} → {1:N0} символов. Уже в буфере обмена.</comment>
+  </data>
+  <data name="SC06B7F21C448FEF7" xml:space="preserve">
+    <value>पेस्ट किया गया</value>
+    <comment>Вставлено</comment>
+  </data>
+  <data name="SC0B22DB79ACFEFB9" xml:space="preserve">
+    <value>अपडेट उपलब्ध है।</value>
+    <comment>Доступно обновление.</comment>
+  </data>
+  <data name="SC202C29C383321F4" xml:space="preserve">
+    <value>पाठ का अनुवाद नहीं हो सका।</value>
+    <comment>Не удалось перевести текст.</comment>
+  </data>
+  <data name="SC3013C72DD820F9E" xml:space="preserve">
+    <value>खाली उद्धरण चिह्न</value>
+    <comment>Пустые кавычки</comment>
+  </data>
+  <data name="SC3089753A24678FE" xml:space="preserve">
+    <value>सभी</value>
+    <comment>все</comment>
+  </data>
+  <data name="SC3857E2DBDE47060" xml:space="preserve">
+    <value>विवरण: {0}</value>
+    <comment>Подробности: {0}</comment>
+  </data>
+  <data name="SC4613187A1DC0504" xml:space="preserve">
+    <value>{0} पृष्ठभूमि में डाउनलोड हो रहा है…</value>
+    <comment>Скачиваем {0} в фоне…</comment>
+  </data>
+  <data name="SC4614694972A49FE" xml:space="preserve">
+    <value>अभी कोई पिन की गई प्रविष्टि नहीं है</value>
+    <comment>Закреплённых пока нет</comment>
+  </data>
+  <data name="SC4627F79F5903BA7" xml:space="preserve">
+    <value>पाठ रूसी में अनुवाद करें</value>
+    <comment>Перевести текст на русский</comment>
+  </data>
+  <data name="SC4956A92A41C5977" xml:space="preserve">
+    <value>त्रुटि के बाद स्वचालित स्थापना रोक दी गई। </value>
+    <comment>Автоустановка приостановлена после ошибки. </comment>
+  </data>
+  <data name="SC5ECD3BA97158C6B" xml:space="preserve">
+    <value>पूर्वावलोकन की चौड़ाई</value>
+    <comment>Ширина карточки</comment>
+  </data>
+  <data name="SC6B4CE8D7B6B2F81" xml:space="preserve">
+    <value>परिणाम {0:N0} अक्षरों की सीमा से बड़ा है। कुछ प्रविष्टियाँ हटाएँ या सेटिंग्स में सीमा बढ़ाएँ।</value>
+    <comment>Результат длиннее лимита {0:N0} символов. Уберите записи или увеличьте лимит в настройках.</comment>
+  </data>
+  <data name="SC7F44282F28F374B" xml:space="preserve">
+    <value>छवि चुनें</value>
+    <comment>Выбрать картинку</comment>
+  </data>
+  <data name="SC8D702A189B26FFC" xml:space="preserve">
+    <value>बाद</value>
+    <comment>Через</comment>
+  </data>
+  <data name="SC9FD9FC0E5D2198D" xml:space="preserve">
+    <value>नया समूह</value>
+    <comment>Новая группа</comment>
+  </data>
+  <data name="SCADDE433A64D7B50" xml:space="preserve">
+    <value>बाकी सभी छवियाँ और वीडियो कतार के क्रम में साथ पेस्ट करें (Ctrl+Enter)। लक्ष्य ऐप में कई फ़ाइलें पेस्ट करने का समर्थन होना चाहिए।</value>
+    <comment>Вставить все оставшиеся картинки и видео одной пачкой в порядке очереди (Ctrl+Enter). Чат должен поддерживать вставку нескольких файлов.</comment>
+  </data>
+  <data name="SCB8DE7E9CC5606CC" xml:space="preserve">
+    <value>पथ उनके चुने गए स्लॉट में जोड़े जाएँगे।</value>
+    <comment>Пути подставляются в назначенные слоты.</comment>
+  </data>
+  <data name="SCBA41AECC4B74466" xml:space="preserve">
+    <value>छिपाएँ</value>
+    <comment>Исчезновение</comment>
+  </data>
+  <data name="SCBB9A3873DC4666F" xml:space="preserve">
+    <value>मॉडल ने खाली उत्तर दिया।</value>
+    <comment>Модель вернула пустой ответ.</comment>
+  </data>
+  <data name="SCBC2F7B99D502F96" xml:space="preserve">
+    <value>पाठ जाँचें</value>
+    <comment>Проверить текст</comment>
+  </data>
+  <data name="SCBE4784983E217B8" xml:space="preserve">
+    <value>{0}: प्रक्रिया विफल (कोड 0x{1:X8})।</value>
+    <comment>{0}: ошибка обработки (код 0x{1:X8}).</comment>
+  </data>
+  <data name="SCC03D7C4F928EC30" xml:space="preserve">
+    <value>अवधि या संख्या सीमा घटाने पर, लागू करते समय अतिरिक्त बिना पिन की प्रविष्टियाँ हट जाएँगी।</value>
+    <comment>Сокращение сроков или количества удалит лишние незакреплённые записи при применении.</comment>
+  </data>
+  <data name="SCC4F086EB3D392B1" xml:space="preserve">
+    <value>प्रतिस्थापन विफल</value>
+    <comment>Замена не выполнена</comment>
+  </data>
+  <data name="SCCCCE366FFD96CEF" xml:space="preserve">
+    <value>लेकिन क्लिपबोर्ड व्यस्त है।</value>
+    <comment>но буфер обмена занят.</comment>
+  </data>
+  <data name="SCD87A43A7BB21EB2" xml:space="preserve">
+    <value>{1} में से {0} पेस्ट किए गए</value>
+    <comment>Вставлено {0} из {1}</comment>
+  </data>
+  <data name="SCE34DB4FFFDD2D7B" xml:space="preserve">
+    <value>अपडेट {0} तैयार है। सर्वर से संपर्क नहीं हो सका।</value>
+    <comment>Обновление {0} готово. Нет связи с сервером.</comment>
+  </data>
+  <data name="SCE568834A4D63F47" xml:space="preserve">
+    <value>छवि से रूसी और अंग्रेज़ी पाठ निकाला गया।</value>
+    <comment>Русский и английский текст извлечён из изображения.</comment>
+  </data>
+  <data name="SCEB149731F4F5655" xml:space="preserve">
+    <value>{0:N0} अक्षर</value>
+    <comment>{0:N0} симв.</comment>
+  </data>
+  <data name="SCEC0B257ABF116F7" xml:space="preserve">
+    <value>पाठ, {0:N0} अक्षर</value>
+    <comment>Текст, {0:N0} симв.</comment>
+  </data>
+  <data name="SCF97FC8DCACCBD7B" xml:space="preserve">
+    <value>{0} चैनल</value>
+    <comment>{0} кан.</comment>
+  </data>
+  <data name="SCFACD7048F5580BC" xml:space="preserve">
+    <value>तैयार</value>
+    <comment>Готов к показу</comment>
+  </data>
+  <data name="SD06333F24005105F" xml:space="preserve">
+    <value>पेस्ट के लिए डिक्रिप्ट की गई प्रतियाँ शुरू होते समय और हर घंटे साफ़ की जाती हैं।</value>
+    <comment>Расшифрованные копии для вставки удаляются при запуске и раз в час.</comment>
+  </data>
+  <data name="SD0B8740F814B7E3B" xml:space="preserve">
+    <value>हरा रंग जोड़ा जाने वाला भाग दिखाता है। प्रविष्टि पर छोड़ें। अन्य स्थान देखने के लिए Shift दबाएँ।</value>
+    <comment>Зелёным — вставка. Отпустите на карточке. Shift — другие места.</comment>
+  </data>
+  <data name="SD18E262C4A058A89" xml:space="preserve">
+    <value>यहाँ प्रविष्टि छोड़ें</value>
+    <comment>Перетащите запись сюда</comment>
+  </data>
+  <data name="SD216291AE4ED2204" xml:space="preserve">
+    <value>प्रविष्टियाँ</value>
+    <comment>записи</comment>
+  </data>
+  <data name="SD2857354C120DC5C" xml:space="preserve">
+    <value>छोड़कर पथ जोड़ें</value>
+    <comment>Отпустите — подставить путь</comment>
+  </data>
+  <data name="SD366CED2842867D4" xml:space="preserve">
+    <value>नई कॉपी की गई सामग्री रिकॉर्ड नहीं हो रही है।</value>
+    <comment>Новые копии не сохраняются.</comment>
+  </data>
+  <data name="SD3CFA286DA52296D" xml:space="preserve">
+    <value>क्लिक करके चुनें या चयन हटाएँ। Ctrl+Enter से मर्ज करें। Esc से रद्द करें।</value>
+    <comment>Клик — выбрать или снять отметку. Ctrl+Enter — объединить. Esc — отменить.</comment>
+  </data>
+  <data name="SD44478B11225A141" xml:space="preserve">
+    <value>सादा पाठ पेस्ट करें</value>
+    <comment>Вставить как текст</comment>
+  </data>
+  <data name="SD46537344026274E" xml:space="preserve">
+    <value>ज़ूम 100%</value>
+    <comment>Масштаб 100 %</comment>
+  </data>
+  <data name="SD4EE442869654C33" xml:space="preserve">
+    <value>पथ</value>
+    <comment>путь</comment>
+  </data>
+  <data name="SD5682C76BE4C60A3" xml:space="preserve">
+    <value>स्लॉट खाली करें</value>
+    <comment>Освободить слот</comment>
+  </data>
+  <data name="SD57B977768600584" xml:space="preserve">
+    <value>पाठ प्रविष्टियाँ रखने की अवधि, दिन</value>
+    <comment>Срок хранения обычных записей, дней</comment>
+  </data>
+  <data name="SD59D827B56D009F5" xml:space="preserve">
+    <value>परिणाम सहेजा गया।</value>
+    <comment>Результат сохранён.</comment>
+  </data>
+  <data name="SD5A294E03DF3F98D" xml:space="preserve">
+    <value>क्लिपबोर्ड पढ़ा नहीं जा सका</value>
+    <comment>Не удалось прочитать буфер</comment>
+  </data>
+  <data name="SD64D3F9DAEAA7051" xml:space="preserve">
+    <value>पेस्ट करने के लिए अलग-अलग छवियाँ या वीडियो चुनें।</value>
+    <comment>Выберите разные картинки или видео для вставки.</comment>
+  </data>
+  <data name="SD6667D915584518C" xml:space="preserve">
+    <value>पिन हटाएँ (Ctrl+P)</value>
+    <comment>Открепить (Ctrl+P)</comment>
+  </data>
+  <data name="SD675C9D5A093B6AA" xml:space="preserve">
+    <value>छवि के लेबल रूसी में अनुवाद करें (स्थानीय)</value>
+    <comment>Перевести надписи на картинке (локально)</comment>
+  </data>
+  <data name="SD67C6C95201096DD" xml:space="preserve">
+    <value>समूह में फ़ाइलें</value>
+    <comment>Файлов в пакете</comment>
+  </data>
+  <data name="SD77B6BCA6A8CA099" xml:space="preserve">
+    <value>प्रॉम्प्ट पहले से संक्षिप्त है।</value>
+    <comment>Промпт уже компактный.</comment>
+  </data>
+  <data name="SD7DF6F6D9418C1EE" xml:space="preserve">
+    <value>पाठ का रूसी में अनुवाद हो रहा है।</value>
+    <comment>Текст переводится на русский.</comment>
+  </data>
+  <data name="SD837A73DF0ABEE11" xml:space="preserve">
+    <value>लक्षित विंडो में पेस्ट नहीं किया जा सका। Ctrl+V दबाएँ।</value>
+    <comment>Не удалось вставить в нужное окно. Нажмите Ctrl+V.</comment>
+  </data>
+  <data name="SD8A3846AA2DBAA96" xml:space="preserve">
+    <value>टैब: क्लिपबोर्ड इतिहास</value>
+    <comment>Вкладка: буфер обмена</comment>
+  </data>
+  <data name="SD959E110D0F5AB19" xml:space="preserve">
+    <value>कमांड का परिणाम</value>
+    <comment>Итог команды</comment>
+  </data>
+  <data name="SD9BA87ACB68609DB" xml:space="preserve">
+    <value>चुना गया पाठ मर्ज करें</value>
+    <comment>Объединить выбранные тексты</comment>
+  </data>
+  <data name="SDAAE57846A77A2E2" xml:space="preserve">
+    <value>दिखाने की अवधि, मिलीसेकंड</value>
+    <comment>Длительность появления, миллисекунды</comment>
+  </data>
+  <data name="SDC348037F1B79A33" xml:space="preserve">
+    <value>चुनें</value>
+    <comment>выбрать</comment>
+  </data>
+  <data name="SDC6836FA4BB275AD" xml:space="preserve">
+    <value>चुने गए पाठ का क्रम</value>
+    <comment>Порядок выбранных текстов</comment>
+  </data>
+  <data name="SDCBBB9BDE64AC167" xml:space="preserve">
+    <value>FFmpeg 2 मिनट में पूरा नहीं हुआ।</value>
+    <comment>FFmpeg не завершил обработку за 2 минуты.</comment>
+  </data>
+  <data name="SDCD85BADA23A9985" xml:space="preserve">
+    <value>त्वरित पेस्ट</value>
+    <comment>быстро</comment>
+  </data>
+  <data name="SDD33660ECD470ABA" xml:space="preserve">
+    <value>विंडो ऐनिमेशन बंद होने पर प्रभाव स्थिर रहता है। पैनल छिपा होने पर चलना रुक जाता है।</value>
+    <comment>При выключенной анимации окна пламя замирает. В скрытом окне эффект не воспроизводится.</comment>
+  </data>
+  <data name="SDE01F354F722A6AA" xml:space="preserve">
+    <value>टैब: पिन की प्रविष्टियाँ</value>
+    <comment>Вкладка: закреплённые</comment>
+  </data>
+  <data name="SDF1C14A41E216714" xml:space="preserve">
+    <value>पॉइंटर बाहर जाने पर पैनल छिपाएँ</value>
+    <comment>Скрывать панель, когда курсор ушёл</comment>
+  </data>
+  <data name="SDF9A74CE91B2731D" xml:space="preserve">
+    <value>छोड़कर बदलें</value>
+    <comment>Отпустите — заменить</comment>
+  </data>
+  <data name="SDFC4A6452FC1E6BB" xml:space="preserve">
+    <value>संपादन पूर्ववत करें</value>
+    <comment>Отменить правку</comment>
+  </data>
+  <data name="SE0E45FD6F27A84CB" xml:space="preserve">
+    <value>{0} तक</value>
+    <comment>До {0}</comment>
+  </data>
+  <data name="SE147C8F1231BA0F1" xml:space="preserve">
+    <value>पहचाना गया पाठ इतिहास में सहेजा गया।</value>
+    <comment>Распознанный текст в истории.</comment>
+  </data>
+  <data name="SE15F960D93EB4EE8" xml:space="preserve">
+    <value>लागू करें</value>
+    <comment>Применить</comment>
+  </data>
+  <data name="SE2086C48FDBFB90A" xml:space="preserve">
+    <value>टाइल के रूप में दिखाएँ</value>
+    <comment>Показать плитками</comment>
+  </data>
+  <data name="SE24F8C2F1B6DF9B9" xml:space="preserve">
+    <value>बदलाव पूर्ववत किया गया।</value>
+    <comment>Изменение отменено.</comment>
+  </data>
+  <data name="SE2CC0CA617C4E733" xml:space="preserve">
+    <value>यह {0} कहाँ जोड़ें?</value>
+    <comment>Куда вставить {0}?</comment>
+  </data>
+  <data name="SE3337A60633C227D" xml:space="preserve">
+    <value>मुद्रा</value>
+    <comment>Валюты</comment>
+  </data>
+  <data name="SE397E461B35D79DF" xml:space="preserve">
+    <value>वीडियो फ़ाइल का एक्सटेंशन गायब या अमान्य है।</value>
+    <comment>У видео отсутствует или повреждено расширение файла.</comment>
+  </data>
+  <data name="SE47A6D2B06F1F3A1" xml:space="preserve">
+    <value>स्लॉट खाली हो गया। पथ फिर अलग पंक्ति में आ गया।</value>
+    <comment>Слот освобождён. Путь вернулся отдельной строкой.</comment>
+  </data>
+  <data name="SE4A17E56970F0D4E" xml:space="preserve">
+    <value>प्रविष्टि का पाठ</value>
+    <comment>Текст записи</comment>
+  </data>
+  <data name="SE4B0DEA7A54ED247" xml:space="preserve">
+    <value>प्रविष्टियाँ</value>
+    <comment>записей</comment>
+  </data>
+  <data name="SE5A41CFCCCEA49C1" xml:space="preserve">
+    <value>विंडो में समायोजित करें (Ctrl+0)</value>
+    <comment>Вписать в окно (Ctrl+0)</comment>
+  </data>
+  <data name="SE5F534734C3678AF" xml:space="preserve">
+    <value>छवि</value>
+    <comment>Изображение</comment>
+  </data>
+  <data name="SE6763B356C5B0E39" xml:space="preserve">
+    <value>सभी पेस्ट करें · {0}</value>
+    <comment>Вставить все · {0}</comment>
+  </data>
+  <data name="SE68C592A8B1E8003" xml:space="preserve">
+    <value>मर्ज करें · {0}</value>
+    <comment>Объединить · {0}</comment>
+  </data>
+  <data name="SE771BAB31C6321FD" xml:space="preserve">
+    <value>{0} दिन</value>
+    <comment>{0} дн.</comment>
+  </data>
+  <data name="SE7754A1F95276D3D" xml:space="preserve">
+    <value>मॉडल ने त्रुटि दी।</value>
+    <comment>Модель вернула ошибку.</comment>
+  </data>
+  <data name="SE892188C88D8CFFC" xml:space="preserve">
+    <value>इसे और छोटा नहीं किया जा सका।</value>
+    <comment>Короче не получилось.</comment>
+  </data>
+  <data name="SE8FE89B1DA7E7B97" xml:space="preserve">
+    <value>दूसरी खोज, स्रोत ऐप या सामग्री प्रकार आज़माएँ।</value>
+    <comment>Измените поиск, приложение или вид записей.</comment>
+  </data>
+  <data name="SE9455A15B5E24913" xml:space="preserve">
+    <value>खोज साफ़ करें (Esc)</value>
+    <comment>Очистить поиск (Esc)</comment>
+  </data>
+  <data name="SE98DA7AC99F6BCC7" xml:space="preserve">
+    <value>फ़ोल्डर तैयार हो रहा है…</value>
+    <comment>Подготовка папки…</comment>
+  </data>
+  <data name="SEA44507714D187E0" xml:space="preserve">
+    <value>प्रभाव लोड हो रहा है…</value>
+    <comment>Загрузка эффекта…</comment>
+  </data>
+  <data name="SEA8B3C38CC5CA6B8" xml:space="preserve">
+    <value>स्थिर किनारा · विंडो ऐनिमेशन बंद है</value>
+    <comment>Статичная рамка · анимация окна выключена</comment>
+  </data>
+  <data name="SEA8C658F5BF11FD1" xml:space="preserve">
+    <value>पिन की गई प्रविष्टियाँ बनी रहेंगी।</value>
+    <comment>Закреплённые останутся.</comment>
+  </data>
+  <data name="SEAA91FB76550D90D" xml:space="preserve">
+    <value>स्रोत ऐप: {0}</value>
+    <comment>Приложение: {0}</comment>
+  </data>
+  <data name="SEB31594AB4F133FA" xml:space="preserve">
+    <value>क्लिपबोर्ड</value>
+    <comment>Буфер обмена</comment>
+  </data>
+  <data name="SEB7F72FDAD266469" xml:space="preserve">
+    <value>ZIP नहीं बनाया जा सका।</value>
+    <comment>Не удалось создать ZIP.</comment>
+  </data>
+  <data name="SEB95B427BA04F59B" xml:space="preserve">
+    <value>। परिणाम: </value>
+    <comment>. Итог: </comment>
+  </data>
+  <data name="SEC28D375FB09FE2B" xml:space="preserve">
+    <value>मूल फ़ोल्डर उपलब्ध नहीं है।</value>
+    <comment>Исходная папка недоступна.</comment>
+  </data>
+  <data name="SEC79F4D0C884351F" xml:space="preserve">
+    <value>पेस्ट करें</value>
+    <comment>Вставить</comment>
+  </data>
+  <data name="SED5A6EFB8543B58C" xml:space="preserve">
+    <value>इतने दिन बाद साफ़ करें</value>
+    <comment>Срок очистки</comment>
+  </data>
+  <data name="SEDFC0E3B5E6223DC" xml:space="preserve">
+    <value>बाकी सभी छवियाँ और वीडियो पेस्ट करें: </value>
+    <comment>Вставить все оставшиеся картинки и видео: </comment>
+  </data>
+  <data name="SEE388C3FD65146A7" xml:space="preserve">
+    <value>पथ {0} स्लॉट {1} में नहीं बैठता। उसे स्वयं जोड़ें या अलग पंक्ति में रखें।</value>
+    <comment>Путь {0} не подходит к слоту {1}. Назначьте его вручную или оставьте строкой.</comment>
+  </data>
+  <data name="SEEC01A68E6047F8E" xml:space="preserve">
+    <value>ऊपर ले जाएँ (Alt+↑)</value>
+    <comment>Выше (Alt+↑)</comment>
+  </data>
+  <data name="SEEC6352B23682FBE" xml:space="preserve">
+    <value>स्थान और सुरक्षा</value>
+    <comment>Расположение и защита</comment>
+  </data>
+  <data name="SEEE48E65E8F3FB84" xml:space="preserve">
+    <value>मान बदलें</value>
+    <comment>Заменить значение</comment>
+  </data>
+  <data name="SEEFF2457569DF7D0" xml:space="preserve">
+    <value>ZIP बनाया जा रहा है।</value>
+    <comment>Создаётся ZIP.</comment>
+  </data>
+  <data name="SEF0EB597929EDEBF" xml:space="preserve">
+    <value>{0:0.#} सेकंड</value>
+    <comment>{0:0.#} с</comment>
+  </data>
+  <data name="SEF1275082A094AEC" xml:space="preserve">
+    <value>अधिकतम 40 अक्षर</value>
+    <comment>До 40 символов</comment>
+  </data>
+  <data name="SEF20E423F8A8D64E" xml:space="preserve">
+    <value>ज़ूम आउट (Ctrl+−)</value>
+    <comment>Уменьшить (Ctrl+−)</comment>
+  </data>
+  <data name="SEF23641CFBF07649" xml:space="preserve">
+    <value>पिन की प्रविष्टियाँ</value>
+    <comment>Закреплённые записи</comment>
+  </data>
+  <data name="SEF2F65BB03749385" xml:space="preserve">
+    <value>सभी प्रविष्टियाँ अलग-अलग पंक्तियों में मर्ज होंगी।</value>
+    <comment>Все записи объединяются отдельными строками.</comment>
+  </data>
+  <data name="SF00C388F0EB04339" xml:space="preserve">
+    <value>पूर्ववत करना विफल</value>
+    <comment>Отмена не выполнена</comment>
+  </data>
+  <data name="SF02956C16588A718" xml:space="preserve">
+    <value>कॉपी करें</value>
+    <comment>Скопировать</comment>
+  </data>
+  <data name="SF05051156FC8801D" xml:space="preserve">
+    <value>अपडेट पैकेज अमान्य है।</value>
+    <comment>Некорректный пакет обновления.</comment>
+  </data>
+  <data name="SF07F805077291E8D" xml:space="preserve">
+    <value>छवि पूर्वावलोकन में देरी, मिलीसेकंड</value>
+    <comment>Задержка увеличения картинки, миллисекунды</comment>
+  </data>
+  <data name="SF0EC5D1F5F300778" xml:space="preserve">
+    <value>समूह विकल्प</value>
+    <comment>Параметры группы</comment>
+  </data>
+  <data name="SF105708317E7FADB" xml:space="preserve">
+    <value>लंबे पाठ का पूर्वावलोकन</value>
+    <comment>Просмотр длинного текста</comment>
+  </data>
+  <data name="SF195133BCEFB6A3B" xml:space="preserve">
+    <value>तीव्रता</value>
+    <comment>Интенсивность</comment>
+  </data>
+  <data name="SF1A8C2074421E0B5" xml:space="preserve">
+    <value>पाठ पहचाना जा रहा है।</value>
+    <comment>Распознаётся текст.</comment>
+  </data>
+  <data name="SF1D50BF77051E4C3" xml:space="preserve">
+    <value>इतिहास खोलें</value>
+    <comment>Открыть историю</comment>
+  </data>
+  <data name="SF3767704BA91CBFA" xml:space="preserve">
+    <value>विंडो ऐनिमेशन</value>
+    <comment>Анимация окна</comment>
+  </data>
+  <data name="SF3F6DFE9F19E0EB2" xml:space="preserve">
+    <value>अनुवादित छवि कॉपी कर दी गई।</value>
+    <comment>Картинка с переводом скопирована.</comment>
+  </data>
+  <data name="SF46CB59F7266BA99" xml:space="preserve">
+    <value> पिन की प्रविष्टियाँ</value>
+    <comment> закреплённые</comment>
+  </data>
+  <data name="SF4CB2C0E2410A7B7" xml:space="preserve">
+    <value>लिंक</value>
+    <comment>Ссылка</comment>
+  </data>
+  <data name="SF4F117766F39AC90" xml:space="preserve">
+    <value>प्रॉम्प्ट संक्षिप्त करें</value>
+    <comment>Сжать промпт</comment>
+  </data>
+  <data name="SF4FA70E92F03B884" xml:space="preserve">
+    <value>मान को फिर खींचें।</value>
+    <comment>Перетащите значение ещё раз.</comment>
+  </data>
+  <data name="SF6223390B45409A3" xml:space="preserve">
+    <value>ऑडियो ट्रैक पढ़े जा रहे हैं…</value>
+    <comment>Чтение звуковых дорожек…</comment>
+  </data>
+  <data name="SF75AF38BE1BAB7E8" xml:space="preserve">
+    <value>प्रतिस्थापन पूर्ववत किया गया</value>
+    <comment>Замена отменена</comment>
+  </data>
+  <data name="SF76EA8BCE77AA870" xml:space="preserve">
+    <value>ग्राफ़</value>
+    <comment>Схемы</comment>
+  </data>
+  <data name="SF8AB9A19C4E741C9" xml:space="preserve">
+    <value>मूल छवि इतिहास में बनी रहेगी।</value>
+    <comment>Исходное изображение осталось в истории.</comment>
+  </data>
+  <data name="SF8B97DBB30F0D1E9" xml:space="preserve">
+    <value>कमांड में पथ बदलें</value>
+    <comment>Заменить путь в команде</comment>
+  </data>
+  <data name="SF8D92D9F2C398D8F" xml:space="preserve">
+    <value>ग्राफ़ खोलें</value>
+    <comment>Открыть граф</comment>
+  </data>
+  <data name="SF9127540BA42D36A" xml:space="preserve">
+    <value>अपडेट सहायक शुरू नहीं हुआ। ऐप अभी भी चल रहा है।</value>
+    <comment>Помощник обновления не запустился. Приложение продолжает работать.</comment>
+  </data>
+  <data name="SF92FAFB4C00A9F5C" xml:space="preserve">
+    <value>वीडियो</value>
+    <comment>Видео</comment>
+  </data>
+  <data name="SF996FD35B2E3C4FC" xml:space="preserve">
+    <value>अनुवादित छवि इतिहास में सहेजी गई।</value>
+    <comment>Картинка с переводом в истории.</comment>
+  </data>
+  <data name="SF9B945D5077E12FF" xml:space="preserve">
+    <value>संक्षिप्त किया जा रहा है…</value>
+    <comment>Сжимается…</comment>
+  </data>
+  <data name="SF9E6B4B56157141E" xml:space="preserve">
+    <value>बिना पिन की प्रविष्टियाँ</value>
+    <comment>Незакреплённых записей</comment>
+  </data>
+  <data name="SFA5D2489E61EE856" xml:space="preserve">
+    <value>चुनी हुई पाठ प्रविष्टियाँ: {0}</value>
+    <comment>Выбрано текстов: {0}</comment>
+  </data>
+  <data name="SFAB397155D4AFDEF" xml:space="preserve">
+    <value>पिन करें (Ctrl+P)</value>
+    <comment>Закрепить (Ctrl+P)</comment>
+  </data>
+  <data name="SFAE3EAD2D3E4C4C0" xml:space="preserve">
+    <value>छवियाँ और वीडियो तैयार नहीं हो सके।</value>
+    <comment>Не удалось подготовить картинки и видео.</comment>
+  </data>
+  <data name="SFAF8C4A14F748AEA" xml:space="preserve">
+    <value>पीला</value>
+    <comment>Жёлтый</comment>
+  </data>
+  <data name="SFB76DC01F528D116" xml:space="preserve">
+    <value>पाठ ऊपर ले जाएँ</value>
+    <comment>Поднять текст</comment>
+  </data>
+  <data name="SFBDD7043AE1BB98B" xml:space="preserve">
+    <value>इतिहास खोलने के लिए Win+V दबाएँ।</value>
+    <comment>Откройте историю по Win+V.</comment>
+  </data>
+  <data name="SFD1E6F563F5BACAD" xml:space="preserve">
+    <value>किनारा प्रभाव सेटिंग्स</value>
+    <comment>Настройки эффектов рамки</comment>
+  </data>
+  <data name="SFDC5555AE230CD22" xml:space="preserve">
+    <value>पाठ संसाधित करते समय llama-server बंद हो गया।</value>
+    <comment>llama-server упал во время обработки текста.</comment>
+  </data>
+  <data name="SFE4EA3E976D3C3CE" xml:space="preserve">
+    <value>मर्ज पूर्ववत करें</value>
+    <comment>Отменить объединение</comment>
+  </data>
+  <data name="SFEB88DE6F3B5722A" xml:space="preserve">
+    <value>ZIP बनाना रद्द कर दिया गया।</value>
+    <comment>Создание ZIP отменено.</comment>
+  </data>
+  <data name="SFEE4BBD8E6B960B7" xml:space="preserve">
+    <value>खींचें: स्थान बदलें</value>
+    <comment>Перетаскивание: сдвиг</comment>
+  </data>
+  <data name="SFF2E4AD1FF5DE649" xml:space="preserve">
+    <value>सभी छवियों और वीडियो का चयन हटाएँ</value>
+    <comment>Снять все отметки картинок и видео</comment>
+  </data>
+  <data name="SFFB51957D4F9BB3A" xml:space="preserve">
+    <value>दृश्य सेटिंग्स</value>
+    <comment>Настройки вида</comment>
+  </data>
+  <data name="SFFC0E927541DA0CD" xml:space="preserve">
+    <value> क्लिपबोर्ड नहीं बदला गया — इतिहास से पाठ कॉपी करें।</value>
+    <comment> Буфер не изменён — скопируйте текст из истории.</comment>
+  </data>
+  <data name="S1EA87AEA0A4F1C25" xml:space="preserve">
+    <value>काटें</value>
+    <comment>Вырезать</comment>
+  </data>
+  <data name="S694DF0097FDEFE5A" xml:space="preserve">
+    <value>सभी चुनें</value>
+    <comment>Выделить всё</comment>
+  </data>
+  <data name="SBDFCC3728F54DD8D" xml:space="preserve">
+    <value>“{0}” बदलें</value>
+    <comment>Заменить «{0}»</comment>
+  </data>
+</root>

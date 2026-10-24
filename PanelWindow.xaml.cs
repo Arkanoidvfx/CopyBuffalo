@@ -1886,7 +1886,7 @@ partial class PanelWindow : Window
 
     // ---------- Очистка и удаление ----------
 
-    static string Records(int n) => UiText.IsEnglish ? (n == 1 ? "entry" : "entries") : (n % 10, n % 100) switch
+    static string Records(int n) => UiText.Language != "ru" ? UiText.T(n == 1 ? "запись" : "записей") : (n % 10, n % 100) switch
     {
         (1, not 11) => UiText.T("запись"),
         (>= 2 and <= 4, not (>= 12 and <= 14)) => UiText.T("записи"),
@@ -2009,7 +2009,7 @@ partial class PanelWindow : Window
         return brush;
     }
 
-    static string LinesWord(int n) => UiText.IsEnglish ? (n == 1 ? "line" : "lines") : (n % 10, n % 100) switch
+    static string LinesWord(int n) => UiText.Language != "ru" ? UiText.T(n == 1 ? "строка" : "строк") : (n % 10, n % 100) switch
     {
         (1, not 11) => UiText.T("строка"),
         (>= 2 and <= 4, not (>= 12 and <= 14)) => UiText.T("строки"),

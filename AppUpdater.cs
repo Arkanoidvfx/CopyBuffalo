@@ -27,7 +27,7 @@ internal sealed class AppUpdater : IDisposable
     internal AppUpdater(string directory)
     {
         _directory = directory;
-        _http.DefaultRequestHeaders.UserAgent.ParseAdd($"ArkCopyBuffer/{VersionText}");
+        _http.DefaultRequestHeaders.UserAgent.ParseAdd($"CopyBuffalo/{VersionText}");
         _http.DefaultRequestHeaders.Accept.ParseAdd("application/vnd.github+json");
     }
 

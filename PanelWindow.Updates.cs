@@ -18,7 +18,7 @@ partial class PanelWindow
         UpdateStatus.Text = status;
         UpdateButton.Content = ready ? UiText.T("Обновить и перезапустить") : UiText.T("Проверить обновления");
         UpdateButton.IsEnabled = !busy;
-        UpdateVersion.Text = $"ArkCopyBuffer {AppUpdater.VersionText}";
+        UpdateVersion.Text = $"CopyBuffalo {AppUpdater.VersionText}";
         _updateInfo = ready ? new Info(InfoKind.Info, UiText.T("Доступно обновление."), status,
             (UiText.T("Обновить и перезапустить"), () => UpdateRequested?.Invoke())) : null;
         RefreshInfo();

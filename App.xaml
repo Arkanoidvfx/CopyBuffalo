@@ -12,8 +12,8 @@
     <Application.Resources>
         <FontFamily x:Key="IconFont">Segoe Fluent Icons, Segoe MDL2 Assets</FontFamily>
         <!-- Статические Plex имеют общие метрики Sans/Mono и не зависят от установленных шрифтов. -->
-        <FontFamily x:Key="TextFont">./Assets/Fonts/#IBM Plex Sans, Segoe UI</FontFamily>
-        <FontFamily x:Key="MonoFont">./Assets/Fonts/#IBM Plex Mono, Consolas</FontFamily>
+        <local:UiFont x:Key="TextFont"/>
+        <local:UiFont x:Key="MonoFont" Mono="True"/>
 
         <Style TargetType="ToolTip">
             <Setter Property="FontFamily" Value="{StaticResource TextFont}"/>
@@ -121,8 +121,34 @@
             </Setter>
         </Style>
 
+        <Style x:Key="LocalizedTextBox" TargetType="TextBox">
+            <Setter Property="ContextMenu">
+                <Setter.Value>
+                    <ContextMenu>
+                        <MenuItem Header="{local:Loc Key=SDFC4A6452FC1E6BB}" Command="ApplicationCommands.Undo" InputGestureText="Ctrl+Z"
+                                  CommandTarget="{Binding PlacementTarget, RelativeSource={RelativeSource AncestorType={x:Type ContextMenu}}}"/>
+                        <MenuItem Header="{local:Loc Key=S12D5AB1441BA29CB}" Command="ApplicationCommands.Redo" InputGestureText="Ctrl+Y"
+                                  CommandTarget="{Binding PlacementTarget, RelativeSource={RelativeSource AncestorType={x:Type ContextMenu}}}"/>
+                        <Separator/>
+                        <MenuItem Header="{local:Loc Key=S1EA87AEA0A4F1C25}" Command="ApplicationCommands.Cut" InputGestureText="Ctrl+X"
+                                  CommandTarget="{Binding PlacementTarget, RelativeSource={RelativeSource AncestorType={x:Type ContextMenu}}}"/>
+                        <MenuItem Header="{local:Loc Key=S1ECDDF40BFEB28AB}" Command="ApplicationCommands.Copy" InputGestureText="Ctrl+C"
+                                  CommandTarget="{Binding PlacementTarget, RelativeSource={RelativeSource AncestorType={x:Type ContextMenu}}}"/>
+                        <MenuItem Header="{local:Loc Key=SEC79F4D0C884351F}" Command="ApplicationCommands.Paste" InputGestureText="Ctrl+V"
+                                  CommandTarget="{Binding PlacementTarget, RelativeSource={RelativeSource AncestorType={x:Type ContextMenu}}}"/>
+                        <MenuItem Header="{local:Loc Key=SBE99B13612015A48}" Command="ApplicationCommands.Delete" InputGestureText="Delete"
+                                  CommandTarget="{Binding PlacementTarget, RelativeSource={RelativeSource AncestorType={x:Type ContextMenu}}}"/>
+                        <Separator/>
+                        <MenuItem Header="{local:Loc Key=S694DF0097FDEFE5A}" Command="ApplicationCommands.SelectAll" InputGestureText="Ctrl+A"
+                                  CommandTarget="{Binding PlacementTarget, RelativeSource={RelativeSource AncestorType={x:Type ContextMenu}}}"/>
+                    </ContextMenu>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style TargetType="TextBox" BasedOn="{StaticResource LocalizedTextBox}"/>
+
         <!-- Поле поиска: Fluent TextBox, нижняя линия становится акцентной при фокусе; крестик очищает запрос -->
-        <Style x:Key="SearchBox" TargetType="TextBox">
+        <Style x:Key="SearchBox" TargetType="TextBox" BasedOn="{StaticResource LocalizedTextBox}">
             <Setter Property="FontFamily" Value="{StaticResource TextFont}"/>
             <Setter Property="FontSize" Value="14"/>
             <Setter Property="Foreground" Value="{DynamicResource TextPrimary}"/>
@@ -174,7 +200,7 @@
         </Style>
 
         <!-- Поле ввода в диалоге: без лупы и крестика. Tag="Error" — красная линия (важнее фокуса) -->
-        <Style x:Key="FieldBox" TargetType="TextBox">
+        <Style x:Key="FieldBox" TargetType="TextBox" BasedOn="{StaticResource LocalizedTextBox}">
             <Setter Property="FontFamily" Value="{StaticResource TextFont}"/>
             <Setter Property="FontSize" Value="14"/>
             <Setter Property="Foreground" Value="{DynamicResource TextPrimary}"/>

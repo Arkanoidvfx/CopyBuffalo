@@ -1,10 +1,10 @@
 #ifndef AppVersion
-  #define AppVersion "0.2.1"
+  #define AppVersion "0.2.2"
 #endif
 
 [Setup]
 AppId=ArkCopyBuffer
-AppName=ArkCopyBuffer
+AppName=CopyBuffalo
 #ifdef FullPack
 OutputBaseFilename=ArkCopyBuffer-Full-Setup
 #else
@@ -20,7 +20,7 @@ PrivilegesRequired=lowest
 ArchitecturesAllowed=x64os
 ArchitecturesInstallIn64BitMode=x64os
 MinVersion=10.0.17763
-DefaultGroupName=ArkCopyBuffer
+DefaultGroupName=CopyBuffalo
 DisableProgramGroupPage=yes
 SetupIconFile=..\Assets\App.ico
 UninstallDisplayIcon={app}\ArkCopyBuffer.exe
@@ -49,8 +49,8 @@ english.DesktopShortcut=Create a desktop shortcut
 russian.DesktopShortcut=Создать ярлык на рабочем столе
 english.Autostart=Start with Windows
 russian.Autostart=Запускать вместе с Windows
-english.Launch=Launch ArkCopyBuffer
-russian.Launch=Запустить ArkCopyBuffer
+english.Launch=Launch CopyBuffalo
+russian.Launch=Запустить CopyBuffalo
 english.UnsupportedSystem=Only Windows 10 and Windows 11 (Intel/AMD x64) are supported.
 russian.UnsupportedSystem=Поддерживаются только Windows 10 и Windows 11 (Intel/AMD x64).
 
@@ -74,8 +74,8 @@ Name: "desktopicon"; Description: "{cm:DesktopShortcut}"
 Name: "autostart"; Description: "{cm:Autostart}"
 
 [Icons]
-Name: "{userprograms}\ArkCopyBuffer"; Filename: "{app}\ArkCopyBuffer.exe"; WorkingDir: "{app}"; Check: not IsUpdate
-Name: "{userdesktop}\ArkCopyBuffer"; Filename: "{app}\ArkCopyBuffer.exe"; WorkingDir: "{app}"; Tasks: desktopicon; Check: not IsUpdate
+Name: "{userprograms}\CopyBuffalo"; Filename: "{app}\ArkCopyBuffer.exe"; WorkingDir: "{app}"; Check: not IsUpdate
+Name: "{userdesktop}\CopyBuffalo"; Filename: "{app}\ArkCopyBuffer.exe"; WorkingDir: "{app}"; Tasks: desktopicon; Check: not IsUpdate
 
 [Registry]
 Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; ValueType: string; ValueName: "ArkCopyBuffer"; ValueData: """{app}\ArkCopyBuffer.exe"""; Tasks: autostart; Check: not IsUpdate

@@ -1,10 +1,12 @@
-# ArkCopyBuffer
+# CopyBuffalo
 
 Clipboard history for Windows. Copy text, images, and files, then press **Win+V** to find and paste them again.
 
+The software is called **CopyBuffalo**. Existing downloads and internal file/storage names retain `ArkCopyBuffer` for compatibility with installed versions.
+
 **[Download for Windows](https://github.com/Arkanoidvfx/CopyBuffalo/releases/latest/download/ArkCopyBuffer-Setup.exe)** · [All downloads](https://github.com/Arkanoidvfx/CopyBuffalo/releases/latest) · [Report a bug](https://github.com/Arkanoidvfx/CopyBuffalo/issues)
 
-Windows 10 (1809+) or Windows 11 · Intel/AMD x64 · English and Russian interface.
+Windows 10 (1809+) or Windows 11 · Intel/AMD x64 · English, Russian, Simplified Chinese, Traditional Chinese, Japanese, and Hindi interface.
 
 <img src="docs/images/history.png" width="392" alt="Clipboard panel with sample notes, a command, and a file path">
 
@@ -32,7 +34,7 @@ Reorder the selected entries, put paths into placeholders, and check the result 
 
 ### Choose when to update
 
-Open **⋯ → Settings → View**, then scroll to **Updates**. You can disable automatic updates or check manually. English is the default; choose English or Russian at the top of this page and restart the app to apply it.
+Open **⋯ → Settings → View**, then scroll to **Updates**. You can disable automatic updates or check manually. English is the default; choose your interface language at the top of this page and restart the app to apply it. Chinese, Japanese, and Hindi fonts are bundled.
 
 <img src="docs/images/updates.png" width="392" alt="Update settings with automatic updates enabled and the current version installed">
 

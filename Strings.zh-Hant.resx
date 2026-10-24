@@ -1,0 +1,2255 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms</value>
+  </resheader>
+  <data name="S001F75C6B3F4631A" xml:space="preserve">
+    <value>其他</value>
+    <comment>Другое</comment>
+  </data>
+  <data name="S00E525F2D9657182" xml:space="preserve">
+    <value>100 毫秒</value>
+    <comment>100 мс</comment>
+  </data>
+  <data name="S01C9518EFEFA5B99" xml:space="preserve">
+    <value>停留時預覽長文字</value>
+    <comment>Просмотр длинного текста при наведении</comment>
+  </data>
+  <data name="S02242562D3F8C60C" xml:space="preserve">
+    <value>這裡還沒有內容</value>
+    <comment>Здесь пока пусто</comment>
+  </data>
+  <data name="S0273B95E0EE75CA8" xml:space="preserve">
+    <value>復原 (Ctrl+Z)</value>
+    <comment>Отменить (Ctrl+Z)</comment>
+  </data>
+  <data name="S0296E4B0A06954B1" xml:space="preserve">
+    <value>正在儲存…</value>
+    <comment>Сохраняется…</comment>
+  </data>
+  <data name="S03498AEA7B5A98E8" xml:space="preserve">
+    <value>無法壓縮提示詞。</value>
+    <comment>Не удалось сжать промпт.</comment>
+  </data>
+  <data name="S034C71AC10A3A1FE" xml:space="preserve">
+    <value>3 秒</value>
+    <comment>3 с</comment>
+  </data>
+  <data name="S03BE041FDB716223" xml:space="preserve">
+    <value>變更尚未套用</value>
+    <comment>Изменения не применены</comment>
+  </data>
+  <data name="S0537BA6A692444BF" xml:space="preserve">
+    <value>順序已變更。</value>
+    <comment>Порядок изменён.</comment>
+  </data>
+  <data name="S053C6742C1336B2C" xml:space="preserve">
+    <value>找不到更新。</value>
+    <comment>Обновление не найдено.</comment>
+  </data>
+  <data name="S05F86AE8582FFC3E" xml:space="preserve">
+    <value>效果強度，百分比</value>
+    <comment>Интенсивность эффекта, процентов</comment>
+  </data>
+  <data name="S0607D283433EA448" xml:space="preserve">
+    <value>剪貼簿忙碌中。請從歷程記錄複製音訊。</value>
+    <comment>Буфер обмена занят. Скопируйте аудиозапись из истории.</comment>
+  </data>
+  <data name="S0770CA9F56216DF8" xml:space="preserve">
+    <value>選取一筆歷程記錄</value>
+    <comment>Выберите запись из истории</comment>
+  </data>
+  <data name="S07C5DCE2B8F8A267" xml:space="preserve">
+    <value>更新尚未準備就緒。</value>
+    <comment>Обновление ещё не готово.</comment>
+  </data>
+  <data name="S07C7B8B8142D494F" xml:space="preserve">
+    <value>繼續記錄</value>
+    <comment>Возобновить</comment>
+  </data>
+  <data name="S07E09CAA765B2F65" xml:space="preserve">
+    <value>選取結果。綠色部分表示插入內容。</value>
+    <comment>Выберите результат. Зелёным — вставка.</comment>
+  </data>
+  <data name="S087397F71C86359B" xml:space="preserve">
+    <value>滑鼠滾輪：捲動</value>
+    <comment>Колесо мыши: прокрутка</comment>
+  </data>
+  <data name="S087494FACE13C38A" xml:space="preserve">
+    <value>找不到音軌。</value>
+    <comment>Звуковые дорожки не найдены.</comment>
+  </data>
+  <data name="S08C05789F573BA9F" xml:space="preserve">
+    <value>下一個</value>
+    <comment>Следующая</comment>
+  </data>
+  <data name="S08F7803BADAA6487" xml:space="preserve">
+    <value>需要 Intel/AMD x64 處理器及 Windows 10（1809 或更新版本）或 Windows 11。</value>
+    <comment>Нужна Windows 10 (1809 или новее) либо Windows 11, 64-битный процессор Intel/AMD.</comment>
+  </data>
+  <data name="S0918B4BA92684EAA" xml:space="preserve">
+    <value>名稱</value>
+    <comment>Название</comment>
+  </data>
+  <data name="S099904B55F08001B" xml:space="preserve">
+    <value>剪貼簿</value>
+    <comment>Буфер</comment>
+  </data>
+  <data name="S0B9F6A92306B93DC" xml:space="preserve">
+    <value>形狀</value>
+    <comment>Фигуры</comment>
+  </data>
+  <data name="S0CB790718ED018BD" xml:space="preserve">
+    <value>已選取 50 筆文字記錄</value>
+    <comment>Выбрано 50 текстов</comment>
+  </data>
+  <data name="S0D724DEBF038BC1E" xml:space="preserve">
+    <value>無法辨識文字。原圖已保留。</value>
+    <comment>Не удалось распознать текст. Исходное изображение сохранено.</comment>
+  </data>
+  <data name="S0D94E4F5CCA0EB0B" xml:space="preserve">
+    <value>尚未儲存至磁碟</value>
+    <comment>Не сохранено на диск</comment>
+  </data>
+  <data name="S0E0919E465C9EE1A" xml:space="preserve">
+    <value>取消選取</value>
+    <comment>Снять отметку</comment>
+  </data>
+  <data name="S0EE457E59ADE53DE" xml:space="preserve">
+    <value>摺疊群組</value>
+    <comment>Свернуть группу</comment>
+  </data>
+  <data name="S0EED34A07ED2D4A2" xml:space="preserve">
+    <value>正在擷取音訊…</value>
+    <comment>Извлекается звук…</comment>
+  </data>
+  <data name="S0EF264281CE208FB" xml:space="preserve">
+    <value>已從合併中移除該項目，歷程記錄中的原項目仍保留。</value>
+    <comment>Запись убрана из объединения. В истории она осталась.</comment>
+  </data>
+  <data name="S0F4D5C50A07B577B" xml:space="preserve">
+    <value>顯示</value>
+    <comment>Появление</comment>
+  </data>
+  <data name="S10371AF4DD53166E" xml:space="preserve">
+    <value>翻譯期間影像尺寸發生變化。</value>
+    <comment>Размер изображения изменился во время перевода.</comment>
+  </data>
+  <data name="S104FE8A2AA075597" xml:space="preserve">
+    <value>縮圖</value>
+    <comment>Миниатюра</comment>
+  </data>
+  <data name="S116D8B3F5BF6561E" xml:space="preserve">
+    <value>滾輪：縮放</value>
+    <comment>Колесо: масштаб</comment>
+  </data>
+  <data name="S1174A37A5AB4982C" xml:space="preserve">
+    <value>藍綠色</value>
+    <comment>Бирюзовый</comment>
+  </data>
+  <data name="S11763D9F26B7FA4C" xml:space="preserve">
+    <value>依序指派路徑</value>
+    <comment>Пути в слоты по порядку</comment>
+  </data>
+  <data name="S12A261F559875E9B" xml:space="preserve">
+    <value>Unreal Engine 節點</value>
+    <comment>Ноды Unreal Engine</comment>
+  </data>
+  <data name="S12C618201D6A5F25" xml:space="preserve">
+    <value>OCR 無法處理此影像。請嘗試較小區域或其他螢幕擷取畫面。</value>
+    <comment>OCR не смог обработать изображение. Попробуйте выделить меньшую область или другой снимок.</comment>
+  </data>
+  <data name="S12D5AB1441BA29CB" xml:space="preserve">
+    <value>重做編輯</value>
+    <comment>Повторить правку</comment>
+  </data>
+  <data name="S12E06B51495C93E8" xml:space="preserve">
+    <value>請嘗試其他螢幕擷取畫面或較大的文字。</value>
+    <comment>Попробуйте другой снимок или более крупный текст.</comment>
+  </data>
+  <data name="S13AF1DAE7C4494CB" xml:space="preserve">
+    <value>值</value>
+    <comment>значение</comment>
+  </data>
+  <data name="S1417B7792D57BBB7" xml:space="preserve">
+    <value>歷程記錄</value>
+    <comment>История</comment>
+  </data>
+  <data name="S14387E4467F2FCC7" xml:space="preserve">
+    <value>暫存檔案</value>
+    <comment>Временные файлы</comment>
+  </data>
+  <data name="S143D34B4EE416F6A" xml:space="preserve">
+    <value>請至少新增一筆非空白文字記錄。</value>
+    <comment>Добавьте хотя бы один непустой текст.</comment>
+  </data>
+  <data name="S143DC498F38A256A" xml:space="preserve">
+    <value>正在貼上…</value>
+    <comment>Вставляем…</comment>
+  </data>
+  <data name="S14E4E1170182FF2B" xml:space="preserve">
+    <value>請等待結果或取消目前的作業。</value>
+    <comment>Дождитесь результата или отмените текущую обработку.</comment>
+  </data>
+  <data name="S1501EFC06EF5F645" xml:space="preserve">
+    <value>取消影像與影片選取</value>
+    <comment>Отменить выбор картинок и видео</comment>
+  </data>
+  <data name="S1557CE3ECCC5C994" xml:space="preserve">
+    <value> · 地點</value>
+    <comment> · место</comment>
+  </data>
+  <data name="S16F8685724EA6A34" xml:space="preserve">
+    <value>無法在要封存的資料夾內建立暫存 ZIP。</value>
+    <comment>Нельзя создать временный ZIP внутри самой архивируемой папки.</comment>
+  </data>
+  <data name="S1718E90D59C50436" xml:space="preserve">
+    <value>音訊</value>
+    <comment>Аудио</comment>
+  </data>
+  <data name="S180F58AB975323F9" xml:space="preserve">
+    <value>搜尋</value>
+    <comment>Поиск</comment>
+  </data>
+  <data name="S186DBA10EE6C9B80" xml:space="preserve">
+    <value>複製一些文字或影像，即可加入歷程記錄。</value>
+    <comment>Скопируйте текст или картинку, и они появятся в этом списке.</comment>
+  </data>
+  <data name="S194306E20807E8A7" xml:space="preserve">
+    <value>重新命名</value>
+    <comment>Переименовать</comment>
+  </data>
+  <data name="S196A2550EDE0D02C" xml:space="preserve">
+    <value>取消文字選取</value>
+    <comment>Отменить выбор текстов</comment>
+  </data>
+  <data name="S19CE8F92856A9D18" xml:space="preserve">
+    <value>開啟節點圖</value>
+    <comment>Открыть граф нод</comment>
+  </data>
+  <data name="S1A9EF6604FE6509C" xml:space="preserve">
+    <value>新記錄會顯示來源應用程式</value>
+    <comment>Новые записи покажут приложение</comment>
+  </data>
+  <data name="S1AED2C05E0D05E70" xml:space="preserve">
+    <value>選取左側文字，以其他記錄取代。</value>
+    <comment>Выделите фрагмент слева, чтобы заменить его текстом другой записи.</comment>
+  </data>
+  <data name="S1AF8D8E007EF408C" xml:space="preserve">
+    <value>拖放到此處插入</value>
+    <comment>Отпустите — подставить сюда</comment>
+  </data>
+  <data name="S1B3A63B288A42D4F" xml:space="preserve">
+    <value>程式碼</value>
+    <comment>Код</comment>
+  </data>
+  <data name="S1B630B5B6D80E4C7" xml:space="preserve">
+    <value>無法啟動更新。</value>
+    <comment>Не удалось запустить обновление.</comment>
+  </data>
+  <data name="S1BD44106B532CEF3" xml:space="preserve">
+    <value>尚未安裝本機 AI 元件。請執行 CopyBuffalo 完整安裝程式並選取本機 AI 元件；影像翻譯也需要此元件。</value>
+    <comment>Не установлен компонент локальной модели. Запустите ArkCopyBuffer-Full-Setup.exe и выберите «Сжатие промптов» (он также нужен для перевода).</comment>
+  </data>
+  <data name="S1C386BD08B121ED9" xml:space="preserve">
+    <value>此影片沒有音訊。</value>
+    <comment>В видео нет звука.</comment>
+  </data>
+  <data name="S1ECDDF40BFEB28AB" xml:space="preserve">
+    <value>複製</value>
+    <comment>Копировать</comment>
+  </data>
+  <data name="S1F9DE09069401BBA" xml:space="preserve">
+    <value>拖放到縮圖之間</value>
+    <comment>Перетащите между миниатюрами</comment>
+  </data>
+  <data name="S201B622D278E1D37" xml:space="preserve">
+    <value>請逐一貼上，以找出損壞的記錄。</value>
+    <comment>Вставьте их по одному, чтобы найти повреждённую запись.</comment>
+  </data>
+  <data name="S20D39D27DFBA6104" xml:space="preserve">
+    <value>正在建立 ZIP…</value>
+    <comment>Создаётся ZIP…</comment>
+  </data>
+  <data name="S20EF921C0E733A4F" xml:space="preserve">
+    <value>結果超出文字儲存上限。內容未被截斷；請在設定中提高上限。</value>
+    <comment>Полученный текст превышает лимит хранения. Он не был обрезан; увеличьте лимит в настройках.</comment>
+  </data>
+  <data name="S211239C18768F7EA" xml:space="preserve">
+    <value>也可選取左側路徑後按一下欄位。在已使用的欄位間移動會交換路徑。</value>
+    <comment>Или выберите путь слева и нажмите слот. Перенос между занятыми слотами меняет назначения местами.</comment>
+  </data>
+  <data name="S215816BF42103F1F" xml:space="preserve">
+    <value>全部</value>
+    <comment>Все</comment>
+  </data>
+  <data name="S21B4D916F3267B6C" xml:space="preserve">
+    <value>紅色</value>
+    <comment>Красный</comment>
+  </data>
+  <data name="S2263DC75D8F9FABF" xml:space="preserve">
+    <value>內容類型：全部</value>
+    <comment>Вид записи: все</comment>
+  </data>
+  <data name="S2358451A22A7CAEF" xml:space="preserve">
+    <value>貼上下一個檔案： </value>
+    <comment>Вставить следующий файл: </comment>
+  </data>
+  <data name="S239186346F82A841" xml:space="preserve">
+    <value>單一路徑或預留位置可自動取代</value>
+    <comment>Один путь или маркер — можно заменить автоматически</comment>
+  </data>
+  <data name="S24626711559EDA38" xml:space="preserve">
+    <value>剪貼簿歷程記錄</value>
+    <comment>История буфера обмена</comment>
+  </data>
+  <data name="S246E10A8E9D25A7D" xml:space="preserve">
+    <value>沒有可翻譯的文字。</value>
+    <comment>Нет текста для перевода.</comment>
+  </data>
+  <data name="S24CBF0F2B12289FC" xml:space="preserve">
+    <value>拖放以移動</value>
+    <comment>Отпустите — переместить</comment>
+  </data>
+  <data name="S253C590ED54240EA" xml:space="preserve">
+    <value>影像中找不到文字。</value>
+    <comment>Текст на изображении не найден.</comment>
+  </data>
+  <data name="S262C4C9C81BBFBD3" xml:space="preserve">
+    <value>暫存磁碟空間不足，無法準備影像與影片。</value>
+    <comment>На диске временных файлов недостаточно места для картинок и видео.</comment>
+  </data>
+  <data name="S2686EEBE90391923" xml:space="preserve">
+    <value>空引號</value>
+    <comment>пустые кавычки</comment>
+  </data>
+  <data name="S26D91972810A8D82" xml:space="preserve">
+    <value>箭頭</value>
+    <comment>Стрелки</comment>
+  </data>
+  <data name="S2734E4685D892F22" xml:space="preserve">
+    <value>更多：暫停記錄、設定、清除歷程記錄</value>
+    <comment>Ещё: пауза записи, настройки, очистка истории</comment>
+  </data>
+  <data name="S27410FC78B03DDB6" xml:space="preserve">
+    <value>效果速度，百分比</value>
+    <comment>Скорость эффекта, процентов</comment>
+  </data>
+  <data name="S2751C91000182394" xml:space="preserve">
+    <value>地圖</value>
+    <comment>Карта</comment>
+  </data>
+  <data name="S277FCF9DB1CC9840" xml:space="preserve">
+    <value>0.6 秒</value>
+    <comment>0,6 с</comment>
+  </data>
+  <data name="S2923E75A55AA53B3" xml:space="preserve">
+    <value>更新未通過 SHA-256 驗證。</value>
+    <comment>Проверка SHA-256 обновления не пройдена.</comment>
+  </data>
+  <data name="S29B06D0B60B7DCF6" xml:space="preserve">
+    <value>縮圖長邊，像素</value>
+    <comment>Длинная сторона миниатюры, пикселей</comment>
+  </data>
+  <data name="S29FBB6B36971FD46" xml:space="preserve">
+    <value>建立釘選群組</value>
+    <comment>Создать группу закреплённых</comment>
+  </data>
+  <data name="S2AA26FC72A2E6FCE" xml:space="preserve">
+    <value>貼上下一個已選影像或影片</value>
+    <comment>Вставить следующую выбранную картинку или видео</comment>
+  </data>
+  <data name="S2AD63BC83419CC36" xml:space="preserve">
+    <value>更新空間不足：安裝套件大小以外，還需預留 512 MB。</value>
+    <comment>Недостаточно места для обновления: нужно ещё 512 МБ сверх размера пакета.</comment>
+  </data>
+  <data name="S2B2A9427D51075B7" xml:space="preserve">
+    <value>檔案或檔案組</value>
+    <comment>Файл или пакет</comment>
+  </data>
+  <data name="S2C12454B6FF51F6B" xml:space="preserve">
+    <value>路徑 · 拖入欄位或保留為單獨一行</value>
+    <comment>Путь · перетащите в слот или оставьте строкой</comment>
+  </data>
+  <data name="S2C20E0AE88B9F103" xml:space="preserve">
+    <value>然後再次按一下「更新並重新啟動」。</value>
+    <comment>Затем нажмите «Обновить и перезапустить» ещё раз.</comment>
+  </data>
+  <data name="S2CCA114C69F11D07" xml:space="preserve">
+    <value>依來源應用程式篩選</value>
+    <comment>Фильтр по приложению</comment>
+  </data>
+  <data name="S2D8622A841F69807" xml:space="preserve">
+    <value>未知的內容類型。</value>
+    <comment>Неизвестный вид записи.</comment>
+  </data>
+  <data name="S2DC9E0798C91D2D1" xml:space="preserve">
+    <value>搜尋歷程記錄</value>
+    <comment>Поиск по истории</comment>
+  </data>
+  <data name="S2FE8F2FD72439D26" xml:space="preserve">
+    <value>已儲存</value>
+    <comment>Сохранено</comment>
+  </data>
+  <data name="S3005C1BC505F2EAD" xml:space="preserve">
+    <value>資料夾</value>
+    <comment>Папки</comment>
+  </data>
+  <data name="S3091ACA226EFA497" xml:space="preserve">
+    <value>文字</value>
+    <comment>Текст</comment>
+  </data>
+  <data name="S30D53A158A794F3F" xml:space="preserve">
+    <value>行</value>
+    <comment>строки</comment>
+  </data>
+  <data name="S317D2C78ED442353" xml:space="preserve">
+    <value>在底部顯示快捷鍵提示</value>
+    <comment>Подсказки клавиш внизу панели</comment>
+  </data>
+  <data name="S3195519C1940592D" xml:space="preserve">
+    <value>無法辨識文字。</value>
+    <comment>Не удалось распознать текст.</comment>
+  </data>
+  <data name="S3217E719A9119FC0" xml:space="preserve">
+    <value>其他片段請選取文字後插入內容取代</value>
+    <comment>Для других фрагментов используйте выделение и вставку</comment>
+  </data>
+  <data name="S325E4FA57704410A" xml:space="preserve">
+    <value>模型遺漏文字或傳回無效翻譯。影像未變更。</value>
+    <comment>Модель пропустила надпись или вернула некорректный перевод. Картинка не изменена.</comment>
+  </data>
+  <data name="S326C58ACDAEFB1E1" xml:space="preserve">
+    <value>上次更新失敗。請手動檢查；詳細資訊見 updates/install-error.txt。</value>
+    <comment>Предыдущее обновление не установилось. Проверьте вручную; подробности в updates/install-error.txt.</comment>
+  </data>
+  <data name="S330E7F8A12363B9A" xml:space="preserve">
+    <value>擷取音訊</value>
+    <comment>Извлечь звук</comment>
+  </data>
+  <data name="S331DCE3192B7B695" xml:space="preserve">
+    <value>沒有空引號或預留位置。各筆文字會分行合併。</value>
+    <comment>Пустых кавычек и заглушек нет. Тексты объединятся построчно.</comment>
+  </data>
+  <data name="S33C9049C2998664A" xml:space="preserve">
+    <value>展開群組</value>
+    <comment>Развернуть группу</comment>
+  </data>
+  <data name="S340E3C751299C910" xml:space="preserve">
+    <value>釘選</value>
+    <comment>Закрепить</comment>
+  </data>
+  <data name="S3413CD1C78698330" xml:space="preserve">
+    <value>音軌 {0}</value>
+    <comment>Дорожка {0}</comment>
+  </data>
+  <data name="S344A33BE4B76BFC0" xml:space="preserve">
+    <value>暫存檔案保留天數</value>
+    <comment>Срок очистки временных файлов, дней</comment>
+  </data>
+  <data name="S344E3EC15B8BA3C3" xml:space="preserve">
+    <value>指標離開後隱藏</value>
+    <comment>Скрывать, когда курсор ушёл</comment>
+  </data>
+  <data name="S349065E9C4467894" xml:space="preserve">
+    <value>儲存</value>
+    <comment>Хранение</comment>
+  </data>
+  <data name="S34DFA3C79F0B7C75" xml:space="preserve">
+    <value>貼上所有剩餘影像與影片</value>
+    <comment>Вставить все оставшиеся картинки и видео</comment>
+  </data>
+  <data name="S3613629A8567FBDD" xml:space="preserve">
+    <value>請檢查相似字元與行序。</value>
+    <comment>Проверьте похожие буквы и порядок строк.</comment>
+  </data>
+  <data name="S36BA2804E029771D" xml:space="preserve">
+    <value>更多：暫停、設定、清除（按 F6 聚焦按鈕）</value>
+    <comment>Ещё: пауза, настройки, очистка (F6 — фокус на кнопки)</comment>
+  </data>
+  <data name="S380FA2FBAAA6699B" xml:space="preserve">
+    <value>從歷程記錄取用</value>
+    <comment>Взять из истории</comment>
+  </data>
+  <data name="S3824A1F61B8E6B11" xml:space="preserve">
+    <value>將路徑拖放到此處</value>
+    <comment>Перетащите сюда путь</comment>
+  </data>
+  <data name="S38264785BF40528B" xml:space="preserve">
+    <value>{0}千</value>
+    <comment>{0} тыс.</comment>
+  </data>
+  <data name="S38E51CDAC3AF99A2" xml:space="preserve">
+    <value>合併並複製</value>
+    <comment>Объединить и скопировать</comment>
+  </data>
+  <data name="S3A4F0128F65CC223" xml:space="preserve">
+    <value>音訊已儲存至歷程記錄。</value>
+    <comment>Звук извлечён в историю.</comment>
+  </data>
+  <data name="S3A8599BD655FB873" xml:space="preserve">
+    <value>重做 (Ctrl+Y)</value>
+    <comment>Повторить (Ctrl+Y)</comment>
+  </data>
+  <data name="S3AE9AFCEE6F4219A" xml:space="preserve">
+    <value>請先完成這次合併，再開始下一次。</value>
+    <comment>Завершите это объединение, затем можно собрать следующее.</comment>
+  </data>
+  <data name="S3B249DC647CDCE29" xml:space="preserve">
+    <value>無法完成。 </value>
+    <comment>Не удалось завершить. </comment>
+  </data>
+  <data name="S3B9CF4A79A869535" xml:space="preserve">
+    <value>Unity Shader Graph 節點</value>
+    <comment>Ноды Unity Shader Graph</comment>
+  </data>
+  <data name="S55435886F76E0E6A" xml:space="preserve">
+    <value>合併文字 — CopyBuffalo</value>
+    <comment>Объединить тексты — CopyBuffalo</comment>
+  </data>
+  <data name="S3C1540238FF55BA4" xml:space="preserve">
+    <value>更新並重新啟動</value>
+    <comment>Обновить и перезапустить</comment>
+  </data>
+  <data name="S3CD129EC5EAE282F" xml:space="preserve">
+    <value>Yandex 地圖</value>
+    <comment>Яндекс Карты</comment>
+  </data>
+  <data name="S3D3419ACCC61723B" xml:space="preserve">
+    <value>內容類型：全部，不篩選</value>
+    <comment>Вид записи: все, без фильтра</comment>
+  </data>
+  <data name="S3D443CEB36624C1B" xml:space="preserve">
+    <value>輸入群組名稱</value>
+    <comment>Введите название группы</comment>
+  </data>
+  <data name="S3E612ADF4D8293FD" xml:space="preserve">
+    <value>節點圖</value>
+    <comment>Граф нод</comment>
+  </data>
+  <data name="S3E795DE749A1EA08" xml:space="preserve">
+    <value>來自 Moment Player 的幽靈火焰</value>
+    <comment>Призрачное пламя из Moment Player</comment>
+  </data>
+  <data name="S3E81C1D36E7641F2" xml:space="preserve">
+    <value>音訊檔案超出儲存設定中的檔案大小上限。</value>
+    <comment>Аудиофайл превышает лимит файлов в настройках хранения.</comment>
+  </data>
+  <data name="S3EEA9DCF2BF6E785" xml:space="preserve">
+    <value>已存在名為「{0}」的群組</value>
+    <comment>Группа «{0}» уже есть</comment>
+  </data>
+  <data name="S3F14FC1EF2A520B0" xml:space="preserve">
+    <value>請使用 &lt;value&gt;、{{value}} 預留位置或命令引數。按 Ctrl+E 可開啟編輯器。</value>
+    <comment>Используйте маркер &lt;значение&gt;, {{значение}} или аргумент команды. Можно открыть редактор: Ctrl+E.</comment>
+  </data>
+  <data name="S3F995E364A5430C0" xml:space="preserve">
+    <value>無色彩</value>
+    <comment>Без цвета</comment>
+  </data>
+  <data name="S3FCEF58E9C383C20" xml:space="preserve">
+    <value>找不到可取代的目標</value>
+    <comment>Не найдено значение для замены</comment>
+  </data>
+  <data name="S40CDEF60755C34B3" xml:space="preserve">
+    <value>已釘選</value>
+    <comment>Закреплённые</comment>
+  </data>
+  <data name="S4150EBF1DB0F7659" xml:space="preserve">
+    <value>影像</value>
+    <comment>Картинки</comment>
+  </data>
+  <data name="S41B0EFEBC831C3E1" xml:space="preserve">
+    <value>無法檢查更新：{0}</value>
+    <comment>Не удалось проверить обновления: {0}</comment>
+  </data>
+  <data name="S42A7BFE71DE35A15" xml:space="preserve">
+    <value>無法讀取音軌。</value>
+    <comment>Не удалось прочитать звуковые дорожки.</comment>
+  </data>
+  <data name="S42B4A2BB3E83EF6A" xml:space="preserve">
+    <value>{0:N0} 個字元，{1} {2}</value>
+    <comment>{0:N0} симв., {1} {2}</comment>
+  </data>
+  <data name="S42B6424F9D3A2D2C" xml:space="preserve">
+    <value>行</value>
+    <comment>строк</comment>
+  </data>
+  <data name="S43E314D2A3F80B8E" xml:space="preserve">
+    <value>此記錄已變更或刪除。</value>
+    <comment>Запись уже изменена или удалена.</comment>
+  </data>
+  <data name="S4401E13B4F44ECDA" xml:space="preserve">
+    <value>適用於新記錄</value>
+    <comment>Для новых записей</comment>
+  </data>
+  <data name="S44AA9BF03160AA2C" xml:space="preserve">
+    <value>檔案路徑</value>
+    <comment>Путь к файлу</comment>
+  </data>
+  <data name="S44B2275E6C13558C" xml:space="preserve">
+    <value>llama-server 在載入模型時結束（代碼 {0}）。</value>
+    <comment>llama-server завершился при загрузке модели (код {0}).</comment>
+  </data>
+  <data name="S44B6F4A631077779" xml:space="preserve">
+    <value>{0:N0} 個字元 · 獨立文字</value>
+    <comment>{0:N0} символов · отдельный текст</comment>
+  </data>
+  <data name="S44F2634FD416851A" xml:space="preserve">
+    <value>自動更新</value>
+    <comment>Обновлять автоматически</comment>
+  </data>
+  <data name="S455471DB0CFB8950" xml:space="preserve">
+    <value>更新</value>
+    <comment>Обновления</comment>
+  </data>
+  <data name="S45E12575218BDE9B" xml:space="preserve">
+    <value>此路徑與欄位的引號不相容。可將其作為單獨一行合併。</value>
+    <comment>Этот путь не подходит к кавычкам слота. Можно объединить его отдельной строкой.</comment>
+  </data>
+  <data name="S4656443C26C025BD" xml:space="preserve">
+    <value>插入文字</value>
+    <comment>Вставить в текст</comment>
+  </data>
+  <data name="S46844DEF19E8DC42" xml:space="preserve">
+    <value>其他</value>
+    <comment>Прочее</comment>
+  </data>
+  <data name="S47984DF695944191" xml:space="preserve">
+    <value>文字已合併</value>
+    <comment>Тексты объединены</comment>
+  </data>
+  <data name="S480FAE1C4BC97F4B" xml:space="preserve">
+    <value>沒有搜尋結果</value>
+    <comment>Ничего не найдено</comment>
+  </data>
+  <data name="S49636D4FD4D754A5" xml:space="preserve">
+    <value>只能編輯文字記錄。</value>
+    <comment>Редактировать можно только текстовые записи.</comment>
+  </data>
+  <data name="S4997A5143D9FA486" xml:space="preserve">
+    <value>結果</value>
+    <comment>Результат</comment>
+  </data>
+  <data name="S49C8352691BF545C" xml:space="preserve">
+    <value>合併文字預覽</value>
+    <comment>Предпросмотр объединённого текста</comment>
+  </data>
+  <data name="S4A64D47B205EBD7F" xml:space="preserve">
+    <value>文字預覽延遲，毫秒</value>
+    <comment>Задержка просмотра текста, миллисекунды</comment>
+  </data>
+  <data name="S4A71BC71DF3007A5" xml:space="preserve">
+    <value>在本機辨識俄語與英語文字。結果會儲存至歷程記錄；若剪貼簿未變更，也會複製結果。</value>
+    <comment>Распознать русский и английский текст локально. Результат появится в истории и будет скопирован, если буфер не изменился.</comment>
+  </data>
+  <data name="S4AED2CD288DE1810" xml:space="preserve">
+    <value>紫色</value>
+    <comment>Фиолетовый</comment>
+  </data>
+  <data name="S4B055A5A553067DB" xml:space="preserve">
+    <value>影像超出儲存設定中的大小上限。</value>
+    <comment>Изображение превышает лимит размера в настройках хранения.</comment>
+  </data>
+  <data name="S4BBB3F269D235FBC" xml:space="preserve">
+    <value>合併文字</value>
+    <comment>Объединить тексты</comment>
+  </data>
+  <data name="S4CBE758BC22A3C5B" xml:space="preserve">
+    <value>欄位 {0} · {1}</value>
+    <comment>Слот {0} · {1}</comment>
+  </data>
+  <data name="S4CFB9987CDA5BFE3" xml:space="preserve">
+    <value>文字區域位於影像邊界之外。</value>
+    <comment>Надпись находится за границами картинки.</comment>
+  </data>
+  <data name="S4D88BE035A92C555" xml:space="preserve">
+    <value>將資料夾目前內容建立為 ZIP，並以檔案貼上</value>
+    <comment>Создать ZIP из текущего содержимого папки и вставить как файл</comment>
+  </data>
+  <data name="S4E204E395186D841" xml:space="preserve">
+    <value>以 ZIP 傳送</value>
+    <comment>Отправить архивом .zip</comment>
+  </data>
+  <data name="S4E6171ACEE4847BD" xml:space="preserve">
+    <value>依符號、代碼（2014）或類別（貨幣）搜尋。</value>
+    <comment>Ищите по символу, коду (2014) или группе («валют»).</comment>
+  </data>
+  <data name="S4EBEB45A877CDD5E" xml:space="preserve">
+    <value>儲存設定</value>
+    <comment>Настройки хранения данных</comment>
+  </data>
+  <data name="S4F7C5BA25115D970" xml:space="preserve">
+    <value>刪除群組 · 保留記錄</value>
+    <comment>Удалить группу · плитки останутся</comment>
+  </data>
+  <data name="S50F9A1E3D6E15FA7" xml:space="preserve">
+    <value>以路徑填入欄位</value>
+    <comment>Подставлять пути в слоты</comment>
+  </data>
+  <data name="S513E85C43BB5B058" xml:space="preserve">
+    <value>資料夾 · 原始位置連結</value>
+    <comment>Папка · ссылка на оригинал</comment>
+  </data>
+  <data name="S5189135A6110BD31" xml:space="preserve">
+    <value>重試</value>
+    <comment>Повторить</comment>
+  </data>
+  <data name="S55339A2475B6DD2D" xml:space="preserve">
+    <value>重做合併</value>
+    <comment>Повторить объединение</comment>
+  </data>
+  <data name="S5543508C5EF64551" xml:space="preserve">
+    <value>類型</value>
+    <comment>Виды</comment>
+  </data>
+  <data name="S5730FED63F2FF4F5" xml:space="preserve">
+    <value>選取順序或欄位</value>
+    <comment>Выберите порядок или слот</comment>
+  </data>
+  <data name="S57AD92DE020B8C62" xml:space="preserve">
+    <value>GIF、音訊與檔案</value>
+    <comment>GIF, аудио и файлы</comment>
+  </data>
+  <data name="S586C43A3FF36CEB7" xml:space="preserve">
+    <value>將{0}拖至所需結果。綠色表示插入內容。</value>
+    <comment>Перенесите {0} на нужный результат. Зелёным — вставка.</comment>
+  </data>
+  <data name="S58838F1A2610F060" xml:space="preserve">
+    <value>請從歷程記錄重新複製。</value>
+    <comment>Скопируйте её заново из истории.</comment>
+  </data>
+  <data name="S58E1352174CBF44E" xml:space="preserve">
+    <value>記錄已暫停。</value>
+    <comment>Запись на паузе.</comment>
+  </data>
+  <data name="S595FC716D85F07EE" xml:space="preserve">
+    <value>取代預覽</value>
+    <comment>Так будет после замены</comment>
+  </data>
+  <data name="S596AAD29B8B9BA15" xml:space="preserve">
+    <value>來源資料夾已移動、刪除或無法存取。</value>
+    <comment>Исходная папка перемещена, удалена или недоступна.</comment>
+  </data>
+  <data name="S59F90DFBD572FD09" xml:space="preserve">
+    <value>已是最新版本。</value>
+    <comment>У вас последняя версия.</comment>
+  </data>
+  <data name="S5A33E4A0CDCE618F" xml:space="preserve">
+    <value>{0}{1} · {2:0.#} MB</value>
+    <comment>{0}{1} · {2:0.#} МБ</comment>
+  </data>
+  <data name="S5A3519B294992D05" xml:space="preserve">
+    <value>文字預覽寬度</value>
+    <comment>Ширина карточки просмотра текста</comment>
+  </data>
+  <data name="S5A577D90566052BE" xml:space="preserve">
+    <value>已關閉</value>
+    <comment>Выключен</comment>
+  </data>
+  <data name="S5B2EF8627A936CD5" xml:space="preserve">
+    <value>檔案 {0}</value>
+    <comment>Файл {0}</comment>
+  </data>
+  <data name="S5B3992519F8BF916" xml:space="preserve">
+    <value>請在支援檔案貼上的應用程式中按 Ctrl+V。</value>
+    <comment>Нажмите Ctrl+V в приложении, принимающем файлы.</comment>
+  </data>
+  <data name="S5B3AABBDC87CD365" xml:space="preserve">
+    <value> 結果仍在此處，可以重試。</value>
+    <comment> Результат остаётся здесь; можно повторить.</comment>
+  </data>
+  <data name="S5BB1AA8A2FEC3A7D" xml:space="preserve">
+    <value>文字已辨識並複製。</value>
+    <comment>Текст распознан и скопирован.</comment>
+  </data>
+  <data name="S5BD57038DBADD651" xml:space="preserve">
+    <value>語言</value>
+    <comment>Язык</comment>
+  </data>
+  <data name="S5BF473B2FD59A9AA" xml:space="preserve">
+    <value>媒體與檔案保留天數</value>
+    <comment>Срок хранения медиа и файлов, дней</comment>
+  </data>
+  <data name="S5BF5E5AC637507E3" xml:space="preserve">
+    <value>{0} · {1} 位元組</value>
+    <comment>{0} · {1} Б</comment>
+  </data>
+  <data name="S5C51EDD2D64E5120" xml:space="preserve">
+    <value>編輯文字</value>
+    <comment>Редактировать текст</comment>
+  </data>
+  <data name="S5E80EC2151C6E297" xml:space="preserve">
+    <value>請重新貼上。</value>
+    <comment>Повторите вставку.</comment>
+  </data>
+  <data name="S36DBB75284131879" xml:space="preserve">
+    <value>CopyBuffalo 無法啟動：{0}
+
+詳細資訊：{1}</value>
+    <comment>CopyBuffalo не запустился: {0}
+
+Подробности: {1}</comment>
+  </data>
+  <data name="S5ECC2549250FD2FE" xml:space="preserve">
+    <value>所選影像與影片的順序</value>
+    <comment>Порядок выбранных картинок и видео</comment>
+  </data>
+  <data name="S5F94B28E71A8B993" xml:space="preserve">
+    <value>無法複製到剪貼簿。 </value>
+    <comment>Не удалось скопировать в буфер. </comment>
+  </data>
+  <data name="S5FD6BF9467F3A5A1" xml:space="preserve">
+    <value>填入路徑欄位</value>
+    <comment>Подставлять в слоты</comment>
+  </data>
+  <data name="S602601E628CC43D0" xml:space="preserve">
+    <value>影像大小</value>
+    <comment>Размер картинки</comment>
+  </data>
+  <data name="S6026D2C47F4BCD63" xml:space="preserve">
+    <value>指派的路徑已不適合此欄位。</value>
+    <comment>Назначение пути больше не подходит к слоту.</comment>
+  </data>
+  <data name="S6076E7DEACE54EA2" xml:space="preserve">
+    <value>貼上下一個所選檔案</value>
+    <comment>Вставить следующий выбранный файл</comment>
+  </data>
+  <data name="S60C53905AD7188CF" xml:space="preserve">
+    <value>拖放到目標值上</value>
+    <comment>Перетащите на нужное значение</comment>
+  </data>
+  <data name="S6194D998B332B38D" xml:space="preserve">
+    <value>文字順序</value>
+    <comment>Порядок текстов</comment>
+  </data>
+  <data name="S61B602CBA70C78A2" xml:space="preserve">
+    <value>音訊已擷取並複製。</value>
+    <comment>Звук извлечён и скопирован.</comment>
+  </data>
+  <data name="S6209BDD970DB46E4" xml:space="preserve">
+    <value>模型未完成回覆。不完整的結果未儲存。</value>
+    <comment>Модель не завершила ответ. Неполный результат не сохранён.</comment>
+  </data>
+  <data name="S62C783FB356CEFE6" xml:space="preserve">
+    <value>拖曳縮圖可調整順序。Ctrl+←/→ 移動，Delete 取消選取。</value>
+    <comment>Перетащите миниатюру для смены порядка. Ctrl+←/→ — переставить, Delete — снять отметку.</comment>
+  </data>
+  <data name="S6309A92A7273E8C1" xml:space="preserve">
+    <value>已重做變更。</value>
+    <comment>Изменение повторено.</comment>
+  </data>
+  <data name="S63B71FD3A7034EBB" xml:space="preserve">
+    <value>文字超出 {0:N0} 個字元，本機模型無法處理。</value>
+    <comment>Текст длиннее {0:N0} символов: для локальной модели слишком много.</comment>
+  </data>
+  <data name="S2A5C6674412AA2ED" xml:space="preserve">
+    <value>編輯文字 — CopyBuffalo</value>
+    <comment>Редактировать текст — CopyBuffalo</comment>
+  </data>
+  <data name="S65339243BCD582FB" xml:space="preserve">
+    <value>此處需要與引號相容的路徑</value>
+    <comment>Здесь нужен путь с подходящими кавычками</comment>
+  </data>
+  <data name="S65D43381EA84041D" xml:space="preserve">
+    <value>重做編輯 (Ctrl+Y)</value>
+    <comment>Повторить правку (Ctrl+Y)</comment>
+  </data>
+  <data name="S65E2281FBA14A72F" xml:space="preserve">
+    <value>已指派至文字 {0}，欄位 {1}</value>
+    <comment>Подставлен в текст {0}, слот {1}</comment>
+  </data>
+  <data name="S663C52481DA0D6E3" xml:space="preserve">
+    <value>建立群組</value>
+    <comment>Создать группу</comment>
+  </data>
+  <data name="S66D12FB99282A24A" xml:space="preserve">
+    <value>藍色</value>
+    <comment>Синий</comment>
+  </data>
+  <data name="S6791BBFBFE97992A" xml:space="preserve">
+    <value>已依卡片順序指派路徑。您可以變更任何指派。</value>
+    <comment>Пути назначены по порядку карточек. Любое назначение можно изменить.</comment>
+  </data>
+  <data name="S6941B3680C4BD461" xml:space="preserve">
+    <value>路徑欄位</value>
+    <comment>Слоты для путей</comment>
+  </data>
+  <data name="S69DE26B2E6D554AA" xml:space="preserve">
+    <value>請再次嘗試以 ZIP 傳送。</value>
+    <comment>Повторите отправку архивом.</comment>
+  </data>
+  <data name="S6A20ADC3B99637AE" xml:space="preserve">
+    <value>影像縮放</value>
+    <comment>Увеличение картинок</comment>
+  </data>
+  <data name="S6B07FBC6C23BDADF" xml:space="preserve">
+    <value>影像正在本機處理，您可以繼續其他工作。</value>
+    <comment>Можно продолжать работу — изображение обрабатывается локально.</comment>
+  </data>
+  <data name="S6B38B68B028F998C" xml:space="preserve">
+    <value>原始記錄會保留 · Ctrl+Enter 合併 · Esc 關閉</value>
+    <comment>Исходные записи останутся в истории · Ctrl+Enter — объединить · Esc — закрыть</comment>
+  </data>
+  <data name="S6BA853EF91841053" xml:space="preserve">
+    <value>來源資料夾仍保留於歷程記錄。</value>
+    <comment>Исходная папка сохранена в истории.</comment>
+  </data>
+  <data name="S6C0A472DEC7A960C" xml:space="preserve">
+    <value>待翻譯文字過多。請選取較小的影像區域。</value>
+    <comment>Слишком много текста для перевода. Выделите меньшую область изображения.</comment>
+  </data>
+  <data name="S6CEB21D5A7DEFF82" xml:space="preserve">
+    <value>{0} MB</value>
+    <comment>{0} МБ</comment>
+  </data>
+  <data name="S6D8C85CCC69C391B" xml:space="preserve">
+    <value>放大 (Ctrl++)</value>
+    <comment>Увеличить (Ctrl++)</comment>
+  </data>
+  <data name="S6DA140FDD4BE0189" xml:space="preserve">
+    <value>俄語</value>
+    <comment>Русский</comment>
+  </data>
+  <data name="S6E1F7BAA472FCFBB" xml:space="preserve">
+    <value>清除搜尋</value>
+    <comment>Очистить поиск</comment>
+  </data>
+  <data name="S701E13AB41F1357B" xml:space="preserve">
+    <value>分頁：符號</value>
+    <comment>Вкладка: символы</comment>
+  </data>
+  <data name="S7048F8453E3CA395" xml:space="preserve">
+    <value>群組 {0}</value>
+    <comment>Группа {0}</comment>
+  </data>
+  <data name="S704922C5E68A8605" xml:space="preserve">
+    <value>結果仍在本次工作階段的歷程記錄中。請重新處理以儲存。</value>
+    <comment>Он остаётся в истории этой сессии. Повторите обработку, чтобы сохранить его.</comment>
+  </data>
+  <data name="S7095452CEC085316" xml:space="preserve">
+    <value>希臘字母</value>
+    <comment>Греческий</comment>
+  </data>
+  <data name="S70E98E32147CF4EC" xml:space="preserve">
+    <value>速度</value>
+    <comment>Скорость</comment>
+  </data>
+  <data name="S70EEB56C0B462E42" xml:space="preserve">
+    <value>節點圖</value>
+    <comment>Схема нод</comment>
+  </data>
+  <data name="S7148F1C5E86E4F94" xml:space="preserve">
+    <value>已選取待貼上</value>
+    <comment>Выбрано для вставки</comment>
+  </data>
+  <data name="S720903101412B099" xml:space="preserve">
+    <value>清除選取</value>
+    <comment>Снять все отметки</comment>
+  </data>
+  <data name="S73229ED810CE43C4" xml:space="preserve">
+    <value> · {0} 個檔案</value>
+    <comment> · {0} шт.</comment>
+  </data>
+  <data name="S73A0F69D548DF647" xml:space="preserve">
+    <value>資料夾</value>
+    <comment>Папка</comment>
+  </data>
+  <data name="S73D5A91D62E6A9B0" xml:space="preserve">
+    <value>視窗邊框效果</value>
+    <comment>Эффект по краям окна</comment>
+  </data>
+  <data name="S7422F45938E3A37C" xml:space="preserve">
+    <value>筆記錄</value>
+    <comment>запись</comment>
+  </data>
+  <data name="S7548E9A8CBDB3F6D" xml:space="preserve">
+    <value>資料夾中包含連結或雲端檔案：{0}。請先準備一般的本機副本。</value>
+    <comment>В папке есть ссылка или облачный файл: {0}. Подготовьте обычную локальную копию.</comment>
+  </data>
+  <data name="S75CD24C315D4591C" xml:space="preserve">
+    <value>結束</value>
+    <comment>Выход</comment>
+  </data>
+  <data name="S770911A6DF4F3697" xml:space="preserve">
+    <value>Google 地圖</value>
+    <comment>Google Карты</comment>
+  </data>
+  <data name="S77B488C62D006327" xml:space="preserve">
+    <value>此版本缺少 ArkCopyBuffer-Setup.exe。</value>
+    <comment>В релизе нет установщика ArkCopyBuffer-Setup.exe.</comment>
+  </data>
+  <data name="S78B7A9E85FF0C74F" xml:space="preserve">
+    <value>文字記錄</value>
+    <comment>Обычные записи</comment>
+  </data>
+  <data name="S78EE5E545DA882DD" xml:space="preserve">
+    <value>1 秒</value>
+    <comment>1 с</comment>
+  </data>
+  <data name="S79932A3467F4288A" xml:space="preserve">
+    <value>標點符號</value>
+    <comment>Пунктуация</comment>
+  </data>
+  <data name="S7A7D4120C3A5CBC3" xml:space="preserve">
+    <value>檔案或檔案組大小上限，MB</value>
+    <comment>Лимит размера файла или пакета, мегабайт</comment>
+  </data>
+  <data name="S7B9A494CECC2D7A9" xml:space="preserve">
+    <value>記錄檔案遺失或損壞。</value>
+    <comment>Файл записи повреждён или не найден.</comment>
+  </data>
+  <data name="S7BD88BAC413F49F4" xml:space="preserve">
+    <value>譯文無法以清晰可讀的方式放入影像。請選取較小區域或放大影像。</value>
+    <comment>Перевод не помещается на картинке без потери читаемости. Выделите меньшую область или увеличьте изображение.</comment>
+  </data>
+  <data name="S7C47F7292BA4F2AE" xml:space="preserve">
+    <value>取消</value>
+    <comment>Отменить</comment>
+  </data>
+  <data name="S7C4A78C664492EDD" xml:space="preserve">
+    <value>正在辨識文字…</value>
+    <comment>Распознаётся текст…</comment>
+  </data>
+  <data name="S7CD2C8973CFF782E" xml:space="preserve">
+    <value>面板關閉且目前作業完成後，在背景安裝。</value>
+    <comment>Установим в фоне, когда панель закрыта и операции завершены.</comment>
+  </data>
+  <data name="S7CD2F0FF40822259" xml:space="preserve">
+    <value>正在檢查更新…</value>
+    <comment>Проверяем обновления…</comment>
+  </data>
+  <data name="S7D8BA97711BAE422" xml:space="preserve">
+    <value>無法儲存此設定。</value>
+    <comment>Настройка не сохранена.</comment>
+  </data>
+  <data name="S7DBAD55F568ABCDC" xml:space="preserve">
+    <value>取代值</value>
+    <comment>Значения для замены</comment>
+  </data>
+  <data name="S7E3BECFF8AF12D2F" xml:space="preserve">
+    <value>按 Alt+點擊開始選取文字、影像或影片，接著直接點擊以繼續選取。鍵盤操作請按 Alt+Space。</value>
+    <comment>Alt+клик — начать выбор текстов или картинок и видео. Дальше отмечайте обычными кликами. Alt+пробел — с клавиатуры.</comment>
+  </data>
+  <data name="S7E84EEA1C96A15E8" xml:space="preserve">
+    <value>行</value>
+    <comment>строка</comment>
+  </data>
+  <data name="S7F7E31F38DCB2F5C" xml:space="preserve">
+    <value>清除歷程記錄…</value>
+    <comment>Очистить историю…</comment>
+  </data>
+  <data name="S7FCFECECCCEB1F47" xml:space="preserve">
+    <value>已選取：{0}</value>
+    <comment>Выбрано: {0}</comment>
+  </data>
+  <data name="S7FF0AC825C58BEF9" xml:space="preserve">
+    <value>暫停記錄</value>
+    <comment>Пауза записи</comment>
+  </data>
+  <data name="S81035A17B26F978A" xml:space="preserve">
+    <value>將影像內的文字翻譯為俄語。新影像會儲存至歷程記錄並複製到剪貼簿。</value>
+    <comment>Перевести надписи прямо на картинке. Новое изображение сохранится в истории и скопируется в буфер.</comment>
+  </data>
+  <data name="S8209F325277FEA91" xml:space="preserve">
+    <value>更新未安裝。</value>
+    <comment>Обновление не установлено.</comment>
+  </data>
+  <data name="S824CEE50BFE32C38" xml:space="preserve">
+    <value>Esc 取消 · Ctrl+Z 復原取代</value>
+    <comment>Esc — отменить · Ctrl+Z — отменить замену</comment>
+  </data>
+  <data name="S82EF5D7398CA83BB" xml:space="preserve">
+    <value> · 路線</value>
+    <comment> · маршрут</comment>
+  </data>
+  <data name="S83C7951973894CBF" xml:space="preserve">
+    <value>搜尋歷程記錄中的文字</value>
+    <comment>Поиск текста в истории</comment>
+  </data>
+  <data name="S8422C616A28F5F16" xml:space="preserve">
+    <value>套用儲存設定</value>
+    <comment>Применить настройки хранения</comment>
+  </data>
+  <data name="S843EAF6AA73BC3D2" xml:space="preserve">
+    <value>文字檔案</value>
+    <comment>Текстовый файл</comment>
+  </data>
+  <data name="S854F62197C052034" xml:space="preserve">
+    <value>從 {0}</value>
+    <comment>От {0}</comment>
+  </data>
+  <data name="S858AD7688ABF60CF" xml:space="preserve">
+    <value>搜尋歷程記錄</value>
+    <comment>Поиск в истории</comment>
+  </data>
+  <data name="S8593A09889BF93D1" xml:space="preserve">
+    <value>類型 ▾</value>
+    <comment>Виды ▾</comment>
+  </data>
+  <data name="S86F7E7EE269E386C" xml:space="preserve">
+    <value>無法儲存語言設定。</value>
+    <comment>Не удалось сохранить язык.</comment>
+  </data>
+  <data name="S87711C1317DBB949" xml:space="preserve">
+    <value>西里爾字母</value>
+    <comment>Кириллица</comment>
+  </data>
+  <data name="S887BBD174DA42C24" xml:space="preserve">
+    <value>缺少 OCR 元件。請安裝包含 ocr 資料夾的新版 CopyBuffalo。</value>
+    <comment>Не найден комплект OCR. Установите свежую сборку CopyBuffalo с папкой ocr.</comment>
+  </data>
+  <data name="S8965271D3C97C79D" xml:space="preserve">
+    <value>清除</value>
+    <comment>Очистить</comment>
+  </data>
+  <data name="S8A04D5904428F535" xml:space="preserve">
+    <value>留空則使用「{0}」</value>
+    <comment>Если оставить пустым, будет «{0}»</comment>
+  </data>
+  <data name="S8A7DEA5194EB5DDF" xml:space="preserve">
+    <value>記錄</value>
+    <comment>Записи</comment>
+  </data>
+  <data name="S8AD94270BCF2F92E" xml:space="preserve">
+    <value>無效的影像參照。</value>
+    <comment>Некорректная ссылка на изображение.</comment>
+  </data>
+  <data name="S8AFE320208B00A49" xml:space="preserve">
+    <value>暫存磁碟空間不足，無法建立 ZIP。</value>
+    <comment>На диске временных файлов недостаточно места для ZIP.</comment>
+  </data>
+  <data name="S8B0115A30AB9AAC8" xml:space="preserve">
+    <value>結果尚未儲存至磁碟。</value>
+    <comment>Результат не сохранён на диск.</comment>
+  </data>
+  <data name="S8B97A912B02AE689" xml:space="preserve">
+    <value>影像大小上限，百萬像素</value>
+    <comment>Лимит пикселей изображения, мегапикселей</comment>
+  </data>
+  <data name="S8BB025FE357CF04A" xml:space="preserve">
+    <value>記錄已變更</value>
+    <comment>Запись изменилась</comment>
+  </data>
+  <data name="S8CC6819B724691A2" xml:space="preserve">
+    <value>從合併中移除</value>
+    <comment>Убрать из объединения</comment>
+  </data>
+  <data name="S8D6D99E130FEDBB6" xml:space="preserve">
+    <value>拖曳卡片調整順序，將路徑拖入對應欄位。</value>
+    <comment>Перетащите карточки для порядка, пути — в нужные слоты.</comment>
+  </data>
+  <data name="S8DBF01AE706F3996" xml:space="preserve">
+    <value>文字字元數上限，千字元</value>
+    <comment>Лимит символов текста, тысяч</comment>
+  </data>
+  <data name="S8E111B8549D33DBB" xml:space="preserve">
+    <value>無法復原</value>
+    <comment>Отмена недоступна</comment>
+  </data>
+  <data name="S8EED6432DE060A3C" xml:space="preserve">
+    <value>記錄已暫停</value>
+    <comment>Запись на паузе</comment>
+  </data>
+  <data name="S8EF99396D284012F" xml:space="preserve">
+    <value>釘選的記錄會保留，直到您手動刪除。</value>
+    <comment>Закреплённые записи хранятся до удаления вручную.</comment>
+  </data>
+  <data name="S8F1DCFC7B5F303FE" xml:space="preserve">
+    <value>刪除 {0} {1}？</value>
+    <comment>Удалить {0} {1}?</comment>
+  </data>
+  <data name="S8F215472D1DFB55D" xml:space="preserve">
+    <value>路線</value>
+    <comment>маршрут</comment>
+  </data>
+  <data name="SCD873A143F2D64D0" xml:space="preserve">
+    <value>CopyBuffalo：記錄已暫停</value>
+    <comment>CopyBuffalo: запись на паузе</comment>
+  </data>
+  <data name="S8F54CAD240DBD90C" xml:space="preserve">
+    <value>剪貼簿忙碌中。</value>
+    <comment>Буфер обмена занят.</comment>
+  </data>
+  <data name="S8FBE9B75CBDFBFA6" xml:space="preserve">
+    <value>取消</value>
+    <comment>Отмена</comment>
+  </data>
+  <data name="S9022BA3739723A99" xml:space="preserve">
+    <value>外觀</value>
+    <comment>Вид</comment>
+  </data>
+  <data name="S90443F0455695A6A" xml:space="preserve">
+    <value>復原編輯 (Ctrl+Z)</value>
+    <comment>Отменить правку (Ctrl+Z)</comment>
+  </data>
+  <data name="S9088CA9C0DE94FFD" xml:space="preserve">
+    <value>檔案</value>
+    <comment>Файлы</comment>
+  </data>
+  <data name="S9089A73112CC819E" xml:space="preserve">
+    <value>介面語言</value>
+    <comment>Язык интерфейса</comment>
+  </data>
+  <data name="S90DF1C173662989B" xml:space="preserve">
+    <value>llama-server 無法啟動。</value>
+    <comment>llama-server не запустился.</comment>
+  </data>
+  <data name="S919A05861572CEF5" xml:space="preserve">
+    <value> 請檢查影像中的文字。</value>
+    <comment> Проверьте надписи.</comment>
+  </data>
+  <data name="S91C14BB346727ECC" xml:space="preserve">
+    <value>隱藏動畫時間，毫秒</value>
+    <comment>Длительность исчезновения, миллисекунды</comment>
+  </data>
+  <data name="S91D81CD2107795C1" xml:space="preserve">
+    <value>記錄已移除。</value>
+    <comment>Запись удалена.</comment>
+  </data>
+  <data name="S920E3E44376C13EC" xml:space="preserve">
+    <value>{0} 百萬像素</value>
+    <comment>{0} Мп</comment>
+  </data>
+  <data name="S92AB62AD6F3C1E6B" xml:space="preserve">
+    <value>色彩</value>
+    <comment>Цвет</comment>
+  </data>
+  <data name="S92EF5964A8216B47" xml:space="preserve">
+    <value>值已取代</value>
+    <comment>Значение заменено</comment>
+  </data>
+  <data name="S931330FBEB019D09" xml:space="preserve">
+    <value>拉丁字母</value>
+    <comment>Латиница</comment>
+  </data>
+  <data name="S935E004F83BF55A3" xml:space="preserve">
+    <value>關閉訊息</value>
+    <comment>Закрыть сообщение</comment>
+  </data>
+  <data name="S93962C98A0A2E4FE" xml:space="preserve">
+    <value>有一處文字的翻譯為空。</value>
+    <comment>Перевод надписи пуст.</comment>
+  </data>
+  <data name="S93B08F7B14651B6D" xml:space="preserve">
+    <value>檢查更新</value>
+    <comment>Проверить обновления</comment>
+  </data>
+  <data name="S93D5D12D7854EAF9" xml:space="preserve">
+    <value>結果已儲存至歷程記錄和剪貼簿。</value>
+    <comment>Результат в истории и буфере обмена.</comment>
+  </data>
+  <data name="S9403BA7C2C43DDF0" xml:space="preserve">
+    <value>貼上前請檢查相似字元與行序。</value>
+    <comment>Проверьте похожие буквы и порядок строк перед вставкой.</comment>
+  </data>
+  <data name="S941EC143615E4C26" xml:space="preserve">
+    <value>Ctrl+點擊</value>
+    <comment>Ctrl+клик</comment>
+  </data>
+  <data name="S95333A53FC99C364" xml:space="preserve">
+    <value>以清單顯示</value>
+    <comment>Показать списком</comment>
+  </data>
+  <data name="S956BD916BE29903C" xml:space="preserve">
+    <value>更新檔案大小超出宣告值。</value>
+    <comment>Размер обновления превышает заявленный.</comment>
+  </data>
+  <data name="S95E1B243A48FD248" xml:space="preserve">
+    <value>未釘選記錄的數量上限</value>
+    <comment>Максимум незакреплённых записей</comment>
+  </data>
+  <data name="S95E78A1D4D447198" xml:space="preserve">
+    <value>請先完成目前的作業。</value>
+    <comment>Завершите текущую операцию.</comment>
+  </data>
+  <data name="S96A1585933EB100F" xml:space="preserve">
+    <value>壓縮後的提示詞已儲存至歷程記錄，</value>
+    <comment>Сжатый промпт в истории,</comment>
+  </data>
+  <data name="S96B08FD22A102451" xml:space="preserve">
+    <value>路徑已插入，預覽已更新。</value>
+    <comment>Путь подставлен. Предпросмотр обновлён.</comment>
+  </data>
+  <data name="S96DB220EF58CDC1C" xml:space="preserve">
+    <value>無法在目標視窗中輸入。請按 Ctrl+V。</value>
+    <comment>Не удалось напечатать в нужном окне. Нажмите Ctrl+V.</comment>
+  </data>
+  <data name="S970068E69DFA17DB" xml:space="preserve">
+    <value>找不到模型 {0}。請在 HKCU\Software\ArkCopyBuffer 的 LlamaModel 值中設定路徑。</value>
+    <comment>Не найдена модель {0}. Укажите путь в HKCU\Software\ArkCopyBuffer, значение LlamaModel.</comment>
+  </data>
+  <data name="S973C76436EE0ECD9" xml:space="preserve">
+    <value>等待儲存…</value>
+    <comment>Ожидает сохранения…</comment>
+  </data>
+  <data name="S979D82EF47D80B46" xml:space="preserve">
+    <value>此項目已從歷程記錄刪除。關閉視窗前請先複製文字。</value>
+    <comment>Запись уже удалена из истории. Скопируйте текст перед закрытием окна.</comment>
+  </data>
+  <data name="S985B5E0F2CCF1BA0" xml:space="preserve">
+    <value>設定</value>
+    <comment>Настройки</comment>
+  </data>
+  <data name="S98C1BFB8F849D1CC" xml:space="preserve">
+    <value>將圖中文字翻譯為俄語</value>
+    <comment>Перевести надписи на картинке</comment>
+  </data>
+  <data name="S98D7177BC056FE6A" xml:space="preserve">
+    <value>已開啟 · 64 影格 · 僅在邊緣顯示</value>
+    <comment>Включён · 64 кадра · только по краям</comment>
+  </data>
+  <data name="S99AE3F6C8BA208D7" xml:space="preserve">
+    <value>資料夾可能已移動、刪除，或位於已中斷連線的磁碟。</value>
+    <comment>Она могла быть перемещена, удалена или находиться на отключённом диске.</comment>
+  </data>
+  <data name="S99B320DBCC4298F8" xml:space="preserve">
+    <value>取代「</value>
+    <comment>Заменить «</comment>
+  </data>
+  <data name="S99F307953C162CBC" xml:space="preserve">
+    <value>下載的安裝套件已損壞，請重新檢查更新。</value>
+    <comment>Скачанный пакет повреждён. Проверьте обновления ещё раз.</comment>
+  </data>
+  <data name="S9A1484169DEB3C22" xml:space="preserve">
+    <value>Esc：關閉</value>
+    <comment>Esc: закрыть</comment>
+  </data>
+  <data name="S9AC21D6D0240EB55" xml:space="preserve">
+    <value>依佇列順序批次貼上影像與影片（Ctrl+Enter）。整個佇列貼上成功後會結束選取。</value>
+    <comment>Вставить картинки и видео одной пачкой по порядку (Ctrl+Enter). Успешная вставка всей очереди завершит выбор.</comment>
+  </data>
+  <data name="S9AE3804BD96F4224" xml:space="preserve">
+    <value>擷取限制</value>
+    <comment>Лимиты захвата</comment>
+  </data>
+  <data name="S9B45DFE62C689B6E" xml:space="preserve">
+    <value>辨識文字</value>
+    <comment>Распознать текст</comment>
+  </data>
+  <data name="S9B9AFE8614173671" xml:space="preserve">
+    <value>下一個 · {0}/{1}</value>
+    <comment>Следующая · {0}/{1}</comment>
+  </data>
+  <data name="S9BA58A95D26C5145" xml:space="preserve">
+    <value>已複製。</value>
+    <comment>Скопировано.</comment>
+  </data>
+  <data name="S9BE2593183510FD5" xml:space="preserve">
+    <value>輸出檔案已存在。</value>
+    <comment>Выходной файл уже существует.</comment>
+  </data>
+  <data name="S9C2C7EEB439EC648" xml:space="preserve">
+    <value>路線</value>
+    <comment>Маршрут</comment>
+  </data>
+  <data name="S9CF249E2A8814616" xml:space="preserve">
+    <value>已選取</value>
+    <comment>Выбрано</comment>
+  </data>
+  <data name="S9D0A624F76B27F77" xml:space="preserve">
+    <value>正在記錄</value>
+    <comment>Запись идёт</comment>
+  </data>
+  <data name="S9E321BAA21805962" xml:space="preserve">
+    <value>啟動時檢查，之後每 15 分鐘檢查一次。</value>
+    <comment>Проверка при запуске и каждые 15 минут.</comment>
+  </data>
+  <data name="S9E5972D3C6ACEAD7" xml:space="preserve">
+    <value>無法將翻譯與影像配對。</value>
+    <comment>Не удалось сопоставить перевод с изображением.</comment>
+  </data>
+  <data name="S9E8DA657754935F8" xml:space="preserve">
+    <value>本機模型正在翻譯，您可以繼續其他工作。</value>
+    <comment>Перевод выполняется локальной моделью. Можно продолжать работу.</comment>
+  </data>
+  <data name="S9EC2B3590DF12BB8" xml:space="preserve">
+    <value>OCR 已在執行。</value>
+    <comment>OCR уже работает.</comment>
+  </data>
+  <data name="S9EC66A4B43AF3A91" xml:space="preserve">
+    <value>檔案：{0:N0} · {1:0.#} MB</value>
+    <comment>Файлов: {0:N0} · {1:0.#} МБ</comment>
+  </data>
+  <data name="S9ED5AECDD190AF4C" xml:space="preserve">
+    <value>未分組</value>
+    <comment>Без группы</comment>
+  </data>
+  <data name="S9FB423FBC9181142" xml:space="preserve">
+    <value>取消釘選</value>
+    <comment>Открепить</comment>
+  </data>
+  <data name="S9FDD724556947C5B" xml:space="preserve">
+    <value>{0} 毫秒</value>
+    <comment>{0} мс</comment>
+  </data>
+  <data name="S9FFBBD70A78F8A77" xml:space="preserve">
+    <value>命令中的路徑</value>
+    <comment>Пути в команде</comment>
+  </data>
+  <data name="SA02B63A100DB5278" xml:space="preserve">
+    <value>點擊記錄的釘選按鈕或按 Ctrl+P，即可在此保留。</value>
+    <comment>Нажмите на булавку у записи или Ctrl+P, и она появится здесь.</comment>
+  </data>
+  <data name="SA0F7A780FB6B8F8A" xml:space="preserve">
+    <value>{0} · {1:0.#} KB</value>
+    <comment>{0} · {1:0.#} КБ</comment>
+  </data>
+  <data name="SA1037CAFE3AB0283" xml:space="preserve">
+    <value>模型未能在 2 分鐘內載入。</value>
+    <comment>Модель не загрузилась за 2 минуты.</comment>
+  </data>
+  <data name="SA12E235260500B01" xml:space="preserve">
+    <value>點擊選取或取消選取。Ctrl+Enter 全部貼上，Esc 取消。</value>
+    <comment>Клик — выбрать или снять отметку. Ctrl+Enter — вставить все. Esc — отменить.</comment>
+  </data>
+  <data name="SA41341EE9230073F" xml:space="preserve">
+    <value>無法註冊 Win+V。歷程記錄仍會儲存，可從系統匣開啟。</value>
+    <comment>Не удалось перехватить Win+V. История пишется, открыть можно из трея.</comment>
+  </data>
+  <data name="SA4BB19E1436FD3FC" xml:space="preserve">
+    <value>綠色</value>
+    <comment>Зелёный</comment>
+  </data>
+  <data name="SA553A46B539C9D63" xml:space="preserve">
+    <value>重新啟動</value>
+    <comment>Перезапустить</comment>
+  </data>
+  <data name="SA5B067C45F8FAE4E" xml:space="preserve">
+    <value>沒有其他文字記錄</value>
+    <comment>Других текстовых записей нет</comment>
+  </data>
+  <data name="SA5B50FE0EDBA1058" xml:space="preserve">
+    <value>貼上路徑</value>
+    <comment>Вставить путь</comment>
+  </data>
+  <data name="SA5CD0F3DD54DF28A" xml:space="preserve">
+    <value>數學符號</value>
+    <comment>Математика</comment>
+  </data>
+  <data name="SA62D71F3DBA4F2BF" xml:space="preserve">
+    <value>無法擷取音訊。</value>
+    <comment>Не удалось извлечь звук.</comment>
+  </data>
+  <data name="SA67617147E81BB23" xml:space="preserve">
+    <value>下移文字</value>
+    <comment>Опустить текст</comment>
+  </data>
+  <data name="SA6C7799F7C457683" xml:space="preserve">
+    <value>選取左側路徑，再按一下目標欄位，也可直接拖曳路徑。</value>
+    <comment>Выберите путь слева, затем нажмите нужный слот. Можно также перетащить путь.</comment>
+  </data>
+  <data name="SA785E7AC6CE76655" xml:space="preserve">
+    <value>重新命名群組</value>
+    <comment>Переименовать группу</comment>
+  </data>
+  <data name="SA7A4033657E89FC9" xml:space="preserve">
+    <value>關閉</value>
+    <comment>Закрыть</comment>
+  </data>
+  <data name="SA8F576F608D69D5E" xml:space="preserve">
+    <value>快捷鍵提示</value>
+    <comment>Подсказки клавиш внизу</comment>
+  </data>
+  <data name="SA933661A8716DDEF" xml:space="preserve">
+    <value>OCR 需要不超過 128 MB 的影像檔案。</value>
+    <comment>Для OCR нужен файл изображения не больше 128 МБ.</comment>
+  </data>
+  <data name="SA94D16AFE71C0322" xml:space="preserve">
+    <value>每個檔案組的檔案數量上限</value>
+    <comment>Лимит количества файлов в пакете</comment>
+  </data>
+  <data name="SA9A1762BA2E80189" xml:space="preserve">
+    <value>全部 ▾</value>
+    <comment>Все ▾</comment>
+  </data>
+  <data name="SA9C61AE59CA81A48" xml:space="preserve">
+    <value>Alt+點擊</value>
+    <comment>Alt+клик</comment>
+  </data>
+  <data name="SA9E2FC1FF43D16B4" xml:space="preserve">
+    <value>符號</value>
+    <comment>Символы</comment>
+  </data>
+  <data name="SAA04BABD944704D1" xml:space="preserve">
+    <value>{0} 筆記錄 · {1:N0} 個字元</value>
+    <comment>{0} записей · {1:N0} символов</comment>
+  </data>
+  <data name="SAB0223427DE616F9" xml:space="preserve">
+    <value>結果已儲存並複製。</value>
+    <comment>Результат сохранён и скопирован.</comment>
+  </data>
+  <data name="SABC1AE6FFC4AC4E3" xml:space="preserve">
+    <value>請重試。</value>
+    <comment>Повторите действие.</comment>
+  </data>
+  <data name="SAD5F60BF00740719" xml:space="preserve">
+    <value>OCR 未能在一分鐘內完成。請嘗試較小區域。</value>
+    <comment>OCR не завершился за минуту. Попробуйте меньшую область изображения.</comment>
+  </data>
+  <data name="SAD854F606699D782" xml:space="preserve">
+    <value>所有應用程式</value>
+    <comment>Все приложения</comment>
+  </data>
+  <data name="SADA542BEF1796D6D" xml:space="preserve">
+    <value>其他文字記錄</value>
+    <comment>Другие текстовые записи</comment>
+  </data>
+  <data name="SADC41711D61237AC" xml:space="preserve">
+    <value>貼上</value>
+    <comment>вставить</comment>
+  </data>
+  <data name="SAE13D787B8BF58A8" xml:space="preserve">
+    <value>無法載入效果。請嘗試重新啟動應用程式。</value>
+    <comment>Не удалось загрузить эффект. Попробуйте перезапустить приложение.</comment>
+  </data>
+  <data name="SAE72320093557240" xml:space="preserve">
+    <value>音軌為空。</value>
+    <comment>Звуковая дорожка пуста.</comment>
+  </data>
+  <data name="SAE808FBEC3BA384C" xml:space="preserve">
+    <value>昨天</value>
+    <comment>вчера</comment>
+  </data>
+  <data name="SAEACF2A62793D2EE" xml:space="preserve">
+    <value>尚未儲存。 </value>
+    <comment>Не сохранено. </comment>
+  </data>
+  <data name="SAEF3A78E959942CE" xml:space="preserve">
+    <value>歷程記錄：%LOCALAPPDATA%\ArkCopyBuffer。檔案受 Windows 保護，供目前帳戶使用。</value>
+    <comment>История: %LOCALAPPDATA%\ArkCopyBuffer. Файлы защищены Windows для текущей учётной записи.</comment>
+  </data>
+  <data name="SB00809428FAB2FF2" xml:space="preserve">
+    <value>全部 — 不篩選</value>
+    <comment>Все — без фильтра</comment>
+  </data>
+  <data name="SB0373949564ED80B" xml:space="preserve">
+    <value>{0} — 音軌 {1}{2}</value>
+    <comment>{0} — дорожка {1}{2}</comment>
+  </data>
+  <data name="SB051F39468122ABD" xml:space="preserve">
+    <value>延遲</value>
+    <comment>Задержка</comment>
+  </data>
+  <data name="SB0A46B8454D3F9BC" xml:space="preserve">
+    <value>提示詞已壓縮：</value>
+    <comment>Промпт сжат:</comment>
+  </data>
+  <data name="SB0DA3441F3AB1067" xml:space="preserve">
+    <value>拖放以調整順序</value>
+    <comment>Отпустите — изменить порядок</comment>
+  </data>
+  <data name="SB0DDA07DAF03AFBF" xml:space="preserve">
+    <value>無法準備要貼上的檔案。</value>
+    <comment>Не удалось подготовить файл для вставки.</comment>
+  </data>
+  <data name="SB0EA613921C4927B" xml:space="preserve">
+    <value>停止編輯 1 秒後及關閉時自動儲存</value>
+    <comment>Автосохранение после 1 секунды паузы и при закрытии</comment>
+  </data>
+  <data name="SB312F5A75919C1C0" xml:space="preserve">
+    <value>隨 Windows 啟動</value>
+    <comment>Запускать вместе с Windows</comment>
+  </data>
+  <data name="SB381C35C9F1987D4" xml:space="preserve">
+    <value>橘色</value>
+    <comment>Оранжевый</comment>
+  </data>
+  <data name="SB3A8CC9AF902DE91" xml:space="preserve">
+    <value>內容類型： </value>
+    <comment>Вид записи: </comment>
+  </data>
+  <data name="SB3CADA3734215334" xml:space="preserve">
+    <value>Tab：下一個分頁</value>
+    <comment>Tab: следующая вкладка</comment>
+  </data>
+  <data name="SB456DF5236660C61" xml:space="preserve">
+    <value>版本 {0} 已準備好安裝。</value>
+    <comment>Версия {0} готова к установке.</comment>
+  </data>
+  <data name="SB4D30CAE52894CF0" xml:space="preserve">
+    <value>儲存</value>
+    <comment>Сохранить</comment>
+  </data>
+  <data name="SB5957D9B1329C1D0" xml:space="preserve">
+    <value>來源應用程式：全部</value>
+    <comment>Приложение: все</comment>
+  </data>
+  <data name="SB5A318BE6EC5C751" xml:space="preserve">
+    <value>火焰保持在面板外側</value>
+    <comment>Пламя остаётся снаружи</comment>
+  </data>
+  <data name="SB6A4E0A9D54E2FF1" xml:space="preserve">
+    <value>找不到 {0}。請將 FFmpeg（ffmpeg 與 ffprobe）放入 PATH 或 ArkCopyBuffer.exe 所在目錄。</value>
+    <comment>Не найден {0}. Установите FFmpeg (ffmpeg и ffprobe) в PATH или рядом с ArkCopyBuffer.exe.</comment>
+  </data>
+  <data name="SB6D5CEAD8ACD978C" xml:space="preserve">
+    <value>開啟文字合併視窗（Ctrl+Enter）。合併成功後結束選取。</value>
+    <comment>Открыть окно объединения текстов (Ctrl+Enter). Успешное объединение завершит выбор.</comment>
+  </data>
+  <data name="SB7589F4759192C47" xml:space="preserve">
+    <value>停留在記錄上</value>
+    <comment>Наведите на карточку</comment>
+  </data>
+  <data name="SB80CF78B9970A398" xml:space="preserve">
+    <value>將釘選記錄顯示為清單</value>
+    <comment>Показать закреплённые списком</comment>
+  </data>
+  <data name="SB9AFE508167D6A90" xml:space="preserve">
+    <value>ZIP 已建立並複製。</value>
+    <comment>ZIP готов и скопирован.</comment>
+  </data>
+  <data name="SBABDB58139BE97EA" xml:space="preserve">
+    <value>設定已儲存</value>
+    <comment>Настройки сохранены</comment>
+  </data>
+  <data name="SBB728E0D3FA62A9E" xml:space="preserve">
+    <value>每種格式的文字</value>
+    <comment>Текст каждого формата</comment>
+  </data>
+  <data name="SBB87B9CAF7D6D1C0" xml:space="preserve">
+    <value>拖曳文字或把手可移動卡片。</value>
+    <comment>Тяните карточки за текст или ручку.</comment>
+  </data>
+  <data name="SBC0BF8CCD975604D" xml:space="preserve">
+    <value>文字上限為 {0:N0} 個字元。請縮短文字或提高上限。</value>
+    <comment>Лимит текста в настройках: {0:N0} символов. Сократите текст или увеличьте лимит.</comment>
+  </data>
+  <data name="SBCA6D1C64F7FA4BF" xml:space="preserve">
+    <value>下移 (Alt+↓)</value>
+    <comment>Ниже (Alt+↓)</comment>
+  </data>
+  <data name="SBCBA3C921BEAAF74" xml:space="preserve">
+    <value>請稍後重試。</value>
+    <comment>Повторите позже.</comment>
+  </data>
+  <data name="SBE300BBC861DE97D" xml:space="preserve">
+    <value>指標離開後的隱藏延遲，毫秒</value>
+    <comment>Задержка скрытия вне окна, миллисекунды</comment>
+  </data>
+  <data name="SBE4E0E5FAD95B940" xml:space="preserve">
+    <value>重新啟動 CopyBuffalo 以套用此語言。</value>
+    <comment>Язык изменится после перезапуска.</comment>
+  </data>
+  <data name="SBE99B13612015A48" xml:space="preserve">
+    <value>刪除</value>
+    <comment>Удалить</comment>
+  </data>
+  <data name="SBF4D6267A5A07968" xml:space="preserve">
+    <value>影像預覽大小</value>
+    <comment>Размер просмотра картинки</comment>
+  </data>
+  <data name="SC0101BB2769CBF52" xml:space="preserve">
+    <value>{0:N0} → {1:N0} 個字元。已複製到剪貼簿。</value>
+    <comment>{0:N0} → {1:N0} символов. Уже в буфере обмена.</comment>
+  </data>
+  <data name="SC06B7F21C448FEF7" xml:space="preserve">
+    <value>已貼上</value>
+    <comment>Вставлено</comment>
+  </data>
+  <data name="SC0B22DB79ACFEFB9" xml:space="preserve">
+    <value>有可用更新。</value>
+    <comment>Доступно обновление.</comment>
+  </data>
+  <data name="SC202C29C383321F4" xml:space="preserve">
+    <value>無法翻譯文字。</value>
+    <comment>Не удалось перевести текст.</comment>
+  </data>
+  <data name="SC3013C72DD820F9E" xml:space="preserve">
+    <value>空引號</value>
+    <comment>Пустые кавычки</comment>
+  </data>
+  <data name="SC3089753A24678FE" xml:space="preserve">
+    <value>全部</value>
+    <comment>все</comment>
+  </data>
+  <data name="SC3857E2DBDE47060" xml:space="preserve">
+    <value>詳細資訊：{0}</value>
+    <comment>Подробности: {0}</comment>
+  </data>
+  <data name="SC4613187A1DC0504" xml:space="preserve">
+    <value>正在背景下載 {0}…</value>
+    <comment>Скачиваем {0} в фоне…</comment>
+  </data>
+  <data name="SC4614694972A49FE" xml:space="preserve">
+    <value>尚無釘選記錄</value>
+    <comment>Закреплённых пока нет</comment>
+  </data>
+  <data name="SC4627F79F5903BA7" xml:space="preserve">
+    <value>將文字翻譯為俄語</value>
+    <comment>Перевести текст на русский</comment>
+  </data>
+  <data name="SC4956A92A41C5977" xml:space="preserve">
+    <value>發生錯誤後已暫停自動安裝。 </value>
+    <comment>Автоустановка приостановлена после ошибки. </comment>
+  </data>
+  <data name="SC5ECD3BA97158C6B" xml:space="preserve">
+    <value>預覽寬度</value>
+    <comment>Ширина карточки</comment>
+  </data>
+  <data name="SC6B4CE8D7B6B2F81" xml:space="preserve">
+    <value>結果超出 {0:N0} 個字元的上限。請移除部分記錄或在設定中提高上限。</value>
+    <comment>Результат длиннее лимита {0:N0} символов. Уберите записи или увеличьте лимит в настройках.</comment>
+  </data>
+  <data name="SC7F44282F28F374B" xml:space="preserve">
+    <value>選取影像</value>
+    <comment>Выбрать картинку</comment>
+  </data>
+  <data name="SC8D702A189B26FFC" xml:space="preserve">
+    <value>延遲</value>
+    <comment>Через</comment>
+  </data>
+  <data name="SC9FD9FC0E5D2198D" xml:space="preserve">
+    <value>新群組</value>
+    <comment>Новая группа</comment>
+  </data>
+  <data name="SCADDE433A64D7B50" xml:space="preserve">
+    <value>依佇列順序一次貼上所有剩餘影像與影片（Ctrl+Enter）。目標應用程式必須支援多檔案貼上。</value>
+    <comment>Вставить все оставшиеся картинки и видео одной пачкой в порядке очереди (Ctrl+Enter). Чат должен поддерживать вставку нескольких файлов.</comment>
+  </data>
+  <data name="SCB8DE7E9CC5606CC" xml:space="preserve">
+    <value>路徑會插入已指派的欄位。</value>
+    <comment>Пути подставляются в назначенные слоты.</comment>
+  </data>
+  <data name="SCBA41AECC4B74466" xml:space="preserve">
+    <value>隱藏</value>
+    <comment>Исчезновение</comment>
+  </data>
+  <data name="SCBB9A3873DC4666F" xml:space="preserve">
+    <value>模型傳回空白回覆。</value>
+    <comment>Модель вернула пустой ответ.</comment>
+  </data>
+  <data name="SCBC2F7B99D502F96" xml:space="preserve">
+    <value>檢查文字</value>
+    <comment>Проверить текст</comment>
+  </data>
+  <data name="SCBE4784983E217B8" xml:space="preserve">
+    <value>{0}：處理失敗（代碼 0x{1:X8}）。</value>
+    <comment>{0}: ошибка обработки (код 0x{1:X8}).</comment>
+  </data>
+  <data name="SCC03D7C4F928EC30" xml:space="preserve">
+    <value>縮短保留時間或降低數量上限，會在套用設定時刪除多餘的未釘選記錄。</value>
+    <comment>Сокращение сроков или количества удалит лишние незакреплённые записи при применении.</comment>
+  </data>
+  <data name="SCC4F086EB3D392B1" xml:space="preserve">
+    <value>取代失敗</value>
+    <comment>Замена не выполнена</comment>
+  </data>
+  <data name="SCCCCE366FFD96CEF" xml:space="preserve">
+    <value>但剪貼簿忙碌中。</value>
+    <comment>но буфер обмена занят.</comment>
+  </data>
+  <data name="SCD87A43A7BB21EB2" xml:space="preserve">
+    <value>已貼上 {0}/{1}</value>
+    <comment>Вставлено {0} из {1}</comment>
+  </data>
+  <data name="SCE34DB4FFFDD2D7B" xml:space="preserve">
+    <value>更新 {0} 已準備就緒，但無法連線至伺服器。</value>
+    <comment>Обновление {0} готово. Нет связи с сервером.</comment>
+  </data>
+  <data name="SCE568834A4D63F47" xml:space="preserve">
+    <value>已從影像擷取俄語與英語文字。</value>
+    <comment>Русский и английский текст извлечён из изображения.</comment>
+  </data>
+  <data name="SCEB149731F4F5655" xml:space="preserve">
+    <value>{0:N0} 個字元</value>
+    <comment>{0:N0} симв.</comment>
+  </data>
+  <data name="SCEC0B257ABF116F7" xml:space="preserve">
+    <value>文字，{0:N0} 個字元</value>
+    <comment>Текст, {0:N0} симв.</comment>
+  </data>
+  <data name="SCF97FC8DCACCBD7B" xml:space="preserve">
+    <value>{0} 聲道</value>
+    <comment>{0} кан.</comment>
+  </data>
+  <data name="SCFACD7048F5580BC" xml:space="preserve">
+    <value>就緒</value>
+    <comment>Готов к показу</comment>
+  </data>
+  <data name="SD06333F24005105F" xml:space="preserve">
+    <value>供貼上使用的解密副本會在啟動時及每小時清理。</value>
+    <comment>Расшифрованные копии для вставки удаляются при запуске и раз в час.</comment>
+  </data>
+  <data name="SD0B8740F814B7E3B" xml:space="preserve">
+    <value>綠色表示插入內容。請拖放到記錄上，按住 Shift 查看其他位置。</value>
+    <comment>Зелёным — вставка. Отпустите на карточке. Shift — другие места.</comment>
+  </data>
+  <data name="SD18E262C4A058A89" xml:space="preserve">
+    <value>將記錄拖放到此處</value>
+    <comment>Перетащите запись сюда</comment>
+  </data>
+  <data name="SD216291AE4ED2204" xml:space="preserve">
+    <value>筆記錄</value>
+    <comment>записи</comment>
+  </data>
+  <data name="SD2857354C120DC5C" xml:space="preserve">
+    <value>拖放以插入路徑</value>
+    <comment>Отпустите — подставить путь</comment>
+  </data>
+  <data name="SD366CED2842867D4" xml:space="preserve">
+    <value>新的複製內容不會被記錄。</value>
+    <comment>Новые копии не сохраняются.</comment>
+  </data>
+  <data name="SD3CFA286DA52296D" xml:space="preserve">
+    <value>點擊選取或取消選取。Ctrl+Enter 合併，Esc 取消。</value>
+    <comment>Клик — выбрать или снять отметку. Ctrl+Enter — объединить. Esc — отменить.</comment>
+  </data>
+  <data name="SD44478B11225A141" xml:space="preserve">
+    <value>以純文字貼上</value>
+    <comment>Вставить как текст</comment>
+  </data>
+  <data name="SD46537344026274E" xml:space="preserve">
+    <value>縮放 100%</value>
+    <comment>Масштаб 100 %</comment>
+  </data>
+  <data name="SD4EE442869654C33" xml:space="preserve">
+    <value>路徑</value>
+    <comment>путь</comment>
+  </data>
+  <data name="SD5682C76BE4C60A3" xml:space="preserve">
+    <value>清空欄位</value>
+    <comment>Освободить слот</comment>
+  </data>
+  <data name="SD57B977768600584" xml:space="preserve">
+    <value>文字記錄保留天數</value>
+    <comment>Срок хранения обычных записей, дней</comment>
+  </data>
+  <data name="SD59D827B56D009F5" xml:space="preserve">
+    <value>結果已儲存。</value>
+    <comment>Результат сохранён.</comment>
+  </data>
+  <data name="SD5A294E03DF3F98D" xml:space="preserve">
+    <value>無法讀取剪貼簿</value>
+    <comment>Не удалось прочитать буфер</comment>
+  </data>
+  <data name="SD64D3F9DAEAA7051" xml:space="preserve">
+    <value>請選取不同的影像或影片以貼上。</value>
+    <comment>Выберите разные картинки или видео для вставки.</comment>
+  </data>
+  <data name="SD6667D915584518C" xml:space="preserve">
+    <value>取消釘選 (Ctrl+P)</value>
+    <comment>Открепить (Ctrl+P)</comment>
+  </data>
+  <data name="SD675C9D5A093B6AA" xml:space="preserve">
+    <value>將圖中文字翻譯為俄語（本機）</value>
+    <comment>Перевести надписи на картинке (локально)</comment>
+  </data>
+  <data name="SD67C6C95201096DD" xml:space="preserve">
+    <value>每組檔案數</value>
+    <comment>Файлов в пакете</comment>
+  </data>
+  <data name="SD77B6BCA6A8CA099" xml:space="preserve">
+    <value>提示詞已足夠精簡。</value>
+    <comment>Промпт уже компактный.</comment>
+  </data>
+  <data name="SD7DF6F6D9418C1EE" xml:space="preserve">
+    <value>正在將文字翻譯為俄語。</value>
+    <comment>Текст переводится на русский.</comment>
+  </data>
+  <data name="SD837A73DF0ABEE11" xml:space="preserve">
+    <value>無法貼上至目標視窗。請按 Ctrl+V。</value>
+    <comment>Не удалось вставить в нужное окно. Нажмите Ctrl+V.</comment>
+  </data>
+  <data name="SD8A3846AA2DBAA96" xml:space="preserve">
+    <value>分頁：剪貼簿歷程記錄</value>
+    <comment>Вкладка: буфер обмена</comment>
+  </data>
+  <data name="SD959E110D0F5AB19" xml:space="preserve">
+    <value>命令結果</value>
+    <comment>Итог команды</comment>
+  </data>
+  <data name="SD9BA87ACB68609DB" xml:space="preserve">
+    <value>合併所選文字</value>
+    <comment>Объединить выбранные тексты</comment>
+  </data>
+  <data name="SDAAE57846A77A2E2" xml:space="preserve">
+    <value>顯示動畫時間，毫秒</value>
+    <comment>Длительность появления, миллисекунды</comment>
+  </data>
+  <data name="SDC348037F1B79A33" xml:space="preserve">
+    <value>選取</value>
+    <comment>выбрать</comment>
+  </data>
+  <data name="SDC6836FA4BB275AD" xml:space="preserve">
+    <value>所選文字的順序</value>
+    <comment>Порядок выбранных текстов</comment>
+  </data>
+  <data name="SDCBBB9BDE64AC167" xml:space="preserve">
+    <value>FFmpeg 未能在 2 分鐘內完成。</value>
+    <comment>FFmpeg не завершил обработку за 2 минуты.</comment>
+  </data>
+  <data name="SDCD85BADA23A9985" xml:space="preserve">
+    <value>快速貼上</value>
+    <comment>быстро</comment>
+  </data>
+  <data name="SDD33660ECD470ABA" xml:space="preserve">
+    <value>關閉視窗動畫時，效果保持靜止。面板隱藏時會停止播放。</value>
+    <comment>При выключенной анимации окна пламя замирает. В скрытом окне эффект не воспроизводится.</comment>
+  </data>
+  <data name="SDE01F354F722A6AA" xml:space="preserve">
+    <value>分頁：釘選項目</value>
+    <comment>Вкладка: закреплённые</comment>
+  </data>
+  <data name="SDF1C14A41E216714" xml:space="preserve">
+    <value>指標離開後隱藏面板</value>
+    <comment>Скрывать панель, когда курсор ушёл</comment>
+  </data>
+  <data name="SDF9A74CE91B2731D" xml:space="preserve">
+    <value>拖放以取代</value>
+    <comment>Отпустите — заменить</comment>
+  </data>
+  <data name="SDFC4A6452FC1E6BB" xml:space="preserve">
+    <value>復原編輯</value>
+    <comment>Отменить правку</comment>
+  </data>
+  <data name="SE0E45FD6F27A84CB" xml:space="preserve">
+    <value>到 {0}</value>
+    <comment>До {0}</comment>
+  </data>
+  <data name="SE147C8F1231BA0F1" xml:space="preserve">
+    <value>辨識結果已儲存至歷程記錄。</value>
+    <comment>Распознанный текст в истории.</comment>
+  </data>
+  <data name="SE15F960D93EB4EE8" xml:space="preserve">
+    <value>套用</value>
+    <comment>Применить</comment>
+  </data>
+  <data name="SE2086C48FDBFB90A" xml:space="preserve">
+    <value>以磚塊顯示</value>
+    <comment>Показать плитками</comment>
+  </data>
+  <data name="SE24F8C2F1B6DF9B9" xml:space="preserve">
+    <value>已復原變更。</value>
+    <comment>Изменение отменено.</comment>
+  </data>
+  <data name="SE2CC0CA617C4E733" xml:space="preserve">
+    <value>將此{0}插入哪裡？</value>
+    <comment>Куда вставить {0}?</comment>
+  </data>
+  <data name="SE3337A60633C227D" xml:space="preserve">
+    <value>貨幣</value>
+    <comment>Валюты</comment>
+  </data>
+  <data name="SE397E461B35D79DF" xml:space="preserve">
+    <value>影片檔案副檔名遺失或無效。</value>
+    <comment>У видео отсутствует или повреждено расширение файла.</comment>
+  </data>
+  <data name="SE47A6D2B06F1F3A1" xml:space="preserve">
+    <value>欄位已清空，路徑恢復為單獨一行。</value>
+    <comment>Слот освобождён. Путь вернулся отдельной строкой.</comment>
+  </data>
+  <data name="SE4A17E56970F0D4E" xml:space="preserve">
+    <value>記錄文字</value>
+    <comment>Текст записи</comment>
+  </data>
+  <data name="SE4B0DEA7A54ED247" xml:space="preserve">
+    <value>筆記錄</value>
+    <comment>записей</comment>
+  </data>
+  <data name="SE5A41CFCCCEA49C1" xml:space="preserve">
+    <value>符合視窗 (Ctrl+0)</value>
+    <comment>Вписать в окно (Ctrl+0)</comment>
+  </data>
+  <data name="SE5F534734C3678AF" xml:space="preserve">
+    <value>影像</value>
+    <comment>Изображение</comment>
+  </data>
+  <data name="SE6763B356C5B0E39" xml:space="preserve">
+    <value>全部貼上 · {0}</value>
+    <comment>Вставить все · {0}</comment>
+  </data>
+  <data name="SE68C592A8B1E8003" xml:space="preserve">
+    <value>合併 · {0}</value>
+    <comment>Объединить · {0}</comment>
+  </data>
+  <data name="SE771BAB31C6321FD" xml:space="preserve">
+    <value>{0} 天</value>
+    <comment>{0} дн.</comment>
+  </data>
+  <data name="SE7754A1F95276D3D" xml:space="preserve">
+    <value>模型傳回錯誤。</value>
+    <comment>Модель вернула ошибку.</comment>
+  </data>
+  <data name="SE892188C88D8CFFC" xml:space="preserve">
+    <value>無法進一步縮短。</value>
+    <comment>Короче не получилось.</comment>
+  </data>
+  <data name="SE8FE89B1DA7E7B97" xml:space="preserve">
+    <value>請嘗試其他搜尋詞、來源應用程式或內容類型。</value>
+    <comment>Измените поиск, приложение или вид записей.</comment>
+  </data>
+  <data name="SE9455A15B5E24913" xml:space="preserve">
+    <value>清除搜尋 (Esc)</value>
+    <comment>Очистить поиск (Esc)</comment>
+  </data>
+  <data name="SE98DA7AC99F6BCC7" xml:space="preserve">
+    <value>正在準備資料夾…</value>
+    <comment>Подготовка папки…</comment>
+  </data>
+  <data name="SEA44507714D187E0" xml:space="preserve">
+    <value>正在載入效果…</value>
+    <comment>Загрузка эффекта…</comment>
+  </data>
+  <data name="SEA8B3C38CC5CA6B8" xml:space="preserve">
+    <value>靜態邊框 · 視窗動畫已關閉</value>
+    <comment>Статичная рамка · анимация окна выключена</comment>
+  </data>
+  <data name="SEA8C658F5BF11FD1" xml:space="preserve">
+    <value>釘選的記錄會保留。</value>
+    <comment>Закреплённые останутся.</comment>
+  </data>
+  <data name="SEAA91FB76550D90D" xml:space="preserve">
+    <value>來源應用程式：{0}</value>
+    <comment>Приложение: {0}</comment>
+  </data>
+  <data name="SEB31594AB4F133FA" xml:space="preserve">
+    <value>剪貼簿</value>
+    <comment>Буфер обмена</comment>
+  </data>
+  <data name="SEB7F72FDAD266469" xml:space="preserve">
+    <value>無法建立 ZIP。</value>
+    <comment>Не удалось создать ZIP.</comment>
+  </data>
+  <data name="SEB95B427BA04F59B" xml:space="preserve">
+    <value>。結果： </value>
+    <comment>. Итог: </comment>
+  </data>
+  <data name="SEC28D375FB09FE2B" xml:space="preserve">
+    <value>來源資料夾無法存取。</value>
+    <comment>Исходная папка недоступна.</comment>
+  </data>
+  <data name="SEC79F4D0C884351F" xml:space="preserve">
+    <value>貼上</value>
+    <comment>Вставить</comment>
+  </data>
+  <data name="SED5A6EFB8543B58C" xml:space="preserve">
+    <value>清理期限</value>
+    <comment>Срок очистки</comment>
+  </data>
+  <data name="SEDFC0E3B5E6223DC" xml:space="preserve">
+    <value>貼上所有剩餘影像與影片： </value>
+    <comment>Вставить все оставшиеся картинки и видео: </comment>
+  </data>
+  <data name="SEE388C3FD65146A7" xml:space="preserve">
+    <value>路徑 {0} 不適合欄位 {1}。請手動指派或將其保留為單獨一行。</value>
+    <comment>Путь {0} не подходит к слоту {1}. Назначьте его вручную или оставьте строкой.</comment>
+  </data>
+  <data name="SEEC01A68E6047F8E" xml:space="preserve">
+    <value>上移 (Alt+↑)</value>
+    <comment>Выше (Alt+↑)</comment>
+  </data>
+  <data name="SEEC6352B23682FBE" xml:space="preserve">
+    <value>位置與保護</value>
+    <comment>Расположение и защита</comment>
+  </data>
+  <data name="SEEE48E65E8F3FB84" xml:space="preserve">
+    <value>取代值</value>
+    <comment>Заменить значение</comment>
+  </data>
+  <data name="SEEFF2457569DF7D0" xml:space="preserve">
+    <value>正在建立 ZIP。</value>
+    <comment>Создаётся ZIP.</comment>
+  </data>
+  <data name="SEF0EB597929EDEBF" xml:space="preserve">
+    <value>{0:0.#} 秒</value>
+    <comment>{0:0.#} с</comment>
+  </data>
+  <data name="SEF1275082A094AEC" xml:space="preserve">
+    <value>最多 40 個字元</value>
+    <comment>До 40 символов</comment>
+  </data>
+  <data name="SEF20E423F8A8D64E" xml:space="preserve">
+    <value>縮小 (Ctrl+−)</value>
+    <comment>Уменьшить (Ctrl+−)</comment>
+  </data>
+  <data name="SEF23641CFBF07649" xml:space="preserve">
+    <value>釘選的記錄</value>
+    <comment>Закреплённые записи</comment>
+  </data>
+  <data name="SEF2F65BB03749385" xml:space="preserve">
+    <value>所有記錄會分別按行合併。</value>
+    <comment>Все записи объединяются отдельными строками.</comment>
+  </data>
+  <data name="SF00C388F0EB04339" xml:space="preserve">
+    <value>復原失敗</value>
+    <comment>Отмена не выполнена</comment>
+  </data>
+  <data name="SF02956C16588A718" xml:space="preserve">
+    <value>複製</value>
+    <comment>Скопировать</comment>
+  </data>
+  <data name="SF05051156FC8801D" xml:space="preserve">
+    <value>無效的更新套件。</value>
+    <comment>Некорректный пакет обновления.</comment>
+  </data>
+  <data name="SF07F805077291E8D" xml:space="preserve">
+    <value>影像預覽延遲，毫秒</value>
+    <comment>Задержка увеличения картинки, миллисекунды</comment>
+  </data>
+  <data name="SF0EC5D1F5F300778" xml:space="preserve">
+    <value>群組選項</value>
+    <comment>Параметры группы</comment>
+  </data>
+  <data name="SF105708317E7FADB" xml:space="preserve">
+    <value>長文字預覽</value>
+    <comment>Просмотр длинного текста</comment>
+  </data>
+  <data name="SF195133BCEFB6A3B" xml:space="preserve">
+    <value>強度</value>
+    <comment>Интенсивность</comment>
+  </data>
+  <data name="SF1A8C2074421E0B5" xml:space="preserve">
+    <value>正在辨識文字。</value>
+    <comment>Распознаётся текст.</comment>
+  </data>
+  <data name="SF1D50BF77051E4C3" xml:space="preserve">
+    <value>開啟歷程記錄</value>
+    <comment>Открыть историю</comment>
+  </data>
+  <data name="SF3767704BA91CBFA" xml:space="preserve">
+    <value>視窗動畫</value>
+    <comment>Анимация окна</comment>
+  </data>
+  <data name="SF3F6DFE9F19E0EB2" xml:space="preserve">
+    <value>翻譯後的影像已複製。</value>
+    <comment>Картинка с переводом скопирована.</comment>
+  </data>
+  <data name="SF46CB59F7266BA99" xml:space="preserve">
+    <value> 釘選項目</value>
+    <comment> закреплённые</comment>
+  </data>
+  <data name="SF4CB2C0E2410A7B7" xml:space="preserve">
+    <value>連結</value>
+    <comment>Ссылка</comment>
+  </data>
+  <data name="SF4F117766F39AC90" xml:space="preserve">
+    <value>壓縮提示詞</value>
+    <comment>Сжать промпт</comment>
+  </data>
+  <data name="SF4FA70E92F03B884" xml:space="preserve">
+    <value>請重新拖曳此值。</value>
+    <comment>Перетащите значение ещё раз.</comment>
+  </data>
+  <data name="SF6223390B45409A3" xml:space="preserve">
+    <value>正在讀取音軌…</value>
+    <comment>Чтение звуковых дорожек…</comment>
+  </data>
+  <data name="SF75AF38BE1BAB7E8" xml:space="preserve">
+    <value>已復原取代</value>
+    <comment>Замена отменена</comment>
+  </data>
+  <data name="SF76EA8BCE77AA870" xml:space="preserve">
+    <value>圖表</value>
+    <comment>Схемы</comment>
+  </data>
+  <data name="SF8AB9A19C4E741C9" xml:space="preserve">
+    <value>原圖仍保留於歷程記錄。</value>
+    <comment>Исходное изображение осталось в истории.</comment>
+  </data>
+  <data name="SF8B97DBB30F0D1E9" xml:space="preserve">
+    <value>取代命令中的路徑</value>
+    <comment>Заменить путь в команде</comment>
+  </data>
+  <data name="SF8D92D9F2C398D8F" xml:space="preserve">
+    <value>開啟圖表</value>
+    <comment>Открыть граф</comment>
+  </data>
+  <data name="SF9127540BA42D36A" xml:space="preserve">
+    <value>更新輔助程式未啟動，應用程式仍在執行。</value>
+    <comment>Помощник обновления не запустился. Приложение продолжает работать.</comment>
+  </data>
+  <data name="SF92FAFB4C00A9F5C" xml:space="preserve">
+    <value>影片</value>
+    <comment>Видео</comment>
+  </data>
+  <data name="SF996FD35B2E3C4FC" xml:space="preserve">
+    <value>翻譯後的影像已儲存至歷程記錄。</value>
+    <comment>Картинка с переводом в истории.</comment>
+  </data>
+  <data name="SF9B945D5077E12FF" xml:space="preserve">
+    <value>正在壓縮…</value>
+    <comment>Сжимается…</comment>
+  </data>
+  <data name="SF9E6B4B56157141E" xml:space="preserve">
+    <value>未釘選的記錄</value>
+    <comment>Незакреплённых записей</comment>
+  </data>
+  <data name="SFA5D2489E61EE856" xml:space="preserve">
+    <value>已選取文字：{0}</value>
+    <comment>Выбрано текстов: {0}</comment>
+  </data>
+  <data name="SFAB397155D4AFDEF" xml:space="preserve">
+    <value>釘選 (Ctrl+P)</value>
+    <comment>Закрепить (Ctrl+P)</comment>
+  </data>
+  <data name="SFAE3EAD2D3E4C4C0" xml:space="preserve">
+    <value>無法準備影像與影片。</value>
+    <comment>Не удалось подготовить картинки и видео.</comment>
+  </data>
+  <data name="SFAF8C4A14F748AEA" xml:space="preserve">
+    <value>黃色</value>
+    <comment>Жёлтый</comment>
+  </data>
+  <data name="SFB76DC01F528D116" xml:space="preserve">
+    <value>上移文字</value>
+    <comment>Поднять текст</comment>
+  </data>
+  <data name="SFBDD7043AE1BB98B" xml:space="preserve">
+    <value>按 Win+V 開啟歷程記錄。</value>
+    <comment>Откройте историю по Win+V.</comment>
+  </data>
+  <data name="SFD1E6F563F5BACAD" xml:space="preserve">
+    <value>邊框效果設定</value>
+    <comment>Настройки эффектов рамки</comment>
+  </data>
+  <data name="SFDC5555AE230CD22" xml:space="preserve">
+    <value>llama-server 在處理文字時停止。</value>
+    <comment>llama-server упал во время обработки текста.</comment>
+  </data>
+  <data name="SFE4EA3E976D3C3CE" xml:space="preserve">
+    <value>復原合併</value>
+    <comment>Отменить объединение</comment>
+  </data>
+  <data name="SFEB88DE6F3B5722A" xml:space="preserve">
+    <value>已取消建立 ZIP。</value>
+    <comment>Создание ZIP отменено.</comment>
+  </data>
+  <data name="SFEE4BBD8E6B960B7" xml:space="preserve">
+    <value>拖曳：平移</value>
+    <comment>Перетаскивание: сдвиг</comment>
+  </data>
+  <data name="SFF2E4AD1FF5DE649" xml:space="preserve">
+    <value>取消選取所有影像與影片</value>
+    <comment>Снять все отметки картинок и видео</comment>
+  </data>
+  <data name="SFFB51957D4F9BB3A" xml:space="preserve">
+    <value>外觀設定</value>
+    <comment>Настройки вида</comment>
+  </data>
+  <data name="SFFC0E927541DA0CD" xml:space="preserve">
+    <value> 剪貼簿未變更，請從歷程記錄複製文字。</value>
+    <comment> Буфер не изменён — скопируйте текст из истории.</comment>
+  </data>
+  <data name="S1EA87AEA0A4F1C25" xml:space="preserve">
+    <value>剪下</value>
+    <comment>Вырезать</comment>
+  </data>
+  <data name="S694DF0097FDEFE5A" xml:space="preserve">
+    <value>全選</value>
+    <comment>Выделить всё</comment>
+  </data>
+  <data name="SBDFCC3728F54DD8D" xml:space="preserve">
+    <value>取代「{0}」</value>
+    <comment>Заменить «{0}»</comment>
+  </data>
+</root>

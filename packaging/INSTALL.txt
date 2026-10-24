@@ -1,8 +1,11 @@
-ArkCopyBuffer 0.2.1
+CopyBuffalo 0.2.2
 Windows 10 (1809+) / Windows 11, Intel/AMD x64
 
 DOWNLOAD
 https://github.com/Arkanoidvfx/CopyBuffalo/releases/latest
+
+Existing installers and data paths retain the ArkCopyBuffer name for
+compatibility with installed versions. The software is CopyBuffalo.
 
 Standard: download and run ArkCopyBuffer-Setup.exe.
 Includes clipboard history, local OCR, FFmpeg, and .NET.
@@ -18,7 +21,8 @@ and CPU/NVIDIA runtime for prompt compression and image translation.
 
 USE
 Copy normally, then press Win+V to find and paste a saved entry.
-English is the default. Change English/Russian in Settings > View,
+English is the default. Choose English, Russian, Simplified Chinese,
+Traditional Chinese, Japanese, or Hindi in Settings > View > Language,
 then restart to apply. Settings, pause, and exit are available
 from the tray menu and the panel's three-dot menu.
 Exiting restores the normal Windows Win+V shortcut.

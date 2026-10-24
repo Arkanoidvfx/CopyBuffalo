@@ -1,6 +1,8 @@
 # Development
 
-ArkCopyBuffer is a Windows x64 WPF app targeting .NET 10. Application code and XAML live in the repository root. `tools/ocr/` builds the Rust OCR worker; `packaging/` builds and checks installers.
+CopyBuffalo is a Windows x64 WPF app targeting .NET 10. Application code and XAML live in the repository root. `tools/ocr/` builds the Rust OCR worker; `packaging/` builds and checks installers.
+
+The public product name is CopyBuffalo. The `ArkCopyBuffer` project/assembly, executable and release asset names, installer identity, registry/data paths, clipboard formats and encryption identifiers remain stable for compatibility. Keep those technical names when building, publishing or accessing existing data.
 
 ## Build
 
@@ -32,7 +34,7 @@ pwsh -NoProfile -File packaging/Test-Updater.ps1 -App .\publish\ArkCopyBuffer.ex
 
 Self-tests write a log under `%LOCALAPPDATA%\ArkCopyBuffer\selftest.log` and use synthetic fixtures. Run them outside an active gaming session: some checks exercise native window lifecycle and rendering. Do not use real clipboard history as test data.
 
-The optional directory and language arguments isolate self-test output and select the language before application resources load. Localization checks render the panel, settings, editor, and merge window offscreen and verify both catalogs, placeholders, language selection, and synthetic history. They do not show windows or use the real clipboard.
+The optional directory and language arguments isolate self-test output and select the language before application resources load. Localization checks render the panel, settings, editor, and merge window offscreen and verify all six catalogs, placeholders and format specifiers, language selection, and synthetic history. They do not show windows or use the real clipboard.
 
 After packaging, `packaging/Test-Distribution.ps1` checks the staged bundle without relying on system .NET or FFmpeg. Some distribution checks exercise local AI; check available GPU memory before running them alongside other GPU work.
 
@@ -64,7 +66,7 @@ Validation for v0.2.0 included 489 synthetic checks, distribution dependency che
 
 ## UI conventions
 
-English is the default. Settings → View offers English and Russian; the saved `Language` preference applies on restart. `Strings.resx` is English and `Strings.ru.resx` is Russian. `UiText.T` resolves a source string; `UiText.F` formats a translated `FormattableString`; XAML uses `Loc`. Keys are `S` plus the first 16 uppercase SHA-256 hex characters of the source after normalizing line endings to LF. Keep both resource catalogs and their format arguments in sync. User content, stored group names, OCR character tables, and model examples are not UI translations.
+English is the default. Settings → View offers English, Russian, Simplified Chinese, Traditional Chinese, Japanese, and Hindi; the saved `Language` preference applies on restart. `Strings.resx` is English and `Strings.ru.resx` is Russian. `UiText.T` resolves a source string; `UiText.F` formats a translated `FormattableString`; XAML uses `Loc`. Keys are `S` plus the first 16 uppercase SHA-256 hex characters of the source after normalizing line endings to LF. Keep every resource catalog and its format arguments in sync. Bundled Noto CJK and Plex Devanagari faces provide script coverage without Windows font-pack installation. User content, stored group names, OCR character tables, and model examples are not UI translations.
 
 Use the shared `TextFont` / `MonoFont` resources; see [Typography](typography.md). Side menus and previews use `SidePlacements` to respect monitor work areas and DPI. Keep window activation and clipboard writes out of background work.
 

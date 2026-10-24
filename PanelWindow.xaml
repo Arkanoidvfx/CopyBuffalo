@@ -857,13 +857,7 @@
             <ScrollViewer x:Name="VisualSettingsView" Grid.Row="1" VerticalScrollBarVisibility="Auto" MaxHeight="388" Focusable="False" Padding="16,8,6,8">
                 <StackPanel Margin="0,0,6,0">
                     <TextBlock Text="{local:Loc Key=S5BD57038DBADD651}" FontWeight="SemiBold" Margin="0,0,0,8"/>
-                    <Grid Margin="0,0,0,6">
-                        <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition/></Grid.ColumnDefinitions>
-                        <Button x:Name="EnglishLanguage" Content="English" Tag="en" Click="Language_Click" Margin="0,0,4,0"
-                                Style="{StaticResource StandardButton}" AutomationProperties.Name="English"/>
-                        <Button x:Name="RussianLanguage" Content="{local:Loc Key=S6DA140FDD4BE0189}" Tag="ru" Click="Language_Click" Grid.Column="1" Margin="4,0,0,0"
-                                Style="{StaticResource StandardButton}" AutomationProperties.Name="{local:Loc Key=S6DA140FDD4BE0189}"/>
-                    </Grid>
+                    <UniformGrid x:Name="LanguageChoices" Columns="2" Margin="-4,0,-4,0"/>
                     <TextBlock x:Name="LanguageRestartHint" FontSize="12" Foreground="{DynamicResource TextSecondary}"
                                TextWrapping="Wrap" Margin="0,0,0,12"/>
                     <Border Height="1" Background="{DynamicResource WindowStroke}" Margin="0,0,0,12"/>

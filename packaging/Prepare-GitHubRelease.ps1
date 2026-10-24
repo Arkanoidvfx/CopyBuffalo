@@ -35,7 +35,7 @@ $launcher = @'
 @echo off
 setlocal
 set "ARKCOPYBUFFER_DOWNLOAD_DIR=%~dp0"
-echo Preparing the full ArkCopyBuffer installer. Please wait...
+echo Preparing the full CopyBuffalo installer. Please wait...
 "%SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe" -NoProfile -Command "$ErrorActionPreference='Stop'; try { $dir=$env:ARKCOPYBUFFER_DOWNLOAD_DIR; $target=[IO.Path]::Combine($dir,'ArkCopyBuffer-Full-Setup.exe'); function Verify([string]$path) { $s=[IO.File]::OpenRead($path); $sha=[Security.Cryptography.SHA256]::Create(); try { $actual=[BitConverter]::ToString($sha.ComputeHash($s)).Replace('-',''); if ($actual -ne '__HASH__') { throw 'Installer SHA-256 mismatch. Download the parts again.' } } finally { $s.Dispose(); $sha.Dispose() } }; if (![IO.File]::Exists($target)) { $parts=@(__PARTS__); foreach ($name in $parts) { if (![IO.File]::Exists([IO.Path]::Combine($dir,$name))) { throw ('Missing file: '+$name+'. Put all parts beside Install-Full.cmd.') } }; if (([IO.DriveInfo]::new([IO.Path]::GetPathRoot($dir))).AvailableFreeSpace -lt __SIZE__+536870912) { throw 'Not enough free space to assemble the installer.' }; $temp=$target+'.assembling'; $out=[IO.File]::Create($temp); try { foreach ($name in $parts) { $source=[IO.File]::OpenRead([IO.Path]::Combine($dir,$name)); try { $source.CopyTo($out) } finally { $source.Dispose() } } } finally { $out.Dispose() }; Verify $temp; [IO.File]::Move($temp,$target) }; Verify $target; if ($env:ARKCOPYBUFFER_VERIFY_ONLY -ne '1') { [Diagnostics.Process]::Start($target) | Out-Null }; exit 0 } catch { [Console]::Error.WriteLine($_.Exception.Message); exit 1 }"
 if errorlevel 1 (
   echo Full installer preparation failed.
