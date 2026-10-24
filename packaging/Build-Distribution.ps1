@@ -91,6 +91,6 @@ $manifest = [ordered]@{
     modelSha256 = if ($WithAI) { (Get-FileHash $Model).Hash.ToLowerInvariant() } else { $null }
 }
 $manifest | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $out 'manifest.json') -Encoding utf8
-Get-ChildItem $out -Filter '*.exe' -File | ForEach-Object { (Get-FileHash $_.FullName).Hash.ToLowerInvariant() + '  ' + $_.Name } |
+Get-ChildItem $out -Filter 'CopyBuffalo*.exe' -File | ForEach-Object { (Get-FileHash $_.FullName).Hash.ToLowerInvariant() + '  ' + $_.Name } |
     Set-Content -LiteralPath (Join-Path $out 'SHA256SUMS.txt') -Encoding ascii
 Get-ChildItem $out -File | Select-Object Name,Length

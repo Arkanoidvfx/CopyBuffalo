@@ -11,7 +11,7 @@ namespace ArkCopyBuffer;
 internal sealed class AppUpdater : IDisposable
 {
     const string Repository = "https://github.com/Arkanoidvfx/CopyBuffalo";
-    const string AssetName = "ArkCopyBuffer-Setup.exe";
+    const string AssetName = "CopyBuffalo-Setup.exe";
     internal static Version CurrentVersion => typeof(App).Assembly.GetName().Version!;
     internal static string VersionText => CurrentVersion.ToString(3);
     internal sealed record Package(Version Version, Uri Url, long Size, string Hash);
@@ -49,7 +49,7 @@ internal sealed class AppUpdater : IDisposable
                 throw new InvalidDataException(UiText.T("Некорректный пакет обновления."));
             return new(version, url, size, digest[7..]);
         }
-        throw new InvalidDataException(UiText.T("В релизе нет установщика ArkCopyBuffer-Setup.exe."));
+        throw new InvalidDataException(UiText.T("В релизе нет установщика CopyBuffalo-Setup.exe."));
     }
 
     internal static async Task VerifyAsync(string path, Package package, CancellationToken token)

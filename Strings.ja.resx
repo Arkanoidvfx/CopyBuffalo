@@ -256,9 +256,9 @@
     <value>更新を開始できませんでした。</value>
     <comment>Не удалось запустить обновление.</comment>
   </data>
-  <data name="S1BD44106B532CEF3" xml:space="preserve">
+  <data name="S096FF9C9A5A1D779" xml:space="preserve">
     <value>ローカルAIコンポーネントが未インストールです。ArkCopyBufferの完全版インストーラーでローカルAIを選択してください。画像翻訳にも必要です。</value>
-    <comment>Не установлен компонент локальной модели. Запустите ArkCopyBuffer-Full-Setup.exe и выберите «Сжатие промптов» (он также нужен для перевода).</comment>
+    <comment>Не установлен компонент локальной модели. Запустите CopyBuffalo-Full-Setup.exe и выберите «Сжатие промптов» (он также нужен для перевода).</comment>
   </data>
   <data name="S1C386BD08B121ED9" xml:space="preserve">
     <value>この動画には音声がありません。</value>
@@ -984,9 +984,9 @@
     <value>Google マップ</value>
     <comment>Google Карты</comment>
   </data>
-  <data name="S77B488C62D006327" xml:space="preserve">
-    <value>このリリースには ArkCopyBuffer-Setup.exe がありません。</value>
-    <comment>В релизе нет установщика ArkCopyBuffer-Setup.exe.</comment>
+  <data name="SDE9D352AD5C8C949" xml:space="preserve">
+    <value>このリリースには CopyBuffalo-Setup.exe がありません。</value>
+    <comment>В релизе нет установщика CopyBuffalo-Setup.exe.</comment>
   </data>
   <data name="S78B7A9E85FF0C74F" xml:space="preserve">
     <value>テキスト項目</value>

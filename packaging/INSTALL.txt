@@ -1,23 +1,26 @@
-CopyBuffalo 0.2.3
+CopyBuffalo 0.2.4
 Windows 10 (1809+) / Windows 11, Intel/AMD x64
 
 DOWNLOAD
 https://github.com/Arkanoidvfx/CopyBuffalo/releases/latest
 
-Existing installers and data paths retain the ArkCopyBuffer name for
-compatibility with installed versions. The software is CopyBuffalo.
+Installer files use the CopyBuffalo name. Internal data paths keep the
+ArkCopyBuffer name to preserve existing history and settings.
 
-Standard: download and run ArkCopyBuffer-Setup.exe.
+Standard: download and run CopyBuffalo-Setup.exe.
 Includes clipboard history, local OCR, FFmpeg, and .NET.
 No administrator access or separate runtime installation is needed.
 
-Optional AI: download both ArkCopyBuffer-Full-Setup.exe.part1 and
-ArkCopyBuffer-Full-Setup.exe.part2, plus Install-Full.cmd, to one folder.
-Run Install-Full.cmd. It assembles the installer, verifies SHA-256,
-and opens it. Keep all parts together until this finishes.
+Optional AI: download and run CopyBuffalo-Full-Setup.cmd. It downloads
+the two full-package parts, verifies SHA-256, and opens the installer.
+You may also download both .part1 and .part2 manually beside the CMD
+file; existing parts are reused. Keep them together until it finishes.
 Allow about 3.5 GB for the parts, another 3.5 GB for assembly,
 and additional installation space. The full package adds the model
 and CPU/NVIDIA runtime for prompt compression and image translation.
+
+Versions 0.2.3 and older need one manual upgrade to 0.2.4 because the
+installer filename has changed. Later updates use CopyBuffalo-Setup.exe.
 
 USE
 Copy normally, then press Win+V to find and paste a saved entry.

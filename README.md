@@ -4,7 +4,7 @@ Clipboard history for Windows. Copy text, images, and files, then press **Win+V*
 
 The software is called **CopyBuffalo**. Existing downloads and internal file/storage names retain `ArkCopyBuffer` for compatibility with installed versions.
 
-**[Download for Windows](https://github.com/Arkanoidvfx/CopyBuffalo/releases/latest/download/ArkCopyBuffer-Setup.exe)** · [All downloads](https://github.com/Arkanoidvfx/CopyBuffalo/releases/latest) · [Report a bug](https://github.com/Arkanoidvfx/CopyBuffalo/issues)
+**[Download for Windows](https://github.com/Arkanoidvfx/CopyBuffalo/releases/latest/download/CopyBuffalo-Setup.exe)** · [All downloads](https://github.com/Arkanoidvfx/CopyBuffalo/releases/latest) · [Report a bug](https://github.com/Arkanoidvfx/CopyBuffalo/issues)
 
 Windows 10 (1809+) or Windows 11 · Intel/AMD x64 · English, Russian, Simplified Chinese, Traditional Chinese, Japanese, and Hindi interface.
 
@@ -12,7 +12,7 @@ Windows 10 (1809+) or Windows 11 · Intel/AMD x64 · English, Russian, Simplifie
 
 ## Get started
 
-1. Download and run **ArkCopyBuffer-Setup.exe**. No administrator access is needed; .NET, FFmpeg, and OCR are included.
+1. Download and run **CopyBuffalo-Setup.exe**. No administrator access is needed; .NET, FFmpeg, and OCR are included.
 2. Copy something, then press **Win+V**. Click an entry or select it and press **Enter** to paste.
 3. Open **⋯** or the tray menu for settings, pause, and exit. Exiting restores the usual Windows Win+V shortcut.
 
@@ -42,9 +42,11 @@ Screenshots use sample data, rendered from the app's own controls.
 
 ## Optional local AI
 
-Prompt compression and translation of image labels into Russian need the full package. On the [release page](https://github.com/Arkanoidvfx/CopyBuffalo/releases/latest), download **both** `ArkCopyBuffer-Full-Setup.exe.part1` and `.part2`, plus **Install-Full.cmd**, into the same folder. Run the CMD file; it assembles and verifies the installer before opening it.
+Prompt compression and translation of image labels into Russian need the full package. **[Download the AI setup launcher](https://github.com/Arkanoidvfx/CopyBuffalo/releases/latest/download/CopyBuffalo-Full-Setup.cmd)** and run it. It downloads both package parts, verifies SHA-256, and opens the full installer. For offline installation, download both `CopyBuffalo-Full-Setup.exe.part1` and `.part2` from the [release page](https://github.com/Arkanoidvfx/CopyBuffalo/releases/latest) beside the CMD file.
 
 The full download is about 3.5 GB. Allow another 3.5 GB to assemble it, plus installation space. It includes the model and CPU/NVIDIA runtime. Later app updates use the smaller standard installer.
+
+Versions 0.2.3 and older need one manual upgrade to 0.2.4 because the installer filename changed. Later versions update automatically using `CopyBuffalo-Setup.exe`.
 
 ## Your data
 

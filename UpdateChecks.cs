@@ -57,10 +57,10 @@ internal static class UpdateChecks
         byte[] bytes = [1, 2, 3, 4];
         File.WriteAllBytes(path, bytes);
         string digest = "sha256:" + Convert.ToHexString(SHA256.HashData(bytes));
-        object Release(string tag = "v0.3.0", bool prerelease = false, string? hash = null, string? url = null, long size = 4, bool draft = false) => new
+        object Release(string tag = "v0.3.0", bool prerelease = false, string? hash = null, string? url = null, long size = 4, bool draft = false, string name = "CopyBuffalo-Setup.exe") => new
         {
             tag_name = tag, prerelease, draft,
-            assets = new[] { new { name = "ArkCopyBuffer-Setup.exe", browser_download_url = url ?? "https://github.com/Arkanoidvfx/CopyBuffalo/releases/download/v0.3.0/ArkCopyBuffer-Setup.exe", digest = hash ?? digest, size } }
+            assets = new[] { new { name, browser_download_url = url ?? "https://github.com/Arkanoidvfx/CopyBuffalo/releases/download/v0.3.0/CopyBuffalo-Setup.exe", digest = hash ?? digest, size } }
         };
         AppUpdater.Package? Parse(object release) => AppUpdater.ParseRelease(JsonSerializer.SerializeToElement(release), new Version(0, 2, 0, 0));
         void Reject(object release, string label)
@@ -70,6 +70,7 @@ internal static class UpdateChecks
         }
         var package = Parse(Release())!;
         check(package.Version == new Version(0, 3, 0) && package.Size == 4, "update selects a newer stable core installer");
+        Reject(Release(name: "ArkCopyBuffer-Setup.exe"), "update requires the CopyBuffalo installer asset name");
         check(Parse(Release("v0.2.0")) == null && Parse(Release("v0.1.0")) == null, "update rejects equal versions and downgrades");
         check(Parse(Release(prerelease: true)) == null && Parse(Release(draft: true)) == null, "update skips draft and prerelease versions");
         check(Parse(Release("v0.3.0-beta")) == null, "update refuses malformed version tags");

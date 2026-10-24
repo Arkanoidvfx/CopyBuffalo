@@ -256,9 +256,9 @@
     <value>无法启动更新。</value>
     <comment>Не удалось запустить обновление.</comment>
   </data>
-  <data name="S1BD44106B532CEF3" xml:space="preserve">
+  <data name="S096FF9C9A5A1D779" xml:space="preserve">
     <value>未安装本地 AI 组件。请运行 CopyBuffalo 完整安装程序并选择本地 AI 组件；图像翻译也需要它。</value>
-    <comment>Не установлен компонент локальной модели. Запустите ArkCopyBuffer-Full-Setup.exe и выберите «Сжатие промптов» (он также нужен для перевода).</comment>
+    <comment>Не установлен компонент локальной модели. Запустите CopyBuffalo-Full-Setup.exe и выберите «Сжатие промптов» (он также нужен для перевода).</comment>
   </data>
   <data name="S1C386BD08B121ED9" xml:space="preserve">
     <value>此视频没有音频。</value>
@@ -984,9 +984,9 @@
     <value>Google 地图</value>
     <comment>Google Карты</comment>
   </data>
-  <data name="S77B488C62D006327" xml:space="preserve">
-    <value>该版本缺少 ArkCopyBuffer-Setup.exe。</value>
-    <comment>В релизе нет установщика ArkCopyBuffer-Setup.exe.</comment>
+  <data name="SDE9D352AD5C8C949" xml:space="preserve">
+    <value>该版本缺少 CopyBuffalo-Setup.exe。</value>
+    <comment>В релизе нет установщика CopyBuffalo-Setup.exe.</comment>
   </data>
   <data name="S78B7A9E85FF0C74F" xml:space="preserve">
     <value>文本记录</value>

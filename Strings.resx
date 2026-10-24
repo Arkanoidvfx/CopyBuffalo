@@ -256,9 +256,9 @@
     <value>Could not start the update.</value>
     <comment>Не удалось запустить обновление.</comment>
   </data>
-  <data name="S1BD44106B532CEF3" xml:space="preserve">
+  <data name="S096FF9C9A5A1D779" xml:space="preserve">
     <value>The local AI component is not installed. Run the full CopyBuffalo installer and select the local AI component; it is also needed for image translation.</value>
-    <comment>Не установлен компонент локальной модели. Запустите ArkCopyBuffer-Full-Setup.exe и выберите «Сжатие промптов» (он также нужен для перевода).</comment>
+    <comment>Не установлен компонент локальной модели. Запустите CopyBuffalo-Full-Setup.exe и выберите «Сжатие промптов» (он также нужен для перевода).</comment>
   </data>
   <data name="S1C386BD08B121ED9" xml:space="preserve">
     <value>This video has no audio.</value>
@@ -984,9 +984,9 @@ Details: {1}</value>
     <value>Google Maps</value>
     <comment>Google Карты</comment>
   </data>
-  <data name="S77B488C62D006327" xml:space="preserve">
-    <value>The release is missing ArkCopyBuffer-Setup.exe.</value>
-    <comment>В релизе нет установщика ArkCopyBuffer-Setup.exe.</comment>
+  <data name="SDE9D352AD5C8C949" xml:space="preserve">
+    <value>The release is missing CopyBuffalo-Setup.exe.</value>
+    <comment>В релизе нет установщика CopyBuffalo-Setup.exe.</comment>
   </data>
   <data name="S78B7A9E85FF0C74F" xml:space="preserve">
     <value>Text entries</value>

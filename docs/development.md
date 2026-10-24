@@ -2,7 +2,7 @@
 
 CopyBuffalo is a Windows x64 WPF app targeting .NET 10. Application code and XAML live in the repository root. `tools/ocr/` builds the Rust OCR worker; `packaging/` builds and checks installers.
 
-The public product name is CopyBuffalo. The `ArkCopyBuffer` project/assembly, executable and release asset names, installer identity, registry/data paths, clipboard formats and encryption identifiers remain stable for compatibility. Keep those technical names when building, publishing or accessing existing data.
+The public product and installer names are CopyBuffalo. Keep the internal `ArkCopyBuffer` project/assembly/executable, installer identity and mutexes, registry/data paths, clipboard formats and encryption identifiers stable for compatibility. Version 0.2.4 renames the public installer assets to `CopyBuffalo-Setup.exe` and `CopyBuffalo-Full-Setup.exe.part1` / `.part2`; older clients require one manual upgrade because their updater expects the previous asset name.
 
 CopyBuffalo's original code uses the MIT license in the root `LICENSE`, which is included in published app files, installers and prepared GitHub assets. Third-party components keep their own licenses. FFmpeg is a separate GPLv3 executable; public redistributions must also provide its complete corresponding source and enabled-library sources as required by the GPL, as described in `packaging/THIRD-PARTY-NOTICES.txt`.
 
@@ -53,13 +53,13 @@ pwsh -NoProfile -File packaging/Build-Distribution.ps1 -WithAI
 
 The full build also requires the model (`-Model`), official llama.cpp CPU/CUDA packages under `.cache/distribution-tools/llama-cpu` and `llama-cuda`, and Microsoft VC runtime DLLs (`-VcRuntimeDir`). Keep component licenses alongside these cached inputs. Output goes to `dist/`; staging goes to `.tmp/distribution/`.
 
-For GitHub, `packaging/Prepare-GitHubRelease.ps1` splits the full installer into 1.9 GB parts, reads them back to verify the combined SHA-256, and writes `dist/github/`. `Install-Full.cmd` assembles and verifies the parts using Windows PowerShell 5.1. Set `ARKCOPYBUFFER_VERIFY_ONLY=1` to verify without launching the installer.
+For GitHub, `packaging/Prepare-GitHubRelease.ps1` splits the full installer into 1.9 GB parts, reads them back to verify SHA-256, and writes `dist/github/`. `CopyBuffalo-Full-Setup.cmd` downloads missing parts from its pinned release, verifies each part and the assembled installer, then opens it using Windows PowerShell 5.1. The CMD is the single public AI setup link; existing verified parts also work offline. Set `ARKCOPYBUFFER_VERIFY_ONLY=1` to verify without launching the installer.
 
 ## Release and update contract
 
 1. Increase `<Version>` in `ArkCopyBuffer.csproj` and update the installation guides.
 2. Build, run the relevant checks, and prepare both distributions.
-3. Publish a stable `v<Version>` release in `Arkanoidvfx/CopyBuffalo`. Upload **ArkCopyBuffer-Setup.exe** with that exact name, plus the optional full-package parts, launcher, guides, manifest, and checksums.
+3. Publish a stable `v<Version>` release in `Arkanoidvfx/CopyBuffalo`. Upload **CopyBuffalo-Setup.exe** with that exact name, plus the optional full-package parts, launcher, guides, manifest, and checksums.
 4. Confirm the public GitHub API exposes the asset's size and `sha256` digest and that the download works without authentication.
 
 `AppUpdater.cs` accepts stable releases from this repository only. It verifies the core installer's size and GitHub SHA-256 on download and again before installation. The app checks at startup and every 15 minutes; automatic updates default to on. Installation waits for 30 seconds with the panel hidden and no pending capture, editor, selection, drag, or processing work. The app saves history before exiting, then a hidden helper runs Inno Setup and restarts it.

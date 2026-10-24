@@ -1,14 +1,14 @@
 #ifndef AppVersion
-  #define AppVersion "0.2.3"
+  #define AppVersion "0.2.4"
 #endif
 
 [Setup]
 AppId=ArkCopyBuffer
 AppName=CopyBuffalo
 #ifdef FullPack
-OutputBaseFilename=ArkCopyBuffer-Full-Setup
+OutputBaseFilename=CopyBuffalo-Full-Setup
 #else
-OutputBaseFilename=ArkCopyBuffer-Setup
+OutputBaseFilename=CopyBuffalo-Setup
 #endif
 DefaultDirName={localappdata}\Programs\ArkCopyBuffer
 AppVersion={#AppVersion}

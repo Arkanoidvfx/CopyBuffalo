@@ -256,9 +256,9 @@
     <value>Не удалось запустить обновление.</value>
     <comment>Не удалось запустить обновление.</comment>
   </data>
-  <data name="S1BD44106B532CEF3" xml:space="preserve">
-    <value>Не установлен компонент локальной модели. Запустите ArkCopyBuffer-Full-Setup.exe и выберите «Сжатие промптов» (он также нужен для перевода).</value>
-    <comment>Не установлен компонент локальной модели. Запустите ArkCopyBuffer-Full-Setup.exe и выберите «Сжатие промптов» (он также нужен для перевода).</comment>
+  <data name="S096FF9C9A5A1D779" xml:space="preserve">
+    <value>Не установлен компонент локальной модели. Запустите CopyBuffalo-Full-Setup.exe и выберите «Сжатие промптов» (он также нужен для перевода).</value>
+    <comment>Не установлен компонент локальной модели. Запустите CopyBuffalo-Full-Setup.exe и выберите «Сжатие промптов» (он также нужен для перевода).</comment>
   </data>
   <data name="S1C386BD08B121ED9" xml:space="preserve">
     <value>В видео нет звука.</value>
@@ -984,9 +984,9 @@
     <value>Google Карты</value>
     <comment>Google Карты</comment>
   </data>
-  <data name="S77B488C62D006327" xml:space="preserve">
-    <value>В релизе нет установщика ArkCopyBuffer-Setup.exe.</value>
-    <comment>В релизе нет установщика ArkCopyBuffer-Setup.exe.</comment>
+  <data name="SDE9D352AD5C8C949" xml:space="preserve">
+    <value>В релизе нет установщика CopyBuffalo-Setup.exe.</value>
+    <comment>В релизе нет установщика CopyBuffalo-Setup.exe.</comment>
   </data>
   <data name="S78B7A9E85FF0C74F" xml:space="preserve">
     <value>Обычные записи</value>

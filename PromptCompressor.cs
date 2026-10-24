@@ -321,7 +321,7 @@ sealed class PromptCompressor : IDisposable
             model = File.Exists(bundled) ? bundled : DefaultModel;
         }
         if (exe == null || !File.Exists(exe))
-            throw new Failure(UiText.T("Не установлен компонент локальной модели. Запустите ArkCopyBuffer-Full-Setup.exe и выберите «Сжатие промптов» (он также нужен для перевода)."));
+            throw new Failure(UiText.T("Не установлен компонент локальной модели. Запустите CopyBuffalo-Full-Setup.exe и выберите «Сжатие промптов» (он также нужен для перевода)."));
         if (!File.Exists(model))
             throw new Failure(UiText.F($@"Не найдена модель {model}. Укажите путь в HKCU\Software\ArkCopyBuffer, значение LlamaModel."));
         return (exe, model);
