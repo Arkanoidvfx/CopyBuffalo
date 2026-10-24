@@ -1,0 +1,26 @@
+name: Local working-copy build
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: copybuffalo-local-build
+  cancel-in-progress: false
+
+jobs:
+  build:
+    if: github.actor == github.repository_owner && github.ref == 'refs/heads/main'
+    runs-on: [self-hosted, Windows, X64, copybuffalo-local]
+    timeout-minutes: 15
+    steps:
+      - name: Build and check the local working copy
+        shell: pwsh
+        env:
+          PROJECT_ROOT: ${{ vars.COPYBUFFALO_PROJECT_ROOT }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          if (!$env:PROJECT_ROOT) { throw 'COPYBUFFALO_PROJECT_ROOT is not configured.' }
+          & (Join-Path $env:PROJECT_ROOT 'packaging\Build-Local.ps1')
