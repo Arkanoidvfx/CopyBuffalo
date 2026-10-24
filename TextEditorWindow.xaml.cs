@@ -98,6 +98,7 @@ partial class TextEditorWindow : Window
     void Insert_Click(object sender, RoutedEventArgs e)
     {
         if (_closing || Sources.SelectedItem is not ClipItem source) return;
+        _item.IsSensitive |= source.IsSensitive;
         int start = Editor.SelectionStart;
         using (Editor.DeclareChangeBlock())
         {
@@ -114,6 +115,7 @@ partial class TextEditorWindow : Window
     void ReplacePath_Click(object sender, RoutedEventArgs e)
     {
         if (_closing || Sources.SelectedItem is not ClipItem source || FindPathReplacement(Editor.Text, source.Text) is not { } change) return;
+        _item.IsSensitive |= source.IsSensitive;
         using (Editor.DeclareChangeBlock())
         {
             Editor.Select(change.Start, change.Length);

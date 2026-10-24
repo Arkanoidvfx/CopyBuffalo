@@ -1,3 +1,4 @@
+param([switch]$Installers)
 $ErrorActionPreference='Stop'
 $repo=Split-Path $PSScriptRoot
 $root=Join-Path $repo '.tmp\local-runner'
@@ -67,6 +68,13 @@ public static class LocalBuildIsolation
 '@
 $station=[LocalBuildIsolation]::Open()
 try {
+    if ($Installers) {
+        $releasePid=[LocalBuildIsolation]::Start((Get-Command pwsh.exe).Source,('-NoProfile -File "'+(Join-Path $repo 'packaging\Build-Release.ps1')+'"'))
+        do { $code=[LocalBuildIsolation]::Wait($releasePid,30000) } while ($code -eq [int]::MinValue)
+        if ($code) { throw "Installer build failed ($code); inspect .tmp/password-release-v0.2.4 logs." }
+        Get-Content -LiteralPath (Join-Path $repo '.tmp\password-release-v0.2.4\PASS.txt')
+        return
+    }
     & $sdk publish (Join-Path $repo 'ArkCopyBuffer.csproj') -c Release --nologo -o $stage *> (Join-Path $root 'build.log')
     if ($LASTEXITCODE) { Get-Content -LiteralPath (Join-Path $root 'build.log') -Tail 25; throw 'Local publish failed.' }
     $exe=Join-Path $stage 'ArkCopyBuffer.exe'

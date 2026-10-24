@@ -627,8 +627,8 @@ public partial class App : Application
                 Notify(InfoKind.Info, UiText.T("Промпт уже компактный."), UiText.T("Короче не получилось."));
                 return;
             }
-            _store.Add(compressed, null, null, DateTime.UtcNow);
-            try { Paster.CopyText(compressed); }
+            _store.Add(compressed, null, null, DateTime.UtcNow, sensitive: item.IsSensitive);
+            try { Paster.CopyText(compressed, sensitive: item.IsSensitive); }
             catch (System.Runtime.InteropServices.ExternalException ex)
             {
                 Log(ex);

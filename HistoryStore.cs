@@ -20,6 +20,12 @@ public sealed class ClipItem : INotifyPropertyChanged
     public string Text { get => _text; init => _text = value; }
     public string? Rtf { get; set; }
     public string? Html { get; set; }
+    bool _isSensitive;
+    public bool IsSensitive
+    {
+        get => _isSensitive;
+        set { if (_isSensitive == value) return; _isSensitive = value; PropertyChanged?.Invoke(this, new(null)); }
+    }
     public DateTime CreatedAt { get; init; }
     DateTime _lastUsedAt;
     /// <summary>Когда запись последний раз попала в буфер (копирование или вставка через панель).</summary>
@@ -141,12 +147,12 @@ public sealed class ClipItem : INotifyPropertyChanged
 
     string? _kind, _title, _sub;
     /// <summary>Тип для плитки и строки закреплённого: text, code, url, path, color, image, media, graph.</summary>
-    [JsonIgnore] public string Kind { get { Describe(); return _kind!; } }
+    [JsonIgnore] public string Kind { get { if (IsSensitive) return "text"; Describe(); return _kind!; } }
     /// <summary>Главное: домен ссылки, имя файла, HEX, первая строка текста.</summary>
-    [JsonIgnore] public string TileTitle { get { Describe(); return _title!; } }
+    [JsonIgnore] public string TileTitle { get { if (IsSensitive) return "********"; Describe(); return _title!; } }
     /// <summary>Второстепенное: путь ссылки, папка файла, остаток текста.</summary>
-    [JsonIgnore] public string TileSub { get { Describe(); return _sub!; } }
-    [JsonIgnore] public bool IsMapLink => !IsMedia && !IsImage && !IsNodeGraph && MapLink.TryDescribe(Text, out _, out _);
+    [JsonIgnore] public string TileSub { get { if (IsSensitive) return ""; Describe(); return _sub!; } }
+    [JsonIgnore] public bool IsMapLink => !IsSensitive && !IsMedia && !IsImage && !IsNodeGraph && MapLink.TryDescribe(Text, out _, out _);
     [JsonIgnore] public string KindGlyph => Kind switch
     {
         "url" => "\uE71B", "path" => "\uE8A5", "code" => "\uE943", "color" => "\uE790",
@@ -209,10 +215,10 @@ public sealed class ClipItem : INotifyPropertyChanged
     [JsonIgnore] public bool IsUnityGraph => Text.Contains("UnityEditor.ShaderGraph.CopyPasteGraph", StringComparison.Ordinal)
         || (Text.Contains("\"m_SerializableNodes\"", StringComparison.Ordinal)
             && Text.Contains("\"m_SerializableEdges\"", StringComparison.Ordinal));
-    [JsonIgnore] public bool IsNodeGraph => IsUnrealGraph || IsUnityGraph;
+    [JsonIgnore] public bool IsNodeGraph => !IsSensitive && (IsUnrealGraph || IsUnityGraph);
     bool? _mono;
     /// <summary>Путь или код — моноширинным шрифтом.</summary>
-    [JsonIgnore] public bool IsMono => _mono ??= !IsMedia && !IsImage && !IsNodeGraph && LooksLikeCode(Text);
+    [JsonIgnore] public bool IsMono => !IsSensitive && (_mono ??= !IsMedia && !IsImage && !IsNodeGraph && LooksLikeCode(Text));
 
     /// <summary>
     /// Путь Windows/UNC/Unix одной строкой или многострочный текст, где хотя бы половина строк похожа на код.
@@ -246,18 +252,22 @@ public sealed class ClipItem : INotifyPropertyChanged
 
     /// <summary>Текст для карточки: без хвостовых пробелов, не длиннее пары экранов.</summary>
     [JsonIgnore]
-    public string Preview => IsMedia ? FileName ?? ""
+    public string CardText => Text.Length > 600 ? Text[..600] : Text;
+
+    [JsonIgnore]
+    public string Preview => IsSensitive ? "********"
+        : IsMedia ? FileName ?? ""
         : IsImage ? $"{(IsGif ? "GIF" : UiText.T("Изображение"))} {ImageWidth} × {ImageHeight}"
         : IsNodeGraph ? GraphLabel
         : MapLink.TryDescribe(Text, out var mapTitle, out var mapDetail)
             ? $"{mapTitle}\n{(mapTitle.EndsWith(UiText.T("маршрут"), StringComparison.Ordinal) ? mapDetail.Replace(" → ", "\n→ ") : mapDetail)}"
-        : (Text.Length > 600 ? Text[..600] : Text).Replace('\t', ' ').Trim();
+        : CardText.Replace('\t', ' ').Trim();
 
     [JsonIgnore] internal string? ImageDir { get; set; }
     ImageSource? _thumb;
     ImageSource? _graphPreview;
 
-    [JsonIgnore] public ImageSource? GraphPreview => _graphPreview ??= IsNodeGraph ? UnrealGraph.Render(Text, IsUnityGraph) : null;
+    [JsonIgnore] public ImageSource? GraphPreview => IsSensitive ? null : _graphPreview ??= IsNodeGraph ? UnrealGraph.Render(Text, IsUnityGraph) : null;
 
     /// <summary>Миниатюра. Биндинг с IsAsync=True: грузится в фоне, UI не ждёт.</summary>
     [JsonIgnore]
@@ -430,21 +440,27 @@ public sealed class HistoryStore
         return trimmed.Length > 0 ? trimmed : text;
     }
 
-    public void Add(string text, string? rtf, string? html, DateTime nowUtc, string? sourceApp = null)
+    public void Add(string text, string? rtf, string? html, DateTime nowUtc, string? sourceApp = null, bool sensitive = false)
     {
         string key = TextKey(text);
-        var existing = Items.Where(i => !i.IsImage && !i.IsMedia && TextKey(i.Text) == key)
+        sensitive |= Items.Any(i => !i.IsImage && !i.IsMedia && i.IsSensitive && i.Text == text);
+        var matches = Items.Where(i => !i.IsImage && !i.IsMedia
+            && (sensitive ? i.Text == text : !i.IsSensitive && TextKey(i.Text) == key)).ToArray();
+        if (sensitive)
+            foreach (var match in matches) { match.IsSensitive = true; match.Rtf = match.Html = null; }
+        var existing = matches
             .OrderByDescending(i => i.Pinned).ThenByDescending(i => i.LastUsedAt).FirstOrDefault();
         if (existing != null)
         {
+            existing.IsSensitive |= sensitive;
             // Повтор (в т.ч. наша же вставка) — поднимаем. Форматы не затираем null'ом:
             // после «вставить как текст» в буфере только текст, а форматирование записи терять нельзя.
-            existing.Rtf = rtf ?? existing.Rtf;
-            existing.Html = html ?? existing.Html;
+            existing.Rtf = existing.IsSensitive ? null : rtf ?? existing.Rtf;
+            existing.Html = existing.IsSensitive ? null : html ?? existing.Html;
             existing.SourceApp = sourceApp;
             Bump(existing, nowUtc);
         }
-        else Insert(new ClipItem { Text = text, Rtf = rtf, Html = html, SourceApp = sourceApp, CreatedAt = nowUtc, LastUsedAt = nowUtc }, nowUtc);
+        else Insert(new ClipItem { Text = text, Rtf = sensitive ? null : rtf, Html = sensitive ? null : html, IsSensitive = sensitive, SourceApp = sourceApp, CreatedAt = nowUtc, LastUsedAt = nowUtc }, nowUtc);
     }
 
     /// <summary>Перезаписать текст на месте: Id, время, группа и порядок остаются прежними.</summary>
@@ -722,7 +738,7 @@ public sealed class HistoryStore
     bool ConsolidateTextDuplicates()
     {
         var duplicates = Items.Where(i => !i.IsImage && !i.IsMedia)
-            .GroupBy(i => TextKey(i.Text), StringComparer.Ordinal)
+            .GroupBy(i => (i.IsSensitive, Key: i.IsSensitive ? i.Text : TextKey(i.Text)))
             .SelectMany(group =>
             {
                 var keep = group.OrderByDescending(i => i.Pinned).ThenByDescending(i => i.LastUsedAt).First();
@@ -733,8 +749,9 @@ public sealed class HistoryStore
         File.Copy(_path, Path.Combine(Path.GetDirectoryName(_path)!, $"history.before-dedup-{DateTime.UtcNow:yyyyMMdd-HHmmssfff}.dat"));
         foreach (var (keep, drop) in duplicates)
         {
-            keep.Rtf ??= drop.Rtf;
-            keep.Html ??= drop.Html;
+            keep.IsSensitive |= drop.IsSensitive;
+            keep.Rtf = keep.IsSensitive ? null : keep.Rtf ?? drop.Rtf;
+            keep.Html = keep.IsSensitive ? null : keep.Html ?? drop.Html;
             keep.SourceApp ??= drop.SourceApp;
             if (keep.LastUsedAt < drop.LastUsedAt) { keep.LastUsedAt = drop.LastUsedAt; Place(keep); }
             Items.Remove(drop);
@@ -801,6 +818,7 @@ public sealed class HistoryStore
             TextSubstitution.SelfTest(Check);
             OcrChecks.SelfTest(dir, Check);
             ClipboardWatcher.SelfTest(dir, Check);
+            PanelWindow.SelfTestSensitive(dir, Check);
             PanelWindow.SelfTestVfx(dir, Check);
             TextMerge.SelfTest(Check);
             DragWheelScroll.SelfTest(Check);

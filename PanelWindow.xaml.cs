@@ -29,6 +29,14 @@ partial class PanelWindow : Window
     Image? _gifTarget;
     readonly DispatcherTimer _zoomTimer = new();
     readonly DispatcherTimer _peekTimer = new(); // задержка перед просмотром текста
+    public static readonly DependencyProperty SensitiveRevealedProperty = DependencyProperty.RegisterAttached(
+        "SensitiveRevealed", typeof(bool), typeof(PanelWindow), new PropertyMetadata(false));
+    public static bool GetSensitiveRevealed(DependencyObject element) => (bool)element.GetValue(SensitiveRevealedProperty);
+    public static void SetSensitiveRevealed(DependencyObject element, bool value) => element.SetValue(SensitiveRevealedProperty, value);
+    long _peekStartedAt;
+    internal static readonly TimeSpan SensitivePeekDelay = TimeSpan.FromSeconds(2);
+    internal static bool SensitivePeekReady(long startedAt) => startedAt != 0
+        && System.Diagnostics.Stopwatch.GetElapsedTime(startedAt) >= SensitivePeekDelay;
     ListBoxItem? _peekHover;
     ClipItem? _peekItem;
     readonly DispatcherTimer _outsideTimer = new();   // мышь ушла с панели → скрыть через заданную задержку
@@ -256,7 +264,7 @@ partial class PanelWindow : Window
         // Клик вне панели = фокус ушёл к чужому окну. Прячем почти сразу; пауза отсекает мгновенный возврат фокуса
         // и даёт закрыться контекстному меню, которое гасится тем же кликом. Главный сигнал — EVENT_SYSTEM_FOREGROUND
         // (InitNative): при первом показе WPF мог не прислать Deactivated и держать IsActive = true.
-        Deactivated += (_, _) => { HideShortcuts(); OnFocusMaybeLost(); };
+        Deactivated += (_, _) => { HideShortcuts(); ClosePeek(); OnFocusMaybeLost(); };
         SourceInitialized += (_, _) => InitNative();
     }
 
@@ -1953,6 +1961,7 @@ partial class PanelWindow : Window
     /// <summary>Контейнеры переиспользуются: снять с них анимации до того, как их получит другая запись.</summary>
     static void ResetContainer(ListBoxItem c)
     {
+        c.ClearValue(SensitiveRevealedProperty);
         c.BeginAnimation(OpacityProperty, null);
         c.BeginAnimation(HeightProperty, null);
         c.ClearValue(OpacityProperty);
@@ -2038,20 +2047,26 @@ partial class PanelWindow : Window
     {
         if (HoverPreviewBlocked) { ClosePeek(); return; }
         var container = (e.OriginalSource as DependencyObject)?.FindAncestor<ListBoxItem>();
-        if (ReferenceEquals(container, _peekHover)) return;
+        if (ReferenceEquals(container, _peekHover) && ReferenceEquals(container?.DataContext, _peekItem)) return;
         ClosePeek();
-        if (!TextPeekEnabled || container?.DataContext is not ClipItem item || _dragging || e.LeftButton == MouseButtonState.Pressed
-            || _shortcutContainers.Count > 0 || !NeedsPeek(item, ReferenceEquals(sender, List))) return;
+        if (container?.DataContext is not ClipItem item || _dragging || e.LeftButton == MouseButtonState.Pressed
+            || _shortcutContainers.Count > 0 || !item.IsSensitive && (!TextPeekEnabled || !NeedsPeek(item, ReferenceEquals(sender, List)))) return;
         _peekHover = container;
         _peekItem = item;
+        item.PropertyChanged += PeekItem_Changed;
+        container.Unloaded += PeekContainer_Unloaded;
+        container.DataContextChanged += PeekContainer_DataContextChanged;
+        container.MouseLeave += Text_PeekLeave;
+        _peekStartedAt = System.Diagnostics.Stopwatch.GetTimestamp();
+        var delay = item.IsSensitive ? SensitivePeekDelay : TimeSpan.FromMilliseconds(TextPeekDelayMs);
         if (container.Template.FindName("PeekProgress", container) is Border bar)
         {
             var scale = new ScaleTransform(0, 1);
             bar.RenderTransform = scale;
             bar.Visibility = Visibility.Visible;
-            scale.BeginAnimation(ScaleTransform.ScaleXProperty, new DoubleAnimation(0, 1, TimeSpan.FromMilliseconds(TextPeekDelayMs)));
+            if (Motion.Enabled) scale.BeginAnimation(ScaleTransform.ScaleXProperty, new DoubleAnimation(0, 1, delay));
         }
-        _peekTimer.Interval = TimeSpan.FromMilliseconds(TextPeekDelayMs);
+        _peekTimer.Interval = delay;
         _peekTimer.Start();
     }
 
@@ -2073,8 +2088,18 @@ partial class PanelWindow : Window
     void OpenPeek()
     {
         if (HoverPreviewBlocked) { ClosePeek(); return; }
-        if (_peekHover is not { IsMouseOver: true } container || _peekItem is not { } item || !IsShown) { ClosePeek(); return; }
+        if (_peekHover is not { IsMouseOver: true } container || _peekItem is not { } item || !IsShown
+            || !_store.Items.Contains(item) || !ReferenceEquals(container.DataContext, item)
+            || item.IsSensitive && !SensitivePeekReady(_peekStartedAt)) { ClosePeek(); return; }
         if (container.Template.FindName("PeekProgress", container) is Border bar) bar.Visibility = Visibility.Collapsed;
+
+        if (item.IsSensitive)
+        {
+            TextPeek.IsOpen = false;
+            PeekText.Text = "";
+            SetSensitiveRevealed(container, true);
+            return;
+        }
 
         bool titled = item.Kind is "url" or "path";
         bool mono = item.Kind is "code" or "path";
@@ -2107,6 +2132,20 @@ partial class PanelWindow : Window
     void ClosePeek()
     {
         _peekTimer.Stop();
+        _peekStartedAt = 0;
+        if (_peekItem != null) _peekItem.PropertyChanged -= PeekItem_Changed;
+        if (_peekHover != null)
+        {
+            _peekHover.ClearValue(SensitiveRevealedProperty);
+            _peekHover.Unloaded -= PeekContainer_Unloaded;
+            _peekHover.DataContextChanged -= PeekContainer_DataContextChanged;
+            _peekHover.MouseLeave -= Text_PeekLeave;
+        }
+        if (_peekItem?.IsSensitive == true)
+        {
+            TextPeek.IsOpen = false;
+            PeekText.Text = "";
+        }
         if (_peekHover?.Template?.FindName("PeekProgress", _peekHover) is Border bar)
         {
             bar.RenderTransform = null;
@@ -2117,6 +2156,13 @@ partial class PanelWindow : Window
         if (TextPeek.IsOpen)
             Motion.To(PeekCard, OpacityProperty, 0, Motion.Fast, Motion.Out, done: () => { if (_peekItem == null) TextPeek.IsOpen = false; });
     }
+
+    void PeekItem_Changed(object? sender, PropertyChangedEventArgs e)
+    {
+        if (string.IsNullOrEmpty(e.PropertyName) || e.PropertyName is nameof(ClipItem.IsSensitive) or nameof(ClipItem.Preview)) ClosePeek();
+    }
+    void PeekContainer_Unloaded(object sender, RoutedEventArgs e) => ClosePeek();
+    void PeekContainer_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e) => ClosePeek();
 
     void PeekScroll_ScrollChanged(object sender, ScrollChangedEventArgs e) => UpdatePeekFade();
 

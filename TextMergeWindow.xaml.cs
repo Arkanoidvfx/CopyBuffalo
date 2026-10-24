@@ -11,6 +11,7 @@ partial class TextMergeWindow : Window
 {
     readonly HistoryStore _store;
     readonly TextMerge _model;
+    readonly bool _sensitive;
     readonly Stack<TextMerge.State> _undo = [], _redo = [];
     readonly DispatcherTimer _pointer = new(DispatcherPriority.Input) { Interval = TimeSpan.FromMilliseconds(8) };
     readonly TranslateTransform _ghostShift = new();
@@ -27,7 +28,9 @@ partial class TextMergeWindow : Window
 
     internal TextMergeWindow(HistoryStore store, IEnumerable<string> texts)
     {
-        _store = store; _model = new(texts);
+        var originals = texts.ToArray();
+        _store = store; _model = new(originals);
+        _sensitive = store.Items.Any(i => i.IsSensitive && originals.Contains(i.Text));
         InitializeComponent();
         Sources.ItemsSource = _model.Parts; SlotList.ItemsSource = _model.Slots;
         Ghost.PlacementTarget = this;
@@ -268,8 +271,9 @@ partial class TextMergeWindow : Window
         _saving = true; Sheet.IsEnabled = false; SetStatus(UiText.T("Сохраняется…"));
         try
         {
-            _store.Add(text, null, null, DateTime.UtcNow, "CopyBuffalo"); await _store.SaveAsync();
-            if (copy) Paster.CopyText(text);
+            bool sensitive = _sensitive || _store.Items.Any(i => i.IsSensitive && text.Contains(i.Text, StringComparison.Ordinal));
+            _store.Add(text, null, null, DateTime.UtcNow, "CopyBuffalo", sensitive); await _store.SaveAsync();
+            if (copy) Paster.CopyText(text, sensitive: sensitive);
             SetStatus(copy ? UiText.T("Результат сохранён и скопирован.") : UiText.T("Результат сохранён.")); return true;
         }
         catch (Exception ex) { App.Log(ex); SetStatus(UiText.T("Не удалось завершить. ") + ex.Message + UiText.T(" Результат остаётся здесь; можно повторить."), true); return false; }

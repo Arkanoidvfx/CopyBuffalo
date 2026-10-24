@@ -22,20 +22,21 @@ static class ClipboardSnapshot
         var formats = new HashSet<string>(source.GetFormats());
         if (formats.Count == 0 && CountClipboardFormats() > 0) throw new ExternalException("Clipboard formats are not ready");
         var data = new DataObject();
-        foreach (var format in new[] { "ExcludeClipboardContentFromMonitorProcessing", "Clipboard Viewer Ignore" })
-            if (formats.Contains(format)) { data.SetData(format, true); return (sequence, owner, data); }
+        foreach (var format in new[] { "ExcludeClipboardContentFromMonitorProcessing", "Clipboard Viewer Ignore", "org.nspasteboard.ConcealedType", "application/x-nspasteboard-concealed-type" })
+            if (formats.Contains(format)) data.SetData(format, true);
         CopyStream("CanIncludeInClipboardHistory", 4, prefix: true);
-        if (data.GetData("CanIncludeInClipboardHistory") is MemoryStream { Length: >= 4 } privacy
-            && BitConverter.ToInt32(privacy.ToArray(), 0) == 0) return (sequence, owner, data);
         CopyStream(Paster.OwnFormat, 16, prefix: true);
         if (data.GetData(Paster.OwnFormat) is MemoryStream { Length: >= 16 }) return (sequence, owner, data);
+        foreach (var format in new[] { "x-kde-passwordManagerHint", "application/x-kde-passwordManagerHint" }) CopyStream(format, 32);
+        bool sensitive = ClipboardWatcher.Sensitive(data);
 
-        if (formats.Contains(DataFormats.FileDrop) && ReadData(DataFormats.FileDrop) is string[] paths
+        if (!sensitive && formats.Contains(DataFormats.FileDrop) && ReadData(DataFormats.FileDrop) is string[] paths
             && paths.Length <= limits.FileCount) data.SetData(DataFormats.FileDrop, paths.ToArray(), false);
         if (formats.Contains(DataFormats.UnicodeText) && ReadData(DataFormats.UnicodeText) is string text
-            && !string.IsNullOrWhiteSpace(text) && text.Length <= limits.MaxChars)
+            && text.Length > 0 && text.Length <= limits.MaxChars && (sensitive || !string.IsNullOrWhiteSpace(text)))
         {
             data.SetData(DataFormats.UnicodeText, text, false);
+            if (sensitive) return (sequence, owner, data);
             foreach (var format in new[] { DataFormats.Rtf, DataFormats.Html })
             {
                 try
@@ -47,6 +48,7 @@ static class ClipboardSnapshot
             }
             return (sequence, owner, data);
         }
+        if (sensitive) return (sequence, owner, data);
         CopyStream("GIF", limits.MaxFileBytes);
         if (data.GetData("GIF") is MemoryStream { Length: > 0 }) return (sequence, owner, data);
         foreach (var format in new[] { "PNG", "image/png", DataFormats.Dib })

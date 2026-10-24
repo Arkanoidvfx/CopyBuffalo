@@ -13,7 +13,7 @@ namespace ArkCopyBuffer;
 /// Окно и чтение буфера — на своём STA-потоке: Excel/Word отдают RTF/HTML отложенным рендером, бывает секундами,
 /// а UI-поток должен в это время открывать панель. Тяжёлое (декодирование, хэш, шифрование) — в пуле,
 /// в историю — через UI-диспетчер.
-/// Пропускает то, что приложения просят не сохранять (менеджеры паролей).
+/// Помеченный программами чувствительный текст сохраняет зашифрованным и маскирует в истории.
 /// </summary>
 sealed class ClipboardWatcher : IDisposable
 {
@@ -113,9 +113,19 @@ sealed class ClipboardWatcher : IDisposable
                 if (Paused || _sequence() != sequence) return; // не перечитывать новое копирование из старого повтора
                 var (capturedSequence, owner, d) = _readClipboard(limits);
                 _lastSequence = capturedSequence; // Associate the snapshot with its copy, never with a later clipboard change.
-                if (d == null || Excluded(d)) return;
-                if (OwnItem(d) is { } id) { await RunQueued(async () => await _ui.InvokeAsync(() => _store.Touch(id, now))); return; }
+                if (d == null) return;
+                if (OwnItem(d) is { } id)
+                {
+                    if (id != Guid.Empty) await RunQueued(async () => await _ui.InvokeAsync(() => _store.Touch(id, now)));
+                    return;
+                }
                 var sourceApp = SourceApp(owner);
+                if (Sensitive(d))
+                {
+                    if (d.GetData(DataFormats.UnicodeText) is string secret && secret.Length > 0 && secret.Length <= limits.MaxChars)
+                        await RunQueued(async () => await _ui.InvokeAsync(() => _store.Add(secret, null, null, now, sourceApp, sensitive: true)));
+                    return;
+                }
                 // FileDrop важнее UnicodeText: некоторые приложения отдают оба формата для одного файла.
                 if (ReadFolder(d) is { } folder) { await RunQueued(async () => await _ui.InvokeAsync(() => _store.AddFolder(folder, now, sourceApp))); return; }
                 if (ReadFiles(d, limits) is { } paths) { await RunQueued(() => AddFilesAsync(paths, now, sourceApp, limits)); return; }
@@ -258,12 +268,17 @@ sealed class ClipboardWatcher : IDisposable
         catch (Exception e) { App.Trace($"capture skipped: {e.GetType().Name}: {e.Message}"); }
         finally { _heavyGate.Release(); }
     }
-    static bool Excluded(IDataObject d) =>
+    internal static bool Sensitive(IDataObject d) =>
         d.GetDataPresent("ExcludeClipboardContentFromMonitorProcessing")
         || d.GetDataPresent("Clipboard Viewer Ignore")
+        || d.GetDataPresent("org.nspasteboard.ConcealedType")
+        || d.GetDataPresent("application/x-nspasteboard-concealed-type")
         || (d.GetDataPresent("CanIncludeInClipboardHistory")
             && d.GetData("CanIncludeInClipboardHistory") is MemoryStream ms && ms.Length >= 4
-            && BitConverter.ToInt32(ms.ToArray(), 0) == 0);
+            && BitConverter.ToInt32(ms.ToArray(), 0) == 0)
+        || new[] { "x-kde-passwordManagerHint", "application/x-kde-passwordManagerHint" }.Any(format =>
+            d.GetDataPresent(format) && d.GetData(format) is MemoryStream { Length: <= 32 } hint
+            && System.Text.Encoding.UTF8.GetString(hint.ToArray()).TrimEnd('\0') == "secret");
 
     static (string text, string? rtf, string? html)? ReadText(IDataObject d, StorageSettings limits)
     {
@@ -441,7 +456,7 @@ sealed class ClipboardWatcher : IDisposable
         ignored.SetData("PNG", c.data.GetData("PNG"));
         var excluded = new ClipboardWatcher(retryStore, () => sequence, _ => (sequence, IntPtr.Zero, ignored));
         Complete(excluded.CaptureCurrent());
-        check(retryStore.Items.Count == 1, "immediate capture still honors clipboard privacy exclusions");
+        check(retryStore.Items.Count == 1, "sensitive non-text clipboard payloads are still excluded");
 
         var burstStore = new HistoryStore(Path.Combine(dir, "mixed-capture", "history.dat"));
         var burst = new ClipboardWatcher(burstStore, () => sequence, _ => (sequence, IntPtr.Zero, current));
@@ -506,6 +521,27 @@ sealed class ClipboardWatcher : IDisposable
         Complete(rendered.CaptureCurrent());
         check(rendered.CaptureCurrent().IsCompleted && burstStore.Items.Count == copies.Length + 1,
             "delayed rendering sequence changes do not capture the same payload twice");
+
+        var secretStore = new HistoryStore(Path.Combine(dir, "sensitive-capture", "history.dat"));
+        var secretWatcher = new ClipboardWatcher(secretStore, () => sequence, _ => (sequence, IntPtr.Zero, current));
+        foreach (var marker in new[] { "ExcludeClipboardContentFromMonitorProcessing", "Clipboard Viewer Ignore",
+            "CanIncludeInClipboardHistory", "org.nspasteboard.ConcealedType", "application/x-nspasteboard-concealed-type", "x-kde-passwordManagerHint" })
+        {
+            var marked = new DataObject();
+            marked.SetData(DataFormats.UnicodeText, "synthetic secret " + marker);
+            marked.SetData(DataFormats.Rtf, "private rich text");
+            marked.SetData(marker, marker == "CanIncludeInClipboardHistory" ? new MemoryStream(new byte[4])
+                : marker == "x-kde-passwordManagerHint" ? new MemoryStream("secret"u8.ToArray()) : (object)true);
+            current = marked;
+            sequence++;
+            Complete(secretWatcher.CaptureCurrent());
+            check(secretStore.Items[0] is { IsSensitive: true, Preview: "********", Rtf: null, Html: null },
+                "marked password is retained masked without rich formats: " + marker);
+        }
+        current = Paster.TextClipboard("internal copy", excludeFromHistory: true);
+        sequence++;
+        Complete(secretWatcher.CaptureCurrent());
+        check(secretStore.Items.Count == 6, "our ignored internal writes still do not create password history entries");
     }
 
     /// <summary>Не ждём: поток может висеть в отложенном рендере чужого приложения, а выход не должен.</summary>

@@ -52,6 +52,8 @@ Versions 0.2.3 and older need one manual upgrade to 0.2.4 because the installer 
 
 History stays in `%LOCALAPPDATA%\ArkCopyBuffer`, encrypted for your Windows account. Settings are stored separately from the app. OCR and bundled AI run locally; update checks and downloads contact GitHub.
 
+Text marked sensitive or excluded from history by its source app is kept encrypted and shown as `********`. Hover over its card for two seconds to reveal the value directly in that card; leaving immediately restores the stars. Unmarked text is not guessed to be a password.
+
 Clipboard history can contain sensitive information. Pause recording from the tray menu when needed. Encryption does not hide it from other programs running as your Windows user.
 
 For builds, tests, and release packaging, see [Development](docs/development.md).

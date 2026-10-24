@@ -52,11 +52,12 @@ static class Paster
             data = ImageClipboard(bitmap, png);
         }
         else data.SetData(DataFormats.UnicodeText, item.Text);
-        if (!plainText && item.ImageHash == null)
+        if (!plainText && !item.IsSensitive && item.ImageHash == null)
         {
             if (item.Rtf != null) data.SetData(DataFormats.Rtf, item.Rtf);
             if (item.Html != null) data.SetData(DataFormats.Html, item.Html);
         }
+        if (item.IsSensitive) MarkSensitive(data);
         WriteItemClipboard(data, item.Id, isCurrent);
     }
 
@@ -164,15 +165,27 @@ static class Paster
         return (paths, item.IsGif ? bytes : null);
     }
 
-    internal static DataObject TextClipboard(string text, bool excludeFromHistory = false)
+    internal static void MarkSensitive(DataObject data)
+    {
+        data.SetData("ExcludeClipboardContentFromMonitorProcessing", new MemoryStream(new byte[] { 1 }));
+        data.SetData("CanIncludeInClipboardHistory", new MemoryStream(new byte[4]));
+        data.SetData("CanUploadToCloudClipboard", new MemoryStream(new byte[4]));
+    }
+
+    internal static DataObject TextClipboard(string text, bool excludeFromHistory = false, bool sensitive = false)
     {
         var data = new DataObject();
         data.SetData(DataFormats.UnicodeText, text);
-        if (excludeFromHistory) data.SetData("Clipboard Viewer Ignore", new MemoryStream(new byte[] { 1 }));
+        if (sensitive) MarkSensitive(data);
+        if (excludeFromHistory)
+        {
+            data.SetData("Clipboard Viewer Ignore", new MemoryStream(new byte[] { 1 }));
+            data.SetData(OwnFormat, new MemoryStream(Guid.Empty.ToByteArray()));
+        }
         return data;
     }
 
-    public static void CopyText(string text, bool excludeFromHistory = false) => WriteClipboard(TextClipboard(text, excludeFromHistory));
+    public static void CopyText(string text, bool excludeFromHistory = false, bool sensitive = false) => WriteClipboard(TextClipboard(text, excludeFromHistory, sensitive));
 
     static void WriteClipboard(DataObject data)
     {

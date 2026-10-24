@@ -129,6 +129,9 @@
                 <ContentPresenter x:Name="GroupBody" Content="{Binding}" ContentTemplate="{StaticResource PinGroupHeader}" Visibility="Collapsed"/>
             </Grid>
             <DataTemplate.Triggers>
+                <DataTrigger Binding="{Binding Path=(local:PanelWindow.SensitiveRevealed), RelativeSource={RelativeSource AncestorType=ListBoxItem}}" Value="True">
+                    <Setter TargetName="TextPreview" Property="Text" Value="{Binding CardText}"/>
+                </DataTrigger>
                 <DataTrigger Binding="{Binding IsImage}" Value="True">
                     <Setter TargetName="ImageActions" Property="Visibility" Value="Visible"/>
                 </DataTrigger>
@@ -225,6 +228,9 @@
                 <DataTrigger Binding="{Binding IsGroupHeader}" Value="True">
                     <Setter TargetName="RowBody" Property="Visibility" Value="Collapsed"/>
                     <Setter TargetName="GroupBody" Property="Visibility" Value="Visible"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Path=(local:PanelWindow.SensitiveRevealed), RelativeSource={RelativeSource AncestorType=ListBoxItem}}" Value="True">
+                    <Setter TargetName="RowTitle" Property="Text" Value="{Binding CardText}"/>
                 </DataTrigger>
                 <DataTrigger Binding="{Binding IsImage}" Value="True">
                     <Setter TargetName="ImageActions" Property="Visibility" Value="Visible"/>
@@ -497,6 +503,9 @@
                         </StackPanel>
                     </Grid>
                     <DataTemplate.Triggers>
+                        <DataTrigger Binding="{Binding Path=(local:PanelWindow.SensitiveRevealed), RelativeSource={RelativeSource AncestorType=ListBoxItem}}" Value="True">
+                            <Setter TargetName="TextPreview" Property="Text" Value="{Binding CardText}"/>
+                        </DataTrigger>
                         <DataTrigger Binding="{Binding IsMono}" Value="True">
                             <Setter TargetName="TextPreview" Property="FontFamily" Value="{StaticResource MonoFont}"/>
                         </DataTrigger>

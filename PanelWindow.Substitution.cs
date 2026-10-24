@@ -61,8 +61,9 @@ partial class PanelWindow
 
     string? ReadValue(IDataObject data)
     {
+        if (ClipboardWatcher.Sensitive(data)) return null;
         if (data.GetData(typeof(ClipItem)) is ClipItem item)
-            return _store.Items.Contains(item) && (!item.IsImage && !item.IsMedia || item.IsFolder) ? item.Text : null;
+            return !item.IsSensitive && _store.Items.Contains(item) && (!item.IsImage && !item.IsMedia || item.IsFolder) ? item.Text : null;
         if (data.GetDataPresent(DataFormats.FileDrop))
             return data.GetData(DataFormats.FileDrop) is string[] { Length: 1 } paths ? paths[0] : null;
         return data.GetData(DataFormats.UnicodeText) as string;
@@ -70,7 +71,7 @@ partial class PanelWindow
 
     bool PreviewValue(ListBoxItem? target, IDataObject data, bool fromPaste = false)
     {
-        if (_valueSaving || _textEditor != null || target?.DataContext is not ClipItem item || item.IsImage || item.IsMedia
+        if (_valueSaving || _textEditor != null || target?.DataContext is not ClipItem item || item.IsSensitive || item.IsImage || item.IsMedia
             || !_store.Items.Contains(item) || ReferenceEquals(data.GetData(typeof(ClipItem)), item)) return false;
         string? source = ReadValue(data);
         // ponytail: parse at most 20k characters on the UI thread; larger documents use the editor.

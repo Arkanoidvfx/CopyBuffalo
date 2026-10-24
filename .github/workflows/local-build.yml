@@ -2,6 +2,11 @@ name: Local working-copy build
 
 on:
   workflow_dispatch:
+    inputs:
+      installers:
+        description: Rebuild and verify both 0.2.4 installers
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -14,13 +19,14 @@ jobs:
   build:
     if: github.actor == github.repository_owner && github.ref == 'refs/heads/main'
     runs-on: [self-hosted, Windows, X64, copybuffalo-local]
-    timeout-minutes: 15
+    timeout-minutes: 30
     steps:
       - name: Build and check the local working copy
         shell: pwsh
         env:
           PROJECT_ROOT: ${{ vars.COPYBUFFALO_PROJECT_ROOT }}
+          BUILD_INSTALLERS: ${{ inputs.installers }}
         run: |
           $ErrorActionPreference = 'Stop'
           if (!$env:PROJECT_ROOT) { throw 'COPYBUFFALO_PROJECT_ROOT is not configured.' }
-          & (Join-Path $env:PROJECT_ROOT 'packaging\Build-Local.ps1')
+          & (Join-Path $env:PROJECT_ROOT 'packaging\Build-Local.ps1') -Installers:($env:BUILD_INSTALLERS -eq 'true')
