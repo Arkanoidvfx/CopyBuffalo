@@ -5,8 +5,8 @@ $commit=(& git -C $repo rev-parse HEAD).Trim()
 $version='0.2.4'
 $source=Join-Path $root 'source'
 $stage=Join-Path $root 'main'
-$output=Join-Path $repo ('dist\v'+$version+'-passwords')
-$ai=Join-Path $repo '.tmp\distribution\ai'
+$output=Join-Path $root 'dist'
+$ai=Join-Path $repo '.cache\distribution-ai'
 $sdk=Join-Path $repo '.cache\distribution-tools\dotnet\dotnet.exe'
 
 $env:TEMP=Join-Path $root 'temp'; $env:TMP=$env:TEMP
@@ -30,7 +30,7 @@ $exe=Join-Path $stage 'ArkCopyBuffer.exe'
 $product=(Get-Item -LiteralPath $exe).VersionInfo
 if ($product.ProductVersion -ne ($version+'+'+$commit) -or $product.ProductName -ne 'CopyBuffalo') { throw 'Staged source/version mismatch.' }
 foreach ($name in @('ffmpeg.exe','ffprobe.exe')) { Copy-Item -LiteralPath (Join-Path $repo ('publish\'+$name)) -Destination $stage }
-Get-ChildItem -LiteralPath (Join-Path $repo '.tmp\distribution\main\licenses') -File | Copy-Item -Destination (Join-Path $stage 'licenses') -Force
+Get-ChildItem -LiteralPath (Join-Path $repo '.cache\distribution-licenses') -File | Copy-Item -Destination (Join-Path $stage 'licenses') -Force
 foreach ($name in @('INSTALL.txt','INSTALL-RU.txt','THIRD-PARTY-NOTICES.txt')) { Copy-Item -LiteralPath (Join-Path $source ('packaging\'+$name)) -Destination $stage }
 $runtime=@(Get-ChildItem -LiteralPath $stage -File -Recurse | ForEach-Object { @{name=[IO.Path]::GetRelativePath($stage,$_.FullName);hash=(Get-FileHash -LiteralPath $_.FullName).Hash} })
 $runtime | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $root 'runtime-files.json')
