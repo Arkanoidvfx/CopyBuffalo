@@ -56,7 +56,18 @@ static class ClipboardSnapshot
             if (!formats.Contains(format) || ReadData(format) is not MemoryStream stream) continue;
             if (format == DataFormats.Dib ? !ClipboardWatcher.FitsDib(stream, limits) : !ClipboardWatcher.FitsPng(stream, limits)) continue;
             data.SetData(format, new MemoryStream(stream.ToArray(), writable: false), false);
-            break;
+            return (sequence, owner, data);
+        }
+        // ShareX и другие WinForms-приложения отдают через OLE только CF_BITMAP: синтезированного CF_DIB там нет.
+        if (formats.Contains(DataFormats.Bitmap) && ReadData(DataFormats.Bitmap) is System.Windows.Media.Imaging.BitmapSource bitmap
+            && (long)bitmap.PixelWidth * bitmap.PixelHeight <= limits.MaxImagePixels)
+        {
+            var encoder = new System.Windows.Media.Imaging.BmpBitmapEncoder(); // альфа HBITMAP недостоверна — Bgr32
+            encoder.Frames.Add(System.Windows.Media.Imaging.BitmapFrame.Create(
+                new System.Windows.Media.Imaging.FormatConvertedBitmap(bitmap, System.Windows.Media.PixelFormats.Bgr32, null, 0)));
+            using var bmp = new MemoryStream();
+            encoder.Save(bmp);
+            data.SetData(DataFormats.Dib, new MemoryStream(bmp.ToArray()[14..], writable: false), false); // BMP без заголовка файла = CF_DIB
         }
         return (sequence, owner, data);
 

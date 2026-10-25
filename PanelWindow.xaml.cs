@@ -353,7 +353,8 @@ partial class PanelWindow : Window
     {
         _hwnd = new WindowInteropHelper(this).Handle;
         _onForeground = (_, _, _, _, _, _, _) => OnFocusMaybeLost();
-        SetWinEventHook(EVENT_SYSTEM_FOREGROUND, EVENT_SYSTEM_FOREGROUND, IntPtr.Zero, _onForeground, 0, 0, WINEVENT_OUTOFCONTEXT);
+        var hook = SetWinEventHook(EVENT_SYSTEM_FOREGROUND, EVENT_SYSTEM_FOREGROUND, IntPtr.Zero, _onForeground, 0, 0, WINEVENT_OUTOFCONTEXT);
+        Closed += (_, _) => UnhookWinEvent(hook); // иначе хук переживёт окно и вызовет собранный GC делегат
         // Инструментальное окно: нет в Alt+Tab и на панели задач.
         var ex = (long)GetWindowLongPtr(_hwnd, GWL_EXSTYLE);
         SetWindowLongPtr(_hwnd, GWL_EXSTYLE, new IntPtr((ex | WS_EX_TOOLWINDOW) & ~WS_EX_APPWINDOW));
