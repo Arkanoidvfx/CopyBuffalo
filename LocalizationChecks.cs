@@ -129,6 +129,7 @@ partial class PanelWindow
             panel.OpenSettings();
             string? chosen = null;
             panel.LanguageChanged += language => { chosen = language; panel.SetLanguagePreference(language); };
+            panel.ConfirmLanguageRestart = () => true;
             string other = UiText.Language == "en" ? "ru" : "en";
             var target = panel.LanguageChoices.Children.OfType<Button>().Single(b => (string)b.Tag == other);
             LocalizationChecks.Require(panel.LanguageChoices.Children.Count == UiText.Languages.Length, "All language choices are reachable");

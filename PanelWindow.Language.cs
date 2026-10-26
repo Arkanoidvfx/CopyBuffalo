@@ -11,9 +11,11 @@ partial class PanelWindow
 {
     public event Action<string>? LanguageChanged;
     string _preferredLanguage = UiText.Language;
+    internal Func<bool> ConfirmLanguageRestart = null!; // задаётся в InitializeLanguage; проверки подменяют модальный вопрос: без человека он ждал бы вечно
 
     void InitializeLanguage()
     {
+        ConfirmLanguageRestart = ConfirmRestart;
         foreach (string language in UiText.Languages)
         {
             var choice = new Button { Content = CultureInfo.GetCultureInfo(language).NativeName, Tag = language, Margin = new Thickness(4, 0, 4, 6) };
@@ -38,7 +40,7 @@ partial class PanelWindow
     {
         string language = (string)((Button)sender).Tag;
         if (language == _preferredLanguage) return;
-        if (ConfirmRestart()) LanguageChanged?.Invoke(language);
+        if (ConfirmLanguageRestart()) LanguageChanged?.Invoke(language);
     }
 
     /// <summary>Отдельное окно-уведомление в теме приложения вместо системного MessageBox; фокус на «Отмена», Esc — отмена.</summary>
