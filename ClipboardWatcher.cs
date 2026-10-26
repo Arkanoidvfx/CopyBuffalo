@@ -105,9 +105,12 @@ sealed class ClipboardWatcher : IDisposable
     async Task CaptureAsync(DateTime now, uint sequence)
     {
         var limits = Storage; // один набор лимитов для всего копирования
-        // Буфер может быть занят записывающим приложением — несколько попыток.
-        for (int attempt = 0; attempt < 40; attempt++)
+        // Буфер может быть занят записывающим приложением. ShareX после долгого простоя рендерит большой скриншот
+        // (OleFlushClipboard) дольше секунды — повторяем по времени, а не по числу попыток.
+        var elapsed = System.Diagnostics.Stopwatch.StartNew();
+        for (int attempt = 0; ; attempt++)
         {
+            if (elapsed.Elapsed > TimeSpan.FromSeconds(5)) { App.Trace($"capture gave up after {attempt} attempts: clipboard busy"); return; }
             try
             {
                 if (Paused || _sequence() != sequence) return; // не перечитывать новое копирование из старого повтора
@@ -140,7 +143,7 @@ sealed class ClipboardWatcher : IDisposable
                 if (ReadImageData(d, limits) is { } image) await RunQueued(() => AddImageAsync(image, now, sourceApp, limits));
                 return;
             }
-            catch (ExternalException) { await Task.Delay(5); }
+            catch (ExternalException) { await Task.Delay(Math.Min(5 << Math.Min(attempt, 5), 100)); }
             catch (Exception e) { App.Trace($"capture skipped: {e.GetType().Name}: {e.Message}"); return; } // владелец умер до отложенного рендера и т.п.
         }
     }
