@@ -1,4 +1,4 @@
-CopyBuffalo 0.2.5
+CopyBuffalo 0.2.6
 Windows 10 (1809+) / Windows 11, Intel/AMD x64
 
 DOWNLOAD

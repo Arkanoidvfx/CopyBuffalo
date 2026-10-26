@@ -1,8 +1,8 @@
 $ErrorActionPreference='Stop'
 $repo=Split-Path $PSScriptRoot
-$root=Join-Path $repo '.tmp\release-v0.2.5'
+$root=Join-Path $repo '.tmp\release-v0.2.6'
 $commit=(& git -C $repo rev-parse HEAD).Trim()
-$version='0.2.5'
+$version='0.2.6'
 $source=Join-Path $root 'source'
 $stage=Join-Path $root 'main'
 $output=Join-Path $root 'dist'

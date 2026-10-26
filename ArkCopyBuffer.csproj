@@ -3,7 +3,7 @@
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net10.0-windows</TargetFramework>
-    <Version>0.2.5</Version>
+    <Version>0.2.6</Version>
     <Product>CopyBuffalo</Product>
     <AssemblyTitle>CopyBuffalo</AssemblyTitle>
     <Description>CopyBuffalo clipboard history for Windows</Description>

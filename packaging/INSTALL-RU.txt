@@ -1,4 +1,4 @@
-CopyBuffalo 0.2.5 — Windows 10 / Windows 11, Intel/AMD x64
+CopyBuffalo 0.2.6 — Windows 10 / Windows 11, Intel/AMD x64
 
 Программа и установщики называются CopyBuffalo. Внутренние пути ArkCopyBuffer
 сохранены для совместимости с существующей историей и настройками.
