@@ -151,12 +151,13 @@ public partial class App : Application
         _panel.Storage = _storage;
         _panel.LanguageChanged += language =>
         {
+            // Язык интерфейса читается только при старте: выбор сохраняем вместе с перезапуском (панель уже спросила).
             try
             {
                 using var key = Registry.CurrentUser.CreateSubKey(SettingsKey);
                 key.SetValue("Language", language, RegistryValueKind.String);
                 _panel.SetLanguagePreference(language);
-                Notify(InfoKind.Neutral, UiText.T("Язык изменится после перезапуска."), "");
+                Restart();
             }
             catch (Exception ex) { Notify(InfoKind.Caution, UiText.T("Не удалось сохранить язык."), ex.Message); }
         };
@@ -173,6 +174,7 @@ public partial class App : Application
         _panel.SeriesPasteAllRequested += items => { if (items.Count > 0) OnPasteRequested(items[0], false, items); };
         _panel.TypeRequested += OnTypeRequested;
         _panel.CompressRequested += OnCompressRequested;
+        _panel.TranslateTextRequested += OnTranslateTextRequested;
         _panel.ArchiveRequested += OnArchiveRequested;
         _panel.ExtractAudioRequested += OnExtractAudioRequested;
         _panel.OcrRequested += OnOcrRequested;
@@ -648,6 +650,46 @@ public partial class App : Application
             Notify(InfoKind.Critical, UiText.T("Не удалось сжать промпт."), UiText.F($"Подробности: {Path.Combine(DataDir, "error.log")}"), 5000);
         }
         finally { item.Compressing = false; }
+    }
+
+    async void OnTranslateTextRequested(ClipItem item, System.Globalization.CultureInfo target)
+    {
+        if (item.Compressing) return;
+        item.Compressing = true; // одна операция модели на запись: сжатие и перевод не пересекаются
+        using var cancel = new CancellationTokenSource();
+        _panel.SetTextTranslationProgress(cancel.Cancel);
+        try
+        {
+            // Запуск llama-server и ожидание модели — в пуле: панель не должна замирать даже на синхронных участках.
+            string text = item.Text, language = target.EnglishName;
+            var translated = await Task.Run(() => _compressor.TranslateTextAsync(text, language, cancel.Token));
+            _panel.SetTextTranslationProgress(null);
+            _store.Add(translated, null, null, DateTime.UtcNow, sensitive: item.IsSensitive);
+            try { Paster.CopyText(translated, sensitive: item.IsSensitive); }
+            catch (System.Runtime.InteropServices.ExternalException ex)
+            {
+                Log(ex);
+                Notify(InfoKind.Caution, UiText.T("Перевод в истории,"), UiText.T("но буфер обмена занят."));
+                return;
+            }
+            Notify(InfoKind.Success, UiText.T("Перевод готов."), UiText.T("Перевод в истории и в буфере обмена."));
+        }
+        catch (OperationCanceledException) when (cancel.IsCancellationRequested) { }
+        catch (PromptCompressor.Failure ex)
+        {
+            Log(ex);
+            Notify(InfoKind.Critical, UiText.T("Не удалось перевести текст."), ex.Message, 5000);
+        }
+        catch (Exception ex)
+        {
+            Log(ex);
+            Notify(InfoKind.Critical, UiText.T("Не удалось перевести текст."), UiText.F($"Подробности: {Path.Combine(DataDir, "error.log")}"), 5000);
+        }
+        finally
+        {
+            _panel.SetTextTranslationProgress(null);
+            item.Compressing = false;
+        }
     }
 
     void Save()

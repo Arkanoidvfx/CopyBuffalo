@@ -50,6 +50,8 @@ partial class PanelWindow : Window
     bool _pinnedDirty;       // закреплённые пересобираем при показе, а не на каждое копирование в скрытом окне
     DateTime _labelsDay;     // день, на который посчитаны подписи времени
     WinEventProc? _onForeground; // держим ссылку: хук вызывает делегат, GC не должен его собрать
+    RECT _anchor;            // каретка последнего показа: от неё же ставим окно, выросшее под настройки
+    Size _normalSize;        // размер панели без настроек
     readonly List<ListBoxItem> _shortcutContainers = [];
     readonly HashSet<ClipItem> _leaving = [];  // уезжают с анимацией, ещё в списке
     bool _clearing;
@@ -57,7 +59,7 @@ partial class PanelWindow : Window
 
     /// <summary>Сообщение в InfoBar: заголовок жирным, текст, до двух кнопок.</summary>
     sealed record Info(InfoKind Kind, string Title, string Message,
-        (string Text, Action? Act)? Primary = null, (string Text, Action? Act)? Secondary = null, bool Closable = true, bool Compact = false);
+        (string Text, Action? Act)? Primary = null, (string Text, Action? Act)? Secondary = null, bool Closable = true, bool Compact = false, bool Progress = false);
     Info? _transient; // подтверждение, итог операции, ошибка — до закрытия или скрытия панели
     Info? _archiveInfo;
     Info? _ocrInfo;
@@ -352,6 +354,7 @@ partial class PanelWindow : Window
     void InitNative()
     {
         _hwnd = new WindowInteropHelper(this).Handle;
+        _normalSize = new Size(Width, Height);
         _onForeground = (_, _, _, _, _, _, _) => OnFocusMaybeLost();
         var hook = SetWinEventHook(EVENT_SYSTEM_FOREGROUND, EVENT_SYSTEM_FOREGROUND, IntPtr.Zero, _onForeground, 0, 0, WINEVENT_OUTOFCONTEXT);
         Closed += (_, _) => UnhookWinEvent(hook); // иначе хук переживёт окно и вызовет собранный GC делегат
@@ -480,6 +483,8 @@ partial class PanelWindow : Window
         }
 
         new WindowInteropHelper(this).EnsureHandle();
+        _anchor = anchor;
+        Width = _normalSize.Width; Height = _normalSize.Height; // настройки могли остаться открытыми при скрытии
         Place(anchor);
         // Ставим стартовое состояние напрямую до Show: нулевая анимация может примениться
         // лишь на следующем кадре и показать старое содержимое после долгого простоя.
@@ -600,6 +605,7 @@ partial class PanelWindow : Window
         int m = (int)(ShadowMargin * scale);
         int w = (int)(Width * scale) - 2 * m, h = (int)(Height * scale) - 2 * m, gap = (int)(6 * scale);
         var work = mi.rcWork;
+        w = Math.Min(w, work.Right - work.Left); h = Math.Min(h, work.Bottom - work.Top); // окно настроек не выше экрана
 
         int x = a.Left;
         int y = a.Bottom + gap;
@@ -895,6 +901,25 @@ partial class PanelWindow : Window
         if (ItemOf(sender) is { IsImage: true, Recognizing: false } item) TranslateImageRequested?.Invoke(item);
     }
 
+    /// <summary>Популярные языки перевода текста: английский, русский, китайский, хинди и основные европейские.</summary>
+    static readonly string[] TextTranslationTargets = ["en", "ru", "zh-Hans", "hi", "es", "de", "fr"];
+    public event Action<ClipItem, System.Globalization.CultureInfo>? TranslateTextRequested;
+
+    void TranslateText_Click(object sender, RoutedEventArgs e)
+    {
+        e.Handled = true;
+        if (ItemOf(sender) is not { Compressing: false } item || sender is not UIElement target) return;
+        var menu = new ContextMenu { PlacementTarget = target, Placement = PlacementMode.Bottom };
+        foreach (var code in TextTranslationTargets)
+        {
+            var culture = System.Globalization.CultureInfo.GetCultureInfo(code);
+            string name = culture.NativeName;
+            menu.Items.Add(Entry(char.ToUpper(name[0], culture) + name[1..], "\uE8C1", () => TranslateTextRequested?.Invoke(item, culture)));
+        }
+        menu.Closed += (_, _) => Search.Focus();
+        OpenMenu(menu);
+    }
+
     void Graph_Click(object sender, RoutedEventArgs e)
     {
         if (ItemOf(sender) is { IsNodeGraph: true } item) OpenGraph(item);
@@ -1092,8 +1117,22 @@ partial class PanelWindow : Window
     {
         Storage = _storage; // закрытие без «Применить» отменяет изменения бегунков
         SettingsFlyout.Visibility = Visibility.Collapsed;
+        Width = _normalSize.Width; Height = _normalSize.Height;
+        Place(_anchor);
         Search.Focus();
     }
+
+    /// <summary>Настройки без прокрутки: окно шире и растёт на скрытую часть страницы; Place держит его в пределах экрана.</summary>
+    void FitSettings()
+    {
+        if (SettingsFlyout.Visibility != Visibility.Visible) return;
+        Width = _normalSize.Width + SettingsExtraWidth;
+        UpdateLayout();
+        var view = new[] { VisualSettingsView, StorageSettingsView, VfxSettingsView }.First(v => v.Visibility == Visibility.Visible);
+        Height = Math.Max(_normalSize.Height, Height + view.ExtentHeight - view.ViewportHeight);
+        Place(_anchor);
+    }
+    const double SettingsExtraWidth = 400;
 
     /// <summary>Настройки: выезжают из-под «⋯» (из меню панели или трея).</summary>
     public void OpenSettings()
@@ -1101,6 +1140,7 @@ partial class PanelWindow : Window
         Storage = _storage;
         ShowVisualSettings_Click(VisualSettingsTab, new RoutedEventArgs());
         SettingsFlyout.Visibility = Visibility.Visible;
+        FitSettings();
         Motion.Enter(SettingsFlyout, 0, -8);
         Dispatcher.BeginInvoke(DispatcherPriority.Input, () => VisualSettingsTab.Focus());
     }
@@ -1116,11 +1156,12 @@ partial class PanelWindow : Window
         VisualSettingsTab.Style = (Style)FindResource(page == 0 ? "AccentButton" : "StandardButton");
         StorageSettingsTab.Style = (Style)FindResource(page == 1 ? "AccentButton" : "StandardButton");
         VfxSettingsTab.Style = (Style)FindResource(page == 2 ? "AccentButton" : "StandardButton");
+        FitSettings();
     }
 
     void Storage_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
     {
-        if (StorageApplyButton == null || _loadingStorage) return; // события при загрузке XAML и установке сохранённых значений
+        if (!IsInitialized || _loadingStorage) return; // события при загрузке XAML и установке сохранённых значений
         UpdateStorageLabels();
     }
 
@@ -1788,8 +1829,25 @@ partial class PanelWindow : Window
     {
         if (cancel != null) _transient = null;
         _ocrInfo = cancel == null ? null : new Info(InfoKind.Info, translating ? UiText.T("Текст переводится на русский.") : UiText.T("Распознаётся текст."),
-            translating ? UiText.T("Перевод выполняется локальной моделью. Можно продолжать работу.") : UiText.T("Можно продолжать работу — изображение обрабатывается локально."), (UiText.T("Отменить"), cancel), Closable: false);
+            translating ? UiText.T("Перевод выполняется локальной моделью. Можно продолжать работу.") : UiText.T("Можно продолжать работу — изображение обрабатывается локально."), (UiText.T("Отменить"), cancel), Closable: false, Progress: true);
         RefreshInfo();
+    }
+
+    Info? _textTranslationInfo;
+    internal void SetTextTranslationProgress(Action? cancel)
+    {
+        if (cancel != null) _transient = null;
+        _textTranslationInfo = cancel == null ? null : new Info(InfoKind.Info, UiText.T("Текст переводится."),
+            UiText.T("Перевод выполняется локальной моделью. Можно продолжать работу."), (UiText.T("Отменить"), cancel), Closable: false, Progress: true);
+        RefreshInfo();
+    }
+
+    void ShowInfoProgress(bool show)
+    {
+        if ((InfoProgress.Visibility == Visibility.Visible) == show) return;
+        InfoProgress.Visibility = show ? Visibility.Visible : Visibility.Collapsed;
+        InfoProgressShift.BeginAnimation(TranslateTransform.XProperty, !show ? null : new DoubleAnimation(-72, 340, TimeSpan.FromSeconds(1.3))
+            { RepeatBehavior = RepeatBehavior.Forever, EasingFunction = new SineEase { EasingMode = EasingMode.EaseInOut } });
     }
 
     internal void ShowTranslatedImageResult(bool copied, bool review)
@@ -1824,12 +1882,13 @@ partial class PanelWindow : Window
     /// <summary>Показать главное сообщение: разовое важнее паузы; закрыли разовое — снова видна пауза.</summary>
     void RefreshInfo()
     {
-        var info = _transient ?? _archiveInfo ?? _ocrInfo ?? PauseInfo ?? _updateInfo;
+        var info = _transient ?? _archiveInfo ?? _ocrInfo ?? _textTranslationInfo ?? PauseInfo ?? _updateInfo;
         if (!ReferenceEquals(_shown, info))
         {
             _infoTimer.Stop();
             if (info?.Compact == true) _infoTimer.Start();
         }
+        ShowInfoProgress(info?.Progress == true);
         if (info == null)
         {
             _shown = null;

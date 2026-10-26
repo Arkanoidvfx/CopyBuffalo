@@ -2252,4 +2252,32 @@
     <value>“{0}” बदलें</value>
     <comment>Заменить «{0}»</comment>
   </data>
+  <data name="SC61B78DB9343AE7F" xml:space="preserve">
+    <value>भाषा बदलने के लिए CopyBuffalo को अभी पुनः आरंभ करें?</value>
+    <comment>Перезапустить CopyBuffalo сейчас, чтобы сменить язык?</comment>
+  </data>
+  <data name="S9FCAEEA7E9A16A2B" xml:space="preserve">
+    <value>टेक्स्ट का अनुवाद करें</value>
+    <comment>Перевести текст</comment>
+  </data>
+  <data name="SF7AF0277BEAD0DBC" xml:space="preserve">
+    <value>अनुवाद तैयार है।</value>
+    <comment>Перевод готов.</comment>
+  </data>
+  <data name="S624DCA0545CBD032" xml:space="preserve">
+    <value>यह इतिहास और क्लिपबोर्ड में है।</value>
+    <comment>Перевод в истории и в буфере обмена.</comment>
+  </data>
+  <data name="S0A707E94D1F5648B" xml:space="preserve">
+    <value>अनुवाद इतिहास में है,</value>
+    <comment>Перевод в истории,</comment>
+  </data>
+  <data name="S6D47649389A45E0A" xml:space="preserve">
+    <value>मॉडल ने खाली अनुवाद लौटाया।</value>
+    <comment>Модель вернула пустой перевод.</comment>
+  </data>
+  <data name="S13A1601A66B84822" xml:space="preserve">
+    <value>टेक्स्ट का अनुवाद हो रहा है।</value>
+    <comment>Текст переводится.</comment>
+  </data>
 </root>
