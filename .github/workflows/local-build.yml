@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       installers:
-        description: Rebuild and verify both 0.2.6 installers
+        description: Rebuild and verify both installers
         type: boolean
         default: false
 

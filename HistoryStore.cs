@@ -318,6 +318,10 @@ static class ImageFiles
         int rowsPerChunk = Math.Max(1, 1048576 / stride);
         var pixels = new byte[stride * Math.Min(rowsPerChunk, bgra.PixelHeight)];
         using var sha = IncrementalHash.CreateHash(HashAlgorithmName.SHA256);
+        Span<byte> dimensions = stackalloc byte[8];
+        BinaryPrimitives.WriteInt32LittleEndian(dimensions, bgra.PixelWidth);
+        BinaryPrimitives.WriteInt32LittleEndian(dimensions[4..], bgra.PixelHeight);
+        sha.AppendData(dimensions);
         for (int y = 0; y < bgra.PixelHeight; y += rowsPerChunk)
         {
             int rows = Math.Min(rowsPerChunk, bgra.PixelHeight - y);
@@ -417,6 +421,28 @@ public sealed class HistoryStore
     readonly string _path;
     internal StorageSettings Storage { get; set; } = new();
     Task _writing = Task.CompletedTask; // цепочка записей на диск: строго по порядку снимков
+    int _blobWriters;
+    readonly HashSet<string> _deferredDeletes = [];
+
+    internal IDisposable PreserveBlobFiles()
+    {
+        _blobWriters++;
+        return new BlobWrite(this);
+    }
+
+    sealed class BlobWrite(HistoryStore store) : IDisposable
+    {
+        bool disposed;
+        public void Dispose()
+        {
+            if (disposed) return;
+            disposed = true;
+            if (--store._blobWriters != 0) return;
+            foreach (var hash in store._deferredDeletes)
+                if (!store.Items.Any(i => i.ImageHash == hash)) ImageFiles.Delete(store.ImagesDir, hash);
+            store._deferredDeletes.Clear();
+        }
+    }
     public string ImagesDir { get; }
     public ObservableCollection<ClipItem> Items { get; } = new();
     public List<PinnedGroup> Groups { get; } = [];
@@ -539,7 +565,11 @@ public sealed class HistoryStore
     /// <summary>Единая точка удаления: вместе с записью уходят файлы картинки.</summary>
     void Drop(ClipItem item)
     {
-        if (Items.Remove(item) && item.ImageHash != null) ImageFiles.Delete(ImagesDir, item.ImageHash);
+        if (Items.Remove(item) && item.ImageHash != null)
+        {
+            if (_blobWriters != 0) _deferredDeletes.Add(item.ImageHash);
+            else ImageFiles.Delete(ImagesDir, item.ImageHash);
+        }
     }
 
     public void Remove(ClipItem item) { Drop(item); Changed?.Invoke(); }
@@ -719,7 +749,15 @@ public sealed class HistoryStore
             {
                 // Не теряем молча: откладываем битый файл рядом и начинаем с пустой истории.
                 var dir = Path.GetDirectoryName(_path)!;
-                File.Move(_path, Path.Combine(dir, $"history.corrupt-{DateTime.Now:yyyyMMdd-HHmmss}.dat"), overwrite: true);
+                var backup = Path.Combine(dir, $"history.corrupt-{DateTime.UtcNow:yyyyMMdd-HHmmssfff}-{Guid.NewGuid():N}.dat");
+                bool movedImages = Directory.Exists(ImagesDir);
+                if (movedImages) Directory.Move(ImagesDir, backup + ".images");
+                try { File.Move(_path, backup); }
+                catch
+                {
+                    if (movedImages) Directory.Move(backup + ".images", ImagesDir);
+                    throw;
+                }
                 Items.Clear();
                 Groups.Clear();
             }
@@ -818,6 +856,8 @@ public sealed class HistoryStore
             TextSubstitution.SelfTest(Check);
             OcrChecks.SelfTest(dir, Check);
             ClipboardWatcher.SelfTest(dir, Check);
+            StabilityChecks.Run(dir, Check);
+            PanelWindow.SelfTestAnimation(dir, Check);
             PanelWindow.SelfTestSensitive(dir, Check);
             PanelWindow.SelfTestVfx(dir, Check);
             TextMerge.SelfTest(Check);
@@ -948,7 +988,11 @@ public sealed class HistoryStore
             var largePixels = new byte[513 * 513 * 4];
             Random.Shared.NextBytes(largePixels);
             var large = BitmapSource.Create(513, 513, 96, 96, PixelFormats.Bgra32, null, largePixels, 513 * 4);
-            Check(ImageFiles.Normalize(large).hash == Convert.ToHexString(SHA256.HashData(largePixels)), "хэш картинки верен при обработке по частям");
+            var expectedPixels = new byte[8 + largePixels.Length];
+            BinaryPrimitives.WriteInt32LittleEndian(expectedPixels, 513);
+            BinaryPrimitives.WriteInt32LittleEndian(expectedPixels.AsSpan(4), 513);
+            largePixels.CopyTo(expectedPixels, 8);
+            Check(ImageFiles.Normalize(large).hash == Convert.ToHexString(SHA256.HashData(expectedPixels)), "хэш картинки верен при обработке по частям");
             ImageFiles.Write(s.ImagesDir, h1, n1);
             s.AddImage(h1, 2, 2, t0.AddDays(10).AddMinutes(5));
             s.AddImage(h1, 2, 2, t0.AddDays(10).AddMinutes(6));
@@ -1247,8 +1291,7 @@ public sealed class HistoryStore
             recover2.Load(DateTime.UtcNow);
             Check(recover2.Items.Count == 1, "восстановленная картинка записана в историю");
 
-            using (new ClipboardWatcher(new HistoryStore(Path.Combine(dir, "watch", "history.dat"))))
-                Check(true, "слушатель буфера стартует на своём STA-потоке");
+            ClipboardWatcher.SelfTestListener(dir, Check);
 
             var oldPath = Path.Combine(dir, "legacy", "history.dat"); // своя папка: иначе images/ соседнего теста — «осиротевшие» для неё
             Directory.CreateDirectory(Path.GetDirectoryName(oldPath)!);

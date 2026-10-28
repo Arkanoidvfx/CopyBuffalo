@@ -1,8 +1,9 @@
+param([string]$WorkRoot)
 $ErrorActionPreference='Stop'
 $repo=Split-Path $PSScriptRoot
-$root=Join-Path $repo '.tmp\release-v0.2.6'
+$root=if ($WorkRoot) { [IO.Path]::GetFullPath($WorkRoot) } else { Join-Path $repo '.tmp\release-v0.2.7' }
 $commit=(& git -C $repo rev-parse HEAD).Trim()
-$version='0.2.6'
+$version='0.2.7'
 $source=Join-Path $root 'source'
 $stage=Join-Path $root 'main'
 $output=Join-Path $root 'dist'
@@ -17,7 +18,7 @@ function Run-Low([string]$Exe,[string[]]$Parameters,[string]$Log,[int]$Timeout=1
     if (!$process.WaitForExit($Timeout)) { $process.Kill(); throw "Timed out: $Log" }
     if ($process.ExitCode) { throw "Command failed ($($process.ExitCode)): $Log" }
 }
-if ((Get-PSDrive D).Free -lt 13GB -or (Get-PSDrive C).Free -lt 3GB) { throw 'Insufficient disk space for release build.' }
+if ((Get-PSDrive ([IO.Path]::GetPathRoot($root).TrimEnd(':\'))).Free -lt 13GB -or (Get-PSDrive C).Free -lt 3GB) { throw 'Insufficient disk space for release build.' }
 if ((Test-Path -LiteralPath $source) -or (Test-Path -LiteralPath $stage) -or (Test-Path -LiteralPath $output)) { throw 'Refusing to overwrite an existing versioned release.' }
 New-Item -ItemType Directory -Force $env:TEMP,$source,$stage,$output,(Join-Path $stage 'licenses') | Out-Null
 $archive=Join-Path $root 'source.zip'
@@ -55,7 +56,7 @@ foreach ($language in @('en','ru','zh-Hans','zh-Hant','ja','hi')) {
     $directory=Join-Path $root ('regression-'+$language)
     Run-Low $exe @('--selftest',$directory,$language) (Join-Path $root ('regression-'+$language+'.process.log')) 60000
     $count=(Get-Content -LiteralPath (Join-Path $directory 'selftest.log') | Measure-Object -Line).Lines
-    if ($count -ne 525) { throw "Unexpected regression count: $language $count" }
+    if ($count -lt 542 -or (Select-String -LiteralPath (Join-Path $directory 'selftest.log') -Pattern '^FAIL')) { throw "Incomplete regressions: $language $count" }
     "PASS $language $count checks"
     Run-Low $exe @('--localization-selftest',(Join-Path $root ('locale-'+$language)),$language) (Join-Path $root ('locale-'+$language+'.process.log')) 60000
 }
@@ -74,7 +75,7 @@ $records=@()
 foreach ($file in Get-ChildItem -LiteralPath $assets -File) {
     $records+=[ordered]@{name=$file.Name;bytes=$file.Length;digest=('sha256:'+(Get-FileHash -LiteralPath $file.FullName).Hash.ToLowerInvariant())}
 }
-if ($records.Count -ne 9) { throw 'Unexpected release asset count.' }
+if ($records.Count -ne (7 + @(Get-ChildItem -LiteralPath $assets -Filter '*.part*' -File).Count)) { throw 'Incomplete release assets.' }
 @{version=$version;sourceCommit=$commit;productVersion=$product.ProductVersion;assets=$records;validated=[DateTime]::UtcNow.ToString('o')} | ConvertTo-Json -Depth 6 | Set-Content -LiteralPath (Join-Path $root 'validation.json')
 'PASS: installers, six-language regressions, distribution, updater helper, full launcher and hash checks.' | Set-Content -LiteralPath (Join-Path $root 'PASS.txt')
 Get-Content -LiteralPath (Join-Path $root 'PASS.txt')

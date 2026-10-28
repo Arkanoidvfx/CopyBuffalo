@@ -496,6 +496,7 @@ public partial class App : Application
 
     async void OnExtractAudioRequested(ClipItem item, AudioExtractor.Track track)
     {
+        using var blobFiles = _store.PreserveBlobFiles();
         if (item.MediaKind != "video" || item.ExtractingAudio) return;
         item.ExtractingAudio = true;
         try
@@ -522,6 +523,7 @@ public partial class App : Application
 
     async void ProcessImage(ClipItem item, bool translate)
     {
+        using var blobFiles = _store.PreserveBlobFiles();
         if (!item.IsImage || item.ImageHash == null || !_store.Items.Contains(item)) return;
         if (_ocrCancel != null) { Notify(InfoKind.Info, UiText.T("OCR уже работает."), UiText.T("Дождитесь результата или отмените текущую обработку.")); return; }
         using var cancel = new CancellationTokenSource();

@@ -34,6 +34,7 @@ static class FileBundle
             throw new InvalidDataException("Invalid file bundle");
         using var zip = new ZipArchive(new MemoryStream(bytes), ZipArchiveMode.Read);
         if (zip.Entries.Count != expectedCount) throw new InvalidDataException("File count changed");
+        dir = Path.Combine(dir, Guid.NewGuid().ToString("N"));
         var paths = new string[expectedCount];
         long total = 0;
         for (int i = 0; i < expectedCount; i++)

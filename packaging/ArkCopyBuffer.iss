@@ -1,5 +1,5 @@
 #ifndef AppVersion
-  #define AppVersion "0.2.6"
+  #define AppVersion "0.2.7"
 #endif
 
 [Setup]
@@ -25,8 +25,10 @@ DefaultGroupName=CopyBuffalo
 DisableProgramGroupPage=yes
 SetupIconFile=..\Assets\App.ico
 UninstallDisplayIcon={app}\ArkCopyBuffer.exe
-Compression=lzma2/fast
-SolidCompression=no
+Compression=lzma2/max
+LZMANumBlockThreads=2
+LZMADictionarySize=65536
+SolidCompression=yes
 DiskSpanning=no
 OutputDir={#OutputDir}
 CloseApplications=yes
@@ -59,7 +61,7 @@ russian.UnsupportedSystem=Поддерживаются только Windows 10 �
 Source: "{#StageDir}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 #ifdef FullPack
 Source: "{#AiDir}\*"; DestDir: "{app}\ai"; Excludes: "models\*"; Components: ai; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "{#AiDir}\models\*.gguf"; DestDir: "{app}\ai\models"; Components: ai; Flags: ignoreversion nocompression
+Source: "{#AiDir}\models\*.gguf"; DestDir: "{app}\ai\models"; Components: ai; Flags: ignoreversion solidbreak
 
 [Types]
 Name: "full"; Description: "{cm:FullInstall}"

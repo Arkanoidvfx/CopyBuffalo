@@ -25,6 +25,10 @@ partial class PanelWindow : Window
     const double ShadowMargin = 16; // поле под тень вокруг панели (Root.Margin в XAML)
     const double EnterScale = 0.96, EnterShift = 6; // появление: небольшой рост и сдвиг от каретки, без «прыжка» с 80%
     bool _hiding;
+    int _visibilityVersion;
+    int _framesRemaining;
+    TimeSpan? _lastAnimationFrame;
+    Action? _afterAnimationFrames;
     CancellationTokenSource? _gifPlayback;
     Image? _gifTarget;
     readonly DispatcherTimer _zoomTimer = new();
@@ -177,7 +181,7 @@ partial class PanelWindow : Window
             _infoTimer.Stop();
             if (_shown?.Compact == true && ReferenceEquals(_shown, _transient)) CloseTransient();
         };
-        Closed += (_, _) => _infoTimer.Stop();
+        Closed += (_, _) => { _infoTimer.Stop(); _visibilityVersion++; CancelFrameWait(); };
         _zoomTimer.Tick += (_, _) => OpenZoom();
         _peekTimer.Tick += (_, _) => { _peekTimer.Stop(); OpenPeek(); };
         _outsideTimer.Tick += (_, _) =>
@@ -384,24 +388,40 @@ partial class PanelWindow : Window
         AfterFrames(2, () => { if (IsVisible && !_hiding) AnimateIn(); });
     }
 
-    /// <summary>Через n кадров отрисовки: действие ждёт, пока предыдущее состояние действительно окажется на экране.</summary>
-    static void AfterFrames(int n, Action action)
+    /// <summary>Ждём разные кадры WPF: несколько Rendering могут иметь одно и то же RenderingTime.</summary>
+    void AfterFrames(int n, Action action)
     {
-        int frames = 0;
-        EventHandler? tick = null;
-        tick = (_, _) =>
-        {
-            if (++frames < n) return;
-            CompositionTarget.Rendering -= tick;
-            action();
-        };
-        CompositionTarget.Rendering += tick;
+        CancelFrameWait();
+        _framesRemaining = n;
+        _afterAnimationFrames = action;
+        CompositionTarget.Rendering += OnAnimationRendering;
+    }
+
+    void CancelFrameWait()
+    {
+        CompositionTarget.Rendering -= OnAnimationRendering;
+        _afterAnimationFrames = null;
+        _lastAnimationFrame = null;
+    }
+
+    void OnAnimationRendering(object? sender, EventArgs e) => AdvanceAnimationFrame(((RenderingEventArgs)e).RenderingTime);
+
+    void AdvanceAnimationFrame(TimeSpan time)
+    {
+        if (_afterAnimationFrames == null || _lastAnimationFrame == time) return;
+        _lastAnimationFrame = time;
+        if (--_framesRemaining > 0) return;
+        var action = _afterAnimationFrames;
+        CancelFrameWait();
+        action();
     }
 
     /// <summary>Исчезновение: размер → 96%, видимость → 0 с разгоном; затем Hide.</summary>
     public void HideAnimated()
     {
         if (!IsVisible || _hiding) return;
+        int version = ++_visibilityVersion;
+        CancelFrameWait();
         FinishMergeSelection(open: false);
         FinishDragVisual();
         CloseValueDrop();
@@ -414,7 +434,7 @@ partial class PanelWindow : Window
         _hiding = true;
         Animate(null, EnterScale, null, 0, null, 0, HideDurationMs, Motion.Out, () =>
         {
-            if (!_hiding) return; // пока исчезала, снова вызвали Win+V — не прячем
+            if (!_hiding || version != _visibilityVersion) return;
             // Прозрачное окно (layered) при следующем Show на кадр показывает то, что было на экране перед Hide.
             // Completed приходит раньше, чем отрисован последний кадр, — прятали полупрозрачную панель, и она мелькала
             // при следующем появлении. Сначала дорисовываем полностью прозрачный кадр, потом Hide.
@@ -422,7 +442,7 @@ partial class PanelWindow : Window
             Root.Opacity = 0;
             AfterFrames(2, () =>
             {
-                if (!_hiding) return;
+                if (!_hiding || version != _visibilityVersion) return;
                 _hiding = false;
                 Hide();
             });
@@ -460,6 +480,8 @@ partial class PanelWindow : Window
     /// <summary>Показать у каретки (rect в физических пикселях экрана). Вкладка — та, что была открыта в прошлый раз.</summary>
     public void ShowAt(RECT anchor)
     {
+        _visibilityVersion++;
+        CancelFrameWait();
         _outsideTimer.Stop();
         _deactivateTimer.Stop();
         HideShortcuts();

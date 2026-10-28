@@ -19,14 +19,19 @@ static class ClipboardSnapshot
         var sequence = Native.GetClipboardSequenceNumber();
         var owner = Native.GetClipboardOwner();
         var source = new DataObject(ole);
+        if (source.GetFormats().Length == 0 && CountClipboardFormats() > 0) throw new ExternalException("Clipboard formats are not ready");
+        return (sequence, owner, Materialize(source, limits));
+    }
+
+    internal static IDataObject Materialize(IDataObject source, StorageSettings limits)
+    {
         var formats = new HashSet<string>(source.GetFormats());
-        if (formats.Count == 0 && CountClipboardFormats() > 0) throw new ExternalException("Clipboard formats are not ready");
         var data = new DataObject();
         foreach (var format in new[] { "ExcludeClipboardContentFromMonitorProcessing", "Clipboard Viewer Ignore", "org.nspasteboard.ConcealedType", "application/x-nspasteboard-concealed-type" })
             if (formats.Contains(format)) data.SetData(format, true);
         CopyStream("CanIncludeInClipboardHistory", 4, prefix: true);
         CopyStream(Paster.OwnFormat, 16, prefix: true);
-        if (data.GetData(Paster.OwnFormat) is MemoryStream { Length: >= 16 }) return (sequence, owner, data);
+        if (data.GetData(Paster.OwnFormat) is MemoryStream { Length: >= 16 }) return data;
         foreach (var format in new[] { "x-kde-passwordManagerHint", "application/x-kde-passwordManagerHint" }) CopyStream(format, 32);
         bool sensitive = ClipboardWatcher.Sensitive(data);
 
@@ -36,7 +41,7 @@ static class ClipboardSnapshot
             && text.Length > 0 && text.Length <= limits.MaxChars && (sensitive || !string.IsNullOrWhiteSpace(text)))
         {
             data.SetData(DataFormats.UnicodeText, text, false);
-            if (sensitive) return (sequence, owner, data);
+            if (sensitive) return data;
             foreach (var format in new[] { DataFormats.Rtf, DataFormats.Html })
             {
                 try
@@ -46,20 +51,22 @@ static class ClipboardSnapshot
                 }
                 catch (ExternalException) { } // Optional formatting must not discard already captured text.
             }
-            return (sequence, owner, data);
+            return data;
         }
-        if (sensitive) return (sequence, owner, data);
-        CopyStream("GIF", limits.MaxFileBytes);
-        if (data.GetData("GIF") is MemoryStream { Length: > 0 }) return (sequence, owner, data);
+        if (sensitive) return data;
+        ExternalException? imageError = null;
+        try { CopyStream("GIF", limits.MaxFileBytes); }
+        catch (ExternalException ex) { imageError = ex; }
+        if (data.GetData("GIF") is MemoryStream { Length: > 0 }) return data;
         foreach (var format in new[] { "PNG", "image/png", DataFormats.Dib })
         {
-            if (!formats.Contains(format) || ReadData(format) is not MemoryStream stream) continue;
+            if (!formats.Contains(format) || ReadImageData(format) is not MemoryStream stream) continue;
             if (format == DataFormats.Dib ? !ClipboardWatcher.FitsDib(stream, limits) : !ClipboardWatcher.FitsPng(stream, limits)) continue;
             data.SetData(format, new MemoryStream(stream.ToArray(), writable: false), false);
-            return (sequence, owner, data);
+            return data;
         }
         // ShareX и другие WinForms-приложения отдают через OLE только CF_BITMAP: синтезированного CF_DIB там нет.
-        if (formats.Contains(DataFormats.Bitmap) && ReadData(DataFormats.Bitmap) is System.Windows.Media.Imaging.BitmapSource bitmap
+        if (formats.Contains(DataFormats.Bitmap) && ReadImageData(DataFormats.Bitmap) is System.Windows.Media.Imaging.BitmapSource bitmap
             && (long)bitmap.PixelWidth * bitmap.PixelHeight <= limits.MaxImagePixels)
         {
             var encoder = new System.Windows.Media.Imaging.BmpBitmapEncoder(); // альфа HBITMAP недостоверна — Bgr32
@@ -68,10 +75,20 @@ static class ClipboardSnapshot
             using var bmp = new MemoryStream();
             encoder.Save(bmp);
             data.SetData(DataFormats.Dib, new MemoryStream(bmp.ToArray()[14..], writable: false), false); // BMP без заголовка файла = CF_DIB
+            return data;
         }
-        return (sequence, owner, data);
+        if (imageError != null) throw imageError;
+        return data;
 
-        object ReadData(string format) => source.GetData(format) ?? throw new ExternalException($"Clipboard data is not ready: {format}");
+        // Never replace temporarily unavailable Unicode with a lossy ANSI fallback.
+        object ReadData(string format) => source.GetData(format, !source.GetDataPresent(format, false))
+            ?? throw new ExternalException($"Clipboard data is not ready: {format}");
+
+        object? ReadImageData(string format)
+        {
+            try { return ReadData(format); }
+            catch (ExternalException ex) { imageError = ex; return null; }
+        }
 
         void CopyStream(string format, long maxBytes, bool prefix = false)
         {

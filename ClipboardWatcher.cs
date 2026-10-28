@@ -68,7 +68,10 @@ sealed class ClipboardWatcher : IDisposable
             worker = Dispatcher.CurrentDispatcher;
             try
             {
-                _source = new HwndSource(new HwndSourceParameters("ArkCopyBufferClipboard") { ParentWindow = new IntPtr(-3) }); // HWND_MESSAGE
+                _source = new HwndSource(new HwndSourceParameters("ArkCopyBufferClipboard")
+                {
+                    ParentWindow = new IntPtr(-3), WindowStyle = 0, ExtendedWindowStyle = 0x08000000 // HWND_MESSAGE, WS_EX_NOACTIVATE
+                });
                 _source.AddHook(WndProc);
                 if (!Native.AddClipboardFormatListener(_source.Handle))
                     throw new InvalidOperationException($"AddClipboardFormatListener failed: {Marshal.GetLastPInvokeError()}");
@@ -267,9 +270,14 @@ sealed class ClipboardWatcher : IDisposable
     async Task RunQueued(Func<Task> work)
     {
         await _heavyGate.WaitAsync();
-        try { await work(); }
+        IDisposable? files = null;
+        try { files = await _ui.InvokeAsync(() => _store.PreserveBlobFiles()); await work(); }
         catch (Exception e) { App.Trace($"capture skipped: {e.GetType().Name}: {e.Message}"); }
-        finally { _heavyGate.Release(); }
+        finally
+        {
+            try { if (files != null) await _ui.InvokeAsync(files.Dispose); }
+            finally { _heavyGate.Release(); }
+        }
     }
     internal static bool Sensitive(IDataObject d) =>
         d.GetDataPresent("ExcludeClipboardContentFromMonitorProcessing")
@@ -369,6 +377,7 @@ sealed class ClipboardWatcher : IDisposable
 
     internal static void SelfTest(string dir, Action<bool, string> check)
     {
+        ClipboardSnapshotChecks.Run(check);
         static (IDataObject data, string hash) Image(byte blue, bool dib = false)
         {
             var bitmap = BitmapSource.Create(1, 1, 96, 96, System.Windows.Media.PixelFormats.Bgra32,
@@ -545,6 +554,17 @@ sealed class ClipboardWatcher : IDisposable
         sequence++;
         Complete(secretWatcher.CaptureCurrent());
         check(secretStore.Items.Count == 6, "our ignored internal writes still do not create password history entries");
+    }
+
+    internal static void SelfTestListener(string dir, Action<bool, string> check)
+    {
+        var foreground = Native.GetForegroundWindow();
+        using var watcher = new ClipboardWatcher(new HistoryStore(Path.Combine(dir, "watch", "history.dat")));
+        var hwnd = watcher._worker.Invoke(() => watcher._source!.Handle);
+        check(((long)Native.GetWindowLongPtr(hwnd, -16) & 0x10000000) == 0
+            && ((long)Native.GetWindowLongPtr(hwnd, Native.GWL_EXSTYLE) & 0x08000000) != 0,
+            "clipboard listener: hidden message window cannot activate");
+        check(Native.GetForegroundWindow() == foreground, "clipboard listener: startup preserves foreground");
     }
 
     /// <summary>Не ждём: поток может висеть в отложенном рендере чужого приложения, а выход не должен.</summary>

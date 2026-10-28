@@ -148,7 +148,7 @@ static class Paster
     internal static (string[] paths, byte[]? gif) PrepareFiles(ClipItem item, string imagesDir)
     {
         var bytes = ImageFiles.ReadFull(imagesDir, item.ImageHash!);
-        var dir = System.IO.Path.Combine(GifTempDir, item.ImageHash![..16]);
+        var dir = System.IO.Path.Combine(GifTempDir, Guid.NewGuid().ToString("N"));
         System.IO.Directory.CreateDirectory(dir);
         string[] paths;
         if (item.MediaKind == "files") paths = FileBundle.Extract(bytes, dir, item.FileCount);
@@ -156,9 +156,7 @@ static class Paster
         {
             var name = System.IO.Path.GetFileName(item.FileName ?? "animation.gif");
             var path = System.IO.Path.Combine(dir, name);
-            // Не перезаписываем файл, который может держать приложение предыдущей вставки.
-            if (new System.IO.FileInfo(path) is not { Exists: true } existing || existing.Length != bytes.Length)
-                System.IO.File.WriteAllBytes(path, bytes);
+            System.IO.File.WriteAllBytes(path, bytes);
             paths = [path];
         }
         System.IO.Directory.SetLastWriteTimeUtc(dir, DateTime.UtcNow);
