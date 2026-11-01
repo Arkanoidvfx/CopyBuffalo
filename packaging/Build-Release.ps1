@@ -1,9 +1,9 @@
 param([string]$WorkRoot)
 $ErrorActionPreference='Stop'
 $repo=Split-Path $PSScriptRoot
-$root=if ($WorkRoot) { [IO.Path]::GetFullPath($WorkRoot) } else { Join-Path $repo '.tmp\release-v0.2.7' }
+$root=if ($WorkRoot) { [IO.Path]::GetFullPath($WorkRoot) } else { Join-Path $repo '.tmp\release-v0.2.8' }
 $commit=(& git -C $repo rev-parse HEAD).Trim()
-$version='0.2.7'
+$version='0.2.8'
 $source=Join-Path $root 'source'
 $stage=Join-Path $root 'main'
 $output=Join-Path $root 'dist'
