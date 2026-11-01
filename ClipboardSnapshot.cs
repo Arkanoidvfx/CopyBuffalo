@@ -37,8 +37,12 @@ static class ClipboardSnapshot
 
         if (!sensitive && formats.Contains(DataFormats.FileDrop) && ReadData(DataFormats.FileDrop) is string[] paths
             && paths.Length <= limits.FileCount) data.SetData(DataFormats.FileDrop, paths.ToArray(), false);
-        if (formats.Contains(DataFormats.UnicodeText) && ReadData(DataFormats.UnicodeText) is string text
-            && text.Length > 0 && text.Length <= limits.MaxChars && (sensitive || !string.IsNullOrWhiteSpace(text)))
+        // Chrome сразу после копирования отдаёт пустую строку вместо текста (следующая попытка через 16 мс уже
+        // не готова → пусто): формат заявлен, данных нет — это «ещё не готово», а не пустое копирование.
+        bool hasText = formats.Contains(DataFormats.UnicodeText);
+        var text = hasText ? ReadData(DataFormats.UnicodeText) as string : null;
+        if (hasText && string.IsNullOrEmpty(text)) throw new ExternalException("Clipboard text is empty while the format is advertised");
+        if (text != null && text.Length <= limits.MaxChars && (sensitive || !string.IsNullOrWhiteSpace(text)))
         {
             data.SetData(DataFormats.UnicodeText, text, false);
             if (sensitive) return data;
@@ -78,6 +82,7 @@ static class ClipboardSnapshot
             return data;
         }
         if (imageError != null) throw imageError;
+        App.Trace($"snapshot: no usable format among [{string.Join(",", formats)}], clipboard formats={CountClipboardFormats()}");
         return data;
 
         // Never replace temporarily unavailable Unicode with a lossy ANSI fallback.

@@ -323,7 +323,7 @@ public partial class App : Application
     }
 
     static readonly object TraceLock = new();
-    static readonly bool TraceOn = Environment.GetEnvironmentVariable("ARKCB_TRACE") == "1"
+    internal static readonly bool TraceOn = Environment.GetEnvironmentVariable("ARKCB_TRACE") == "1"
         || File.Exists(Path.Combine(DataDir, "trace.on"));
 
     /// <summary>Отладочный журнал: ARKCB_TRACE=1 или файл trace.on рядом с историей → trace.log.</summary>
@@ -665,6 +665,7 @@ public partial class App : Application
             // Запуск llama-server и ожидание модели — в пуле: панель не должна замирать даже на синхронных участках.
             string text = item.Text, language = target.EnglishName;
             var translated = await Task.Run(() => _compressor.TranslateTextAsync(text, language, cancel.Token));
+            if (target.Name == "sr-Latn") translated = PromptCompressor.ToSerbianLatin(translated); // модель отвечает кириллицей на кириллический исходник
             _panel.SetTextTranslationProgress(null);
             _store.Add(translated, null, null, DateTime.UtcNow, sensitive: item.IsSensitive);
             try { Paster.CopyText(translated, sensitive: item.IsSensitive); }

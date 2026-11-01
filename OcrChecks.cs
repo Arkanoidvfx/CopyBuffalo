@@ -97,6 +97,8 @@ static class OcrChecks
         }
         try { PromptCompressor.ReadAnswer(Response("stop","<think>hidden</think> ")); check(false,"Модель: пустой ответ принят"); }
         catch (PromptCompressor.Failure) { check(true,"Модель: пустой ответ отклонён"); }
+        check(PromptCompressor.ToSerbianLatin("Љубав, ЊИВА, џеп, Ђак, ћевап, чаша, шума, жаба; Љ https://example.com 42 ok")
+            =="Ljubav, NJIVA, džep, Đak, ćevap, čaša, šuma, žaba; Lj https://example.com 42 ok", "Перевод: сербская кириллица → латиница, диграфы и капс");
         RenderActions(panel, dir, check);
         CheckImageTranslation(dir, check);
         panel.ShowTranslatedImageResult(true, false);

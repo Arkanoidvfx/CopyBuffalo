@@ -123,6 +123,7 @@ sealed class ClipboardWatcher : IDisposable
                 var (capturedSequence, owner, d) = _readClipboard(limits);
                 _lastSequence = capturedSequence; // Associate the snapshot with its copy, never with a later clipboard change.
                 if (d == null) return;
+                if (App.TraceOn) App.Trace($"capture: seq={sequence}->{capturedSequence} attempt={attempt} app={SourceApp(owner) ?? "?"} formats={string.Join(",", d.GetFormats())}");
                 if (OwnItem(d) is { } id)
                 {
                     if (id != Guid.Empty) await RunQueued(async () => await _ui.InvokeAsync(() => _store.Touch(id, now)));
@@ -150,7 +151,11 @@ sealed class ClipboardWatcher : IDisposable
                 else App.Trace($"capture ignored: nothing within limits, formats={string.Join(",", d.GetFormats())}");
                 return;
             }
-            catch (ExternalException) { await Task.Delay(Math.Min(5 << Math.Min(attempt, 5), 100)); }
+            catch (ExternalException e)
+            {
+                if (attempt == 0) App.Trace($"capture: clipboard busy, retrying: {e.Message}");
+                await Task.Delay(Math.Min(5 << Math.Min(attempt, 5), 100));
+            }
             catch (Exception e) { App.Trace($"capture skipped: {e.GetType().Name}: {e.Message}"); return; } // владелец умер до отложенного рендера и т.п.
         }
     }

@@ -41,6 +41,15 @@ static class ClipboardSnapshotChecks
         try { ClipboardSnapshot.Materialize(delayed, new()); }
         catch (ExternalException) { retry = true; }
         check(retry, "snapshot: unavailable native Unicode retries instead of saving ANSI question marks");
+        var empty = new DataObject();
+        empty.SetData(DataFormats.UnicodeText, "", false);
+        retry = false;
+        try { ClipboardSnapshot.Materialize(empty, new()); }
+        catch (ExternalException) { retry = true; }
+        check(retry, "snapshot: advertised but empty Unicode text (Chrome right after a copy) retries instead of dropping the copy");
+        var blank = new DataObject();
+        blank.SetData(DataFormats.UnicodeText, "   ", false);
+        check(ClipboardSnapshot.Materialize(blank, new()).GetFormats().Length == 0, "snapshot: whitespace-only text is ignored without retrying");
 
         var bitmap = BitmapSource.Create(2, 1, 96, 96, PixelFormats.Bgra32, null,
             new byte[] { 0, 0, 255, 0, 0, 255, 0, 0 }, 8);

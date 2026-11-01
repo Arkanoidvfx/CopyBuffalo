@@ -149,6 +149,32 @@ sealed class PromptCompressor : IDisposable
         return translated.Length > 0 ? translated : throw new Failure(UiText.T("Модель вернула пустой перевод."));
     }
 
+    // Сербская кириллица → латиница (гаевица). Модель при кириллическом исходнике (русский) отвечает кириллицей,
+    // какой бы алфавит ни просили, а соответствие букв взаимно однозначно — переводим сами. Русские буквы,
+    // если модель их подмешала, — ближайшими сербскими.
+    static readonly Dictionary<char, string> SerbianLatin = new()
+    {
+        ['а'] = "a", ['б'] = "b", ['в'] = "v", ['г'] = "g", ['д'] = "d", ['ђ'] = "đ", ['е'] = "e", ['ж'] = "ž", ['з'] = "z", ['и'] = "i",
+        ['ј'] = "j", ['к'] = "k", ['л'] = "l", ['љ'] = "lj", ['м'] = "m", ['н'] = "n", ['њ'] = "nj", ['о'] = "o", ['п'] = "p", ['р'] = "r",
+        ['с'] = "s", ['т'] = "t", ['ћ'] = "ć", ['у'] = "u", ['ф'] = "f", ['х'] = "h", ['ц'] = "c", ['ч'] = "č", ['џ'] = "dž", ['ш'] = "š",
+        ['й'] = "j", ['ю'] = "ju", ['я'] = "ja", ['э'] = "e", ['ё'] = "jo", ['щ'] = "šč", ['ы'] = "i", ['ь'] = "", ['ъ'] = "",
+    };
+
+    internal static string ToSerbianLatin(string text)
+    {
+        var sb = new System.Text.StringBuilder(text.Length + 8);
+        for (int i = 0; i < text.Length; i++)
+        {
+            char c = text[i];
+            if (!SerbianLatin.TryGetValue(char.ToLowerInvariant(c), out var latin)) { sb.Append(c); continue; }
+            if (!char.IsUpper(c)) { sb.Append(latin); continue; }
+            // Диграф в капсе (ЉУБАВ → LJUBAV) — если и соседняя буква заглавная; иначе Ljubav.
+            bool caps = latin.Length > 1 && (i + 1 < text.Length ? char.IsUpper(text[i + 1]) : i > 0 && char.IsUpper(text[i - 1]));
+            sb.Append(caps ? latin.ToUpperInvariant() : char.ToUpperInvariant(latin[0]) + latin[1..]);
+        }
+        return sb.ToString();
+    }
+
     internal async Task<string[]> TranslateRegionsAsync(IReadOnlyList<OcrText.Region> regions, CancellationToken cancel)
     {
         if (regions.Sum(r => (long)r.Text.Length) > MaxChars || regions.Count > 256)
