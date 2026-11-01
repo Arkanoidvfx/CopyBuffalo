@@ -923,8 +923,8 @@ partial class PanelWindow : Window
         if (ItemOf(sender) is { IsImage: true, Recognizing: false } item) TranslateImageRequested?.Invoke(item);
     }
 
-    /// <summary>Популярные языки перевода текста: английский, русский, китайский, хинди и основные европейские.</summary>
-    static readonly string[] TextTranslationTargets = ["en", "ru", "zh-Hans", "hi", "es", "de", "fr"];
+    /// <summary>Языки перевода текста: английский, русский, китайский, японский, хинди, основные европейские и сербский в обеих графиках.</summary>
+    static readonly string[] TextTranslationTargets = ["en", "ru", "zh-Hans", "ja", "hi", "es", "de", "fr", "sr-Latn", "sr-Cyrl"];
     public event Action<ClipItem, System.Globalization.CultureInfo>? TranslateTextRequested;
 
     void TranslateText_Click(object sender, RoutedEventArgs e)
