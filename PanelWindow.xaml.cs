@@ -55,6 +55,8 @@ partial class PanelWindow : Window
     DateTime _labelsDay;     // день, на который посчитаны подписи времени
     WinEventProc? _onForeground; // держим ссылку: хук вызывает делегат, GC не должен его собрать
     RECT _anchor;            // каретка последнего показа: от неё же ставим окно, выросшее под настройки
+    RECT? _draggedTo;        // окно, куда панель перетащили за шапку: до перезапуска показываем там, а не у каретки
+    Point? _headerPress;     // нажатие на шапке: перетаскивание начинается после порога, клик по вкладке остаётся кликом
     Size _normalSize;        // размер панели без настроек
     readonly List<ListBoxItem> _shortcutContainers = [];
     readonly HashSet<ClipItem> _leaving = [];  // уезжают с анимацией, ещё в списке
@@ -615,9 +617,26 @@ partial class PanelWindow : Window
         ShowActivated = true;
     }
 
+    void Header_MouseDown(object sender, MouseButtonEventArgs e) => _headerPress = e.GetPosition(this);
+    void Header_MouseUp(object sender, MouseButtonEventArgs e) => _headerPress = null;
+
+    void Header_MouseMove(object sender, MouseEventArgs e)
+    {
+        if (_headerPress is not { } start || e.LeftButton != MouseButtonState.Pressed) return;
+        var now = e.GetPosition(this);
+        if (Math.Abs(now.X - start.X) < SystemParameters.MinimumHorizontalDragDistance &&
+            Math.Abs(now.Y - start.Y) < SystemParameters.MinimumVerticalDragDistance) return;
+        _headerPress = null;
+        try { DragMove(); } catch (InvalidOperationException) { return; } // кнопку уже отпустили
+        if (GetWindowRect(_hwnd, out var rect)) _draggedTo = rect;
+        StartOutsideTimer();
+    }
+
     void Place(RECT a)
     {
-        var mon = MonitorFromPoint(new POINT { X = a.Left, Y = a.Bottom }, MONITOR_DEFAULTTONEAREST);
+        var at = _draggedTo;
+        var mon = MonitorFromPoint(at is { } d ? new POINT { X = (d.Left + d.Right) / 2, Y = (d.Top + d.Bottom) / 2 }
+            : new POINT { X = a.Left, Y = a.Bottom }, MONITOR_DEFAULTTONEAREST);
         var mi = new MONITORINFO { cbSize = System.Runtime.InteropServices.Marshal.SizeOf<MONITORINFO>() };
         GetMonitorInfo(mon, ref mi);
         GetDpiForMonitor(mon, 0, out var dpi, out _);
@@ -633,10 +652,11 @@ partial class PanelWindow : Window
         int y = a.Bottom + gap;
         bool above = y + h > work.Bottom;
         if (above) y = a.Top - gap - h; // не влезает снизу — над кареткой
+        if (at is { } dragged) { x = dragged.Left + m; y = dragged.Top + m; above = false; }
         x = Math.Clamp(x, work.Left, Math.Max(work.Left, work.Right - w));
         y = Math.Clamp(y, work.Top, Math.Max(work.Top, work.Bottom - h));
         // Растёт и сжимается от каретки: по горизонтали — её место на панели, по вертикали — край, ближний к ней.
-        Root.RenderTransformOrigin = new Point(Math.Clamp((a.Left - x) / (double)w, 0, 1), above ? 1 : 0);
+        Root.RenderTransformOrigin = at != null ? new Point(0.5, 0) : new Point(Math.Clamp((a.Left - x) / (double)w, 0, 1), above ? 1 : 0);
         SetWindowPos(_hwnd, HWND_TOPMOST, x - m, y - m, w + 2 * m, h + 2 * m, SWP_NOACTIVATE);
     }
 

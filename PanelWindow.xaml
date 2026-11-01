@@ -294,7 +294,9 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <DockPanel Margin="4,0,6,6" Height="32">
+        <!-- За шапку (вкладки и пустое место рядом) панель перетаскивается: Header_MouseMove -->
+        <DockPanel x:Name="PanelHeader" Margin="4,0,6,6" Height="32" Background="Transparent"
+                   PreviewMouseLeftButtonDown="Header_MouseDown" PreviewMouseMove="Header_MouseMove" PreviewMouseLeftButtonUp="Header_MouseUp">
             <!-- Пауза, настройки и очистка — в меню «⋯»: опасная очистка не лежит в одном клике рядом с шестерёнкой -->
             <Button x:Name="MoreButton" DockPanel.Dock="Right" Style="{StaticResource SubtleIconButton}" Focusable="True" Width="32" Height="32"
                     Content="&#xE712;" Click="More_HeaderClick" FontSize="14"

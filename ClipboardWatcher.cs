@@ -116,7 +116,10 @@ sealed class ClipboardWatcher : IDisposable
             if (elapsed.Elapsed > TimeSpan.FromSeconds(5)) { App.Trace($"capture gave up after {attempt} attempts: clipboard busy"); return; }
             try
             {
-                if (Paused || _sequence() != sequence) return; // не перечитывать новое копирование из старого повтора
+                // Повтор отменяем, только если новое копирование уже перехватил свой CaptureCurrent. Сам номер буфера
+                // сравнивать нельзя: отложенный рендер формата (Office, Проводник, служба истории Windows) увеличивает
+                // его без нового WM_CLIPBOARDUPDATE — и копирование, попавшее на занятый буфер, пропадало.
+                if (Paused || _lastSequence != sequence) return;
                 var (capturedSequence, owner, d) = _readClipboard(limits);
                 _lastSequence = capturedSequence; // Associate the snapshot with its copy, never with a later clipboard change.
                 if (d == null) return;
@@ -144,6 +147,7 @@ sealed class ClipboardWatcher : IDisposable
                     return;
                 }
                 if (ReadImageData(d, limits) is { } image) await RunQueued(() => AddImageAsync(image, now, sourceApp, limits));
+                else App.Trace($"capture ignored: nothing within limits, formats={string.Join(",", d.GetFormats())}");
                 return;
             }
             catch (ExternalException) { await Task.Delay(Math.Min(5 << Math.Min(attempt, 5), 100)); }
@@ -469,6 +473,20 @@ sealed class ClipboardWatcher : IDisposable
         var excluded = new ClipboardWatcher(retryStore, () => sequence, _ => (sequence, IntPtr.Zero, ignored));
         Complete(excluded.CaptureCurrent());
         check(retryStore.Items.Count == 1, "sensitive non-text clipboard payloads are still excluded");
+
+        var renderStore = new HistoryStore(Path.Combine(dir, "render-retry", "history.dat"));
+        bool renderBusy = true;
+        var render = new ClipboardWatcher(renderStore, () => sequence, _ =>
+            renderBusy ? throw new ExternalException("Synthetic clipboard lock") : (sequence, IntPtr.Zero, Text("rendered late")));
+        sequence++;
+        var late = render.CaptureCurrent();
+        sequence++; // владелец дорендерил формат: номер вырос, нового уведомления нет
+        renderBusy = false;
+        Complete(late);
+        check(renderStore.Items.Count == 1 && renderStore.Items[0].Text == "rendered late",
+            "a busy copy whose sequence grew from delayed rendering is still captured");
+        check(render.CaptureCurrent().IsCompleted && renderStore.Items.Count == 1,
+            "the rendered sequence is remembered so a late duplicate notification is ignored");
 
         var burstStore = new HistoryStore(Path.Combine(dir, "mixed-capture", "history.dat"));
         var burst = new ClipboardWatcher(burstStore, () => sequence, _ => (sequence, IntPtr.Zero, current));
