@@ -102,7 +102,7 @@ partial class PanelWindow : Window
     }
     public int ImageZoomScale { get => (int)ZoomScaleSlider.Value; set => ZoomScaleSlider.Value = Math.Clamp(value, 1, 5); }
     public bool AutoHideOutside { get => OutsideHideToggle.IsChecked == true; set => OutsideHideToggle.IsChecked = value; }
-    /// <summary>Булавка в шапке: панель не прячется сама, ни от мыши, ни от фокуса, ни после вставки. Закрывают её только Esc и Win+V.</summary>
+    /// <summary>Булавка в шапке: панель не прячется сама, ни от мыши, ни от фокуса, ни после вставки. Закрывает её только Esc; Win+V возвращает ей клавиатуру (FocusKept).</summary>
     public bool KeepOpen { get => KeepOpenButton.IsChecked == true; set => KeepOpenButton.IsChecked = value; }
     public event Action<bool>? KeepOpenChanged;
     /// <summary>Закреплённая панель: передний план перешёл к чужому окну, теперь вставлять надо туда.</summary>

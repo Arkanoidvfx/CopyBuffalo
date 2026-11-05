@@ -27,7 +27,7 @@ Updates are **on by default**. They download in the background and install when 
 - **Alt+click** to start selecting multiple entries. Combine text, fill paths into a command, or queue images and videos for pasting.
 - Point at an entry, hold **Shift** and roll the wheel up or down to collect entries from it. Release **Shift** to paste them all at once.
 - Turn folders into ZIP files or extract audio from video.
-- Click the pin next to **⋯** to keep the panel on screen while you work in other windows; its edge glows while pinned. **Esc** or **Win+V** still closes it, and pasting goes to the window you used last.
+- Click the pin next to **⋯** to keep the panel on screen while you work in other windows; its edge glows while pinned. **Esc** closes it, **Win+V** returns the keyboard to it, and pasting goes to the window you used last.
 
 ### Combine text and file paths
 
