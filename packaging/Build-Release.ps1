@@ -1,9 +1,9 @@
 param([string]$WorkRoot)
 $ErrorActionPreference='Stop'
 $repo=Split-Path $PSScriptRoot
-$root=if ($WorkRoot) { [IO.Path]::GetFullPath($WorkRoot) } else { Join-Path $repo '.tmp\release-v0.2.8' }
+$root=if ($WorkRoot) { [IO.Path]::GetFullPath($WorkRoot) } else { Join-Path $repo '.tmp\release-v0.2.9' }
 $commit=(& git -C $repo rev-parse HEAD).Trim()
-$version='0.2.8'
+$version='0.2.9'
 $source=Join-Path $root 'source'
 $stage=Join-Path $root 'main'
 $output=Join-Path $root 'dist'
@@ -77,5 +77,5 @@ foreach ($file in Get-ChildItem -LiteralPath $assets -File) {
 }
 if ($records.Count -ne (7 + @(Get-ChildItem -LiteralPath $assets -Filter '*.part*' -File).Count)) { throw 'Incomplete release assets.' }
 @{version=$version;sourceCommit=$commit;productVersion=$product.ProductVersion;assets=$records;validated=[DateTime]::UtcNow.ToString('o')} | ConvertTo-Json -Depth 6 | Set-Content -LiteralPath (Join-Path $root 'validation.json')
-'PASS: installers, six-language regressions, distribution, updater helper, full launcher and hash checks.' | Set-Content -LiteralPath (Join-Path $root 'PASS.txt')
+'PASS: installers, seven-language regressions, distribution, updater helper, full launcher and hash checks.' | Set-Content -LiteralPath (Join-Path $root 'PASS.txt')
 Get-Content -LiteralPath (Join-Path $root 'PASS.txt')
