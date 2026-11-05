@@ -183,6 +183,13 @@ static class Paster
         return data;
     }
 
+    /// <summary>Текст в двойных кавычках; уже взятый в них не удваиваем. Внутренние кавычки не трогаем: правила экранирования у всех программ свои.</summary>
+    internal static string Quoted(string text)
+    {
+        var s = text.Trim();
+        return s is ['"', .., '"'] ? s : $"\"{s}\"";
+    }
+
     public static void CopyText(string text, bool excludeFromHistory = false, bool sensitive = false) => WriteClipboard(TextClipboard(text, excludeFromHistory, sensitive));
 
     static void WriteClipboard(DataObject data)

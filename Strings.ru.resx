@@ -984,6 +984,10 @@
     <value>Google Карты</value>
     <comment>Google Карты</comment>
   </data>
+  <data name="SD11DE7596B8F78CB" xml:space="preserve">
+    <value>Панель закреплена: эффект остановлен</value>
+    <comment>Панель закреплена: эффект остановлен</comment>
+  </data>
   <data name="SDE9D352AD5C8C949" xml:space="preserve">
     <value>В релизе нет установщика CopyBuffalo-Setup.exe.</value>
     <comment>В релизе нет установщика CopyBuffalo-Setup.exe.</comment>
@@ -2279,5 +2283,33 @@
   <data name="S13A1601A66B84822" xml:space="preserve">
     <value>Текст переводится.</value>
     <comment>Текст переводится.</comment>
+  </data>
+  <data name="SF2E6B378918A9586" xml:space="preserve">
+    <value>Отпустите, чтобы закрыть</value>
+    <comment>Отпустите, чтобы закрыть</comment>
+  </data>
+  <data name="S6BCCE6136CD105CA" xml:space="preserve">
+    <value>Не скрывать панель</value>
+    <comment>Не скрывать панель</comment>
+  </data>
+  <data name="S29D614F401E3483B" xml:space="preserve">
+    <value>Снова скрывать панель</value>
+    <comment>Снова скрывать панель</comment>
+  </data>
+  <data name="S5B3067173F204EB7" xml:space="preserve">
+    <value>Отпустите, чтобы вставить: {0}</value>
+    <comment>Отпустите, чтобы вставить: {0}</comment>
+  </data>
+  <data name="S21F2F3E398D92E6A" xml:space="preserve">
+    <value>Shift+колесо</value>
+    <comment>Shift+колесо</comment>
+  </data>
+  <data name="SE2FE65015C71CA55" xml:space="preserve">
+    <value>несколько</value>
+    <comment>несколько</comment>
+  </data>
+  <data name="SC741550FE8935208" xml:space="preserve">
+    <value>Наведите на запись, держите Shift и крутите колесо: записи копятся от неё. Отпустите Shift, и все вставятся разом.</value>
+    <comment>Наведите на запись, держите Shift и крутите колесо: записи копятся от неё. Отпустите Shift, и все вставятся разом.</comment>
   </data>
 </root>

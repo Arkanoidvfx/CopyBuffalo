@@ -577,6 +577,14 @@ sealed class ClipboardWatcher : IDisposable
         sequence++;
         Complete(secretWatcher.CaptureCurrent());
         check(secretStore.Items.Count == 6, "our ignored internal writes still do not create password history entries");
+        var incognito = new DataObject();
+        incognito.SetData(DataFormats.UnicodeText, "https://github.com/D4Vinci/Scrapling");
+        incognito.SetData("CanIncludeInClipboardHistory", new MemoryStream(new byte[4]));
+        current = incognito;
+        sequence++;
+        Complete(secretWatcher.CaptureCurrent());
+        check(secretStore.Items[0] is { IsSensitive: false, Preview: "https://github.com/D4Vinci/Scrapling", Kind: "url" },
+            "link copied with Chrome's no-history flag is captured readable");
     }
 
     internal static void SelfTestListener(string dir, Action<bool, string> check)

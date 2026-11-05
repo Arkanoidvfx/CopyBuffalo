@@ -984,6 +984,10 @@
     <value>Google 地圖</value>
     <comment>Google Карты</comment>
   </data>
+  <data name="SD11DE7596B8F78CB" xml:space="preserve">
+    <value>面板已固定：效果已停止</value>
+    <comment>Панель закреплена: эффект остановлен</comment>
+  </data>
   <data name="SDE9D352AD5C8C949" xml:space="preserve">
     <value>此版本缺少 CopyBuffalo-Setup.exe。</value>
     <comment>В релизе нет установщика CopyBuffalo-Setup.exe.</comment>
@@ -2279,5 +2283,33 @@
   <data name="S13A1601A66B84822" xml:space="preserve">
     <value>正在翻譯文字。</value>
     <comment>Текст переводится.</comment>
+  </data>
+  <data name="SF2E6B378918A9586" xml:space="preserve">
+    <value>放開即可關閉</value>
+    <comment>Отпустите, чтобы закрыть</comment>
+  </data>
+  <data name="S6BCCE6136CD105CA" xml:space="preserve">
+    <value>保持面板開啟</value>
+    <comment>Не скрывать панель</comment>
+  </data>
+  <data name="S29D614F401E3483B" xml:space="preserve">
+    <value>恢復自動隱藏面板</value>
+    <comment>Снова скрывать панель</comment>
+  </data>
+  <data name="S5B3067173F204EB7" xml:space="preserve">
+    <value>放開即可貼上 {0} 項</value>
+    <comment>Отпустите, чтобы вставить: {0}</comment>
+  </data>
+  <data name="S21F2F3E398D92E6A" xml:space="preserve">
+    <value>Shift+滾輪</value>
+    <comment>Shift+колесо</comment>
+  </data>
+  <data name="SE2FE65015C71CA55" xml:space="preserve">
+    <value>批次貼上</value>
+    <comment>несколько</comment>
+  </data>
+  <data name="SC741550FE8935208" xml:space="preserve">
+    <value>指向一筆記錄，按住 Shift 並捲動滾輪，從它開始收集記錄。放開 Shift 即可一次全部貼上。</value>
+    <comment>Наведите на запись, держите Shift и крутите колесо: записи копятся от неё. Отпустите Shift, и все вставятся разом.</comment>
   </data>
 </root>

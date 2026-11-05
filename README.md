@@ -6,7 +6,7 @@ The software is called **CopyBuffalo**. Existing downloads and internal file/sto
 
 **[Download for Windows](https://github.com/Arkanoidvfx/CopyBuffalo/releases/latest/download/CopyBuffalo-Setup.exe)** · [All downloads](https://github.com/Arkanoidvfx/CopyBuffalo/releases/latest) · [Report a bug](https://github.com/Arkanoidvfx/CopyBuffalo/issues)
 
-Windows 10 (1809+) or Windows 11 · Intel/AMD x64 · English, Russian, Simplified Chinese, Traditional Chinese, Japanese, and Hindi interface.
+Windows 10 (1809+) or Windows 11 · Intel/AMD x64 · English, Russian, Simplified Chinese, Traditional Chinese, Cantonese, Japanese, and Hindi interface.
 
 <img src="docs/images/history.png" width="392" alt="Clipboard panel with sample notes, a command, and a file path">
 
@@ -22,9 +22,12 @@ Updates are **on by default**. They download in the background and install when 
 
 - Search your history, filter by app or content type, and pin items in groups.
 - Keep text formatting, paste plain text, or edit a saved entry.
+- **Ctrl+click** or **Ctrl+Enter** to paste text or a folder path in double quotes.
 - Extract text from screenshots with local OCR.
 - **Alt+click** to start selecting multiple entries. Combine text, fill paths into a command, or queue images and videos for pasting.
+- Point at an entry, hold **Shift** and roll the wheel up or down to collect entries from it. Release **Shift** to paste them all at once.
 - Turn folders into ZIP files or extract audio from video.
+- Click the pin next to **⋯** to keep the panel on screen while you work in other windows; its edge glows while pinned. **Esc** or **Win+V** still closes it, and pasting goes to the window you used last.
 
 ### Combine text and file paths
 
@@ -52,7 +55,7 @@ Versions 0.2.3 and older need one manual upgrade to 0.2.4 because the installer 
 
 History stays in `%LOCALAPPDATA%\ArkCopyBuffer`, encrypted for your Windows account. Settings are stored separately from the app. OCR and bundled AI run locally; update checks and downloads contact GitHub.
 
-Text marked sensitive or excluded from history by its source app is kept encrypted and shown as `********`. Hover over its card for two seconds to reveal the value directly in that card; leaving immediately restores the stars. Unmarked text is not guessed to be a password.
+Text marked sensitive or excluded from history by its source app is kept encrypted and shown as `********`. Hover over its card for two seconds to reveal the value directly in that card; leaving immediately restores the stars. Unmarked text is not guessed to be a password. A plain `http(s)` link is not treated as a password even when its source app excludes it from history, as browsers can for private windows; it stays readable and loses that exclusion when pasted from the panel. A link containing a login or a parameter such as `token=` stays masked.
 
 Clipboard history can contain sensitive information. Pause recording from the tray menu when needed. Encryption does not hide it from other programs running as your Windows user.
 

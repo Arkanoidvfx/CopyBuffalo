@@ -42,7 +42,7 @@ internal static class LocalizationChecks
                 Require(Slots(en[key]).SequenceEqual(Slots(text)), "Format arguments: " + language + ":" + key);
             }
         }
-        string expectedClipboard = UiText.Language switch { "en" => "Clipboard", "ru" => "Буфер", "zh-Hans" => "剪贴板", "zh-Hant" => "剪貼簿", "ja" => "クリップボード", "hi" => "क्लिपबोर्ड", _ => throw new InvalidOperationException() };
+        string expectedClipboard = UiText.Language switch { "en" => "Clipboard", "ru" => "Буфер", "zh-Hans" => "剪贴板", "zh-Hant" or "zh-HK" => "剪貼簿", "ja" => "クリップボード", "hi" => "क्लिपबोर्ड", _ => throw new InvalidOperationException() };
         Require(UiText.T("Буфер") == expectedClipboard, "Selected language is used");
         Require(CultureInfo.CurrentUICulture.Name == UiText.Language, "Built-in WPF controls use the selected UI culture");
         CheckFonts();
@@ -77,7 +77,7 @@ internal static class LocalizationChecks
     static void CheckFonts()
     {
         var faces = new List<GlyphTypeface>();
-        foreach (var family in new[] { "IBM Plex Sans", "IBM Plex Mono", "Noto Sans CJK SC", "Noto Sans CJK TC", "Noto Sans CJK JP", "IBM Plex Sans Devanagari" })
+        foreach (var family in new[] { "IBM Plex Sans", "IBM Plex Mono", "Noto Sans CJK SC", "Noto Sans CJK TC", "Noto Sans CJK HK", "Noto Sans CJK JP", "IBM Plex Sans Devanagari" })
         {
             var font = new FontFamily(new Uri("pack://application:,,,/"), "./Assets/Fonts/#" + family);
             foreach (var weight in new[] { FontWeights.Normal, family.StartsWith("Noto", StringComparison.Ordinal) ? FontWeights.Bold : FontWeights.SemiBold })
@@ -90,7 +90,7 @@ internal static class LocalizationChecks
         foreach (string symbolFamily in new[] { "Segoe UI", "Segoe UI Symbol" })
             if (new Typeface(symbolFamily).TryGetGlyphTypeface(out var symbols)) faces.Add(symbols);
         var values = UiText.Resources.GetResourceSet(CultureInfo.GetCultureInfo(UiText.Language), true, true)!
-            .Cast<DictionaryEntry>().Select(p => (string)p.Value!).Concat(UiText.Languages.Select(l => CultureInfo.GetCultureInfo(l).NativeName));
+            .Cast<DictionaryEntry>().Select(p => (string)p.Value!).Concat(UiText.Languages.Select(l => UiText.NativeName(CultureInfo.GetCultureInfo(l))));
         foreach (var rune in string.Concat(values).EnumerateRunes().Distinct())
         {
             if (System.Text.Rune.IsWhiteSpace(rune) || System.Text.Rune.GetUnicodeCategory(rune) is UnicodeCategory.Control or UnicodeCategory.Format) continue;
@@ -120,6 +120,45 @@ partial class PanelWindow
             LocalizationChecks.Require(LinesWord(1) == UiText.T("строка") && LinesWord(21) == UiText.T(UiText.Language == "ru" ? "строка" : "строк"), "Line plurals");
             LocalizationChecks.Save(panel.Root, 392, 492, Path.Combine(directory, "history.png"));
             LocalizationChecks.Require(panel.TabAll.Content.ToString() == UiText.T("Буфер"), "History tab label");
+
+            double hintsWidth = panel.KeyHints.ActualWidth - panel.KeyHints.Padding.Left - panel.KeyHints.Padding.Right;
+            foreach (var (left, right) in new[] { (panel.HintPaste, panel.HintQuick), (panel.HintSelect, panel.HintStack) })
+            {
+                double need = left.ColumnDefinitions.Sum(c => c.ActualWidth) + right.ColumnDefinitions.Sum(c => c.ActualWidth) + 8;
+                LocalizationChecks.Require(need <= hintsWidth, $"Key hints fit in one row: {need:0} of {hintsWidth:0}");
+            }
+
+            panel.KeepOpen = true;
+            panel.PinEnergy.Visibility = Visibility.Visible; panel.PinEnergy.Opacity = 1; panel.PinSpark.Visibility = Visibility.Collapsed; // окно не показано, поэтому кромку включаем сами
+            LocalizationChecks.Save(panel.Root, 392, 492, Path.Combine(directory, "keep-open-still.png"));
+            panel.PinSpark.Visibility = Visibility.Visible;
+            panel.PlacePinOrbit(0.3);
+            LocalizationChecks.Save(panel.Root, 392, 492, Path.Combine(directory, "keep-open.png"));
+            panel.PlacePinOrbit(0.72);
+            LocalizationChecks.Save(panel.Root, 392, 492, Path.Combine(directory, "keep-open-2.png"));
+            panel.PinEnergy.Visibility = Visibility.Collapsed;
+            panel.TabPinned.IsChecked = true;
+            LocalizationChecks.Save(panel.Root, 392, 492, Path.Combine(directory, "keep-open-pinned-tab.png"));
+            var tabs = (FrameworkElement)panel.TabsHost.Children[0];
+            LocalizationChecks.Require(tabs.ActualWidth <= panel.TabsHost.ActualWidth + 0.5, $"Header tabs fit beside its buttons on the busiest tab: {tabs.ActualWidth:0} of {panel.TabsHost.ActualWidth:0}");
+            panel.KeepOpen = false;
+            panel.TabAll.IsChecked = true;
+            panel.Root.UpdateLayout();
+            panel.BeginStack();
+            panel._stackWatch.Stop();
+            panel.GrowStack(store.Items[0]);
+            panel.GrowStack(null);
+            panel.GrowStack(null);
+            LocalizationChecks.Save(panel.Root, 392, 492, Path.Combine(directory, "stack.png"));
+            panel.RefreshMergeMarks();
+            LocalizationChecks.Save(panel.Root, 392, 492, Path.Combine(directory, "stack.png"));
+            var newest = (ListBoxItem)panel.List.ItemContainerGenerator.ContainerFromItem(store.Items[0]);
+            var badge = (Border)newest.Template.FindName("Key", newest);
+            LocalizationChecks.Require(badge.Visibility == Visibility.Visible && ((TextBlock)badge.Child).Text == "3", "Newest clip of a stack of three is pasted last");
+            LocalizationChecks.Require(panel.StackHint.Text.Contains('3', StringComparison.Ordinal), "Stack hint shows the count");
+            panel.CloseStack();
+            panel.Root.UpdateLayout();
+            LocalizationChecks.Require(badge.Visibility == Visibility.Collapsed, "Closing a stack clears its numbers");
             panel.Search.ApplyTemplate();
             var clear = (Button)panel.Search.Template.FindName("PART_Clear", panel.Search);
             LocalizationChecks.Require(clear.ToolTip?.ToString() == UiText.T("Очистить поиск (Esc)"), "Application-level styles use the selected language from startup");

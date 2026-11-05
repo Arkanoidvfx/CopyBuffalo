@@ -171,6 +171,9 @@ public partial class App : Application
             Paster.CleanGifTemp(settings.TempDays);
         };
         _panel.PasteRequested += OnPasteRequested;
+        _panel.StackPasteRequested += OnStackPasteRequested;
+        _panel.QuotedPasteRequested += OnQuotedPasteRequested;
+        _panel.ExternalForeground += foreground => _target = foreground;
         _panel.SeriesPasteAllRequested += items => { if (items.Count > 0) OnPasteRequested(items[0], false, items); };
         _panel.TypeRequested += OnTypeRequested;
         _panel.CompressRequested += OnCompressRequested;
@@ -186,7 +189,7 @@ public partial class App : Application
             _panel.ShowKeyHints = key?.GetValue("KeyHints") is not int hints || hints != 0;
             _panel.PinnedAsList = key?.GetValue("PinnedView") is int view && view == 1;
             _panel.VfxEnabled = key?.GetValue("VfxEnabled") is not int vfx || vfx != 0;
-            _panel.VfxOpacity = key?.GetValue("VfxOpacity") is int vfxOpacity ? vfxOpacity : 85;
+            _panel.VfxOpacity = key?.GetValue("VfxOpacity") is int vfxOpacity ? vfxOpacity : 20;
             _panel.VfxSpeed = key?.GetValue("VfxSpeed") is int vfxSpeed ? vfxSpeed : 100;
             _panel.TextPeekEnabled = key?.GetValue("TextPeek") is not int peek || peek != 0;
             _panel.TextPeekDelayMs = key?.GetValue("TextPeekDelayMs") is int peekDelay ? peekDelay : 600;
@@ -198,7 +201,13 @@ public partial class App : Application
             _panel.AutoHideOutside = key?.GetValue("AutoHideOutside") is int outside ? outside != 0
                 : key?.GetValue("HideOnDeactivate") is not int h || h != 0;
             _panel.OutsideHideDelayMs = key?.GetValue("OutsideHideDelayMs") is int delay ? delay : 3000;
+            _panel.KeepOpen = key?.GetValue("KeepOpen") is int keepOpen && keepOpen != 0;
         }
+        _panel.KeepOpenChanged += on =>
+        {
+            using var key = Registry.CurrentUser.CreateSubKey(SettingsKey);
+            key.SetValue("KeepOpen", on ? 1 : 0, RegistryValueKind.DWord);
+        };
         _panel.TimingsChanged += (show, hide) =>
         {
             using var key = Registry.CurrentUser.CreateSubKey(SettingsKey);
@@ -306,6 +315,7 @@ public partial class App : Application
         Native.GetWindowThreadProcessId(foreground, out var fgPid);
         if (_panel.IsVisible && fgPid == Environment.ProcessId) { _panel.HideAnimated(); return; }
         _target = foreground;
+        if (_panel.KeepOpen && _panel.IsShown) { _panel.FocusKept(); return; }
         long t = System.Diagnostics.Stopwatch.GetTimestamp();
         var (anchor, isCaret) = CaretLocator.Locate(foreground);
         double locate = Ms(t);
@@ -349,6 +359,66 @@ public partial class App : Application
 
     void OnPasteRequested(ClipItem item, bool plainText) => OnPasteRequested(item, plainText, null);
 
+    /// <summary>Ctrl+клик: запись в кавычках. В историю новая запись не попадает, пароль остаётся помеченным.</summary>
+    async void OnQuotedPasteRequested(ClipItem item)
+    {
+        _archiveCancel?.Cancel();
+        int version = ++_pasteVersion;
+        bool Current() => version == _pasteVersion;
+        _panel.HideAfterUse();
+        var target = _target;
+        try { Paster.CopyText(Paster.Quoted(item.Text), excludeFromHistory: true, sensitive: item.IsSensitive); }
+        catch (System.Runtime.InteropServices.ExternalException ex)
+        {
+            Log(ex);
+            Notify(InfoKind.Caution, UiText.T("Буфер обмена занят."), UiText.T("Повторите вставку."));
+            return;
+        }
+        _store.Touch(item.Id, DateTime.UtcNow);
+        if (target == IntPtr.Zero) return; // открыто из трея — только копируем
+        if (!await Paster.PasteInto(target, Current) && Current())
+            Notify(InfoKind.Info, UiText.T("Скопировано."), UiText.T("Не удалось вставить в нужное окно. Нажмите Ctrl+V."));
+    }
+
+    /// <summary>Стопка: по порядку, текстами одним блоком и картинками одной пачкой. Новых записей в истории не появляется.</summary>
+    async void OnStackPasteRequested(IReadOnlyList<ClipItem> items)
+    {
+        _archiveCancel?.Cancel();
+        int version = ++_pasteVersion;
+        bool Current() => version == _pasteVersion;
+        _panel.HideAfterUse();
+        var target = _target;
+        try
+        {
+            bool first = true;
+            foreach (var step in ClipStack.Plan(items))
+            {
+                if (!first) await Task.Delay(ClipStack.PasteGapMs);
+                first = false;
+                if (!Current()) return;
+                if (step.Text is { } text) Paster.CopyText(text, excludeFromHistory: true);
+                else if (step.Items.Count > 1) await Paster.SetImageSeriesClipboardAsync(step.Items, _store.ImagesDir, Current);
+                else await Paster.SetClipboardAsync(step.Items[0], false, _store.ImagesDir, Current);
+                if (target == IntPtr.Zero) return; // открыто из трея — вставлять некуда, остаётся первая часть в буфере
+                if (!await Paster.PasteInto(target, Current))
+                {
+                    if (Current()) Notify(InfoKind.Info, UiText.T("Скопировано."), UiText.T("Не удалось вставить в нужное окно. Нажмите Ctrl+V."));
+                    return;
+                }
+            }
+            // Как после обычной вставки: записи наверху и в том же порядке, повторить можно с верхней.
+            var now = DateTime.UtcNow;
+            for (int i = 0; i < items.Count; i++) _store.Touch(items[i].Id, now.AddMilliseconds(i));
+        }
+        catch (OperationCanceledException) { }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or InvalidDataException
+            or System.Security.Cryptography.CryptographicException or System.Runtime.InteropServices.ExternalException)
+        {
+            Log(ex);
+            Notify(InfoKind.Caution, UiText.T("Не удалось подготовить файл для вставки."), UiText.T("Повторите позже."));
+        }
+    }
+
     async void OnPasteRequested(ClipItem item, bool plainText, IReadOnlyList<ClipItem>? batch)
     {
         _archiveCancel?.Cancel();
@@ -359,7 +429,7 @@ public partial class App : Application
         bool pasted = false;
         try
         {
-            _panel.HideAnimated();
+            _panel.HideAfterUse();
             var target = _target;
             try
             {
@@ -417,7 +487,7 @@ public partial class App : Application
     {
         _archiveCancel?.Cancel();
         ++_pasteVersion;
-        _panel.HideAnimated();
+        _panel.HideAfterUse();
         // Открыто из трея — печатать некуда, кладём в буфер.
         if (_target == IntPtr.Zero || !await Paster.TypeInto(_target, text))
         {
@@ -465,7 +535,7 @@ public partial class App : Application
                 && (_panel.IsActive || Native.GetForegroundWindow() == target);
             if (canPaste)
             {
-                _panel.HideAnimated();
+                _panel.HideAfterUse();
                 if (await Paster.PasteInto(target, Current)) return;
             }
             if (Current()) Notify(InfoKind.Success, UiText.T("ZIP готов и скопирован."), UiText.T("Нажмите Ctrl+V в приложении, принимающем файлы."));
@@ -663,7 +733,8 @@ public partial class App : Application
         try
         {
             // Запуск llama-server и ожидание модели — в пуле: панель не должна замирать даже на синхронных участках.
-            string text = item.Text, language = target.EnglishName;
+            // Без явных маркеров кантонского модель сбивается на путунхуа в традиционных иероглифах.
+            string text = item.Text, language = target.Name == "zh-HK" ? "colloquial written Cantonese (粵語: 嘅, 唔, 咗, 喺, 係, 冇) in Traditional Chinese characters, not Mandarin" : target.EnglishName;
             var translated = await Task.Run(() => _compressor.TranslateTextAsync(text, language, cancel.Token));
             if (target.Name == "sr-Latn") translated = PromptCompressor.ToSerbianLatin(translated); // модель отвечает кириллицей на кириллический исходник
             _panel.SetTextTranslationProgress(null);
@@ -867,6 +938,7 @@ public partial class App : Application
                 ["CautionFill"] = 0xFF433519, ["CautionIcon"] = 0xFFFCE100, ["SuccessFill"] = 0xFF393D1B, ["SuccessIcon"] = 0xFF6CCB5F,
                 ["DropValueText"] = 0xFF65F0A0, ["DropValueFill"] = 0xFF203C2D,
                 ["CriticalFill"] = 0xFF442726, ["CriticalIcon"] = 0xFFFF99A4, ["CriticalText"] = 0xFFFF99A4, ["InfoGlyph"] = 0xFF000000,
+                ["PinGlow"] = 0xFF0DFFE6, ["PinSpark"] = 0xFF9EFFF5, // кромка закреплённой панели: цвет пламени Nether
             }
             : new Dictionary<string, uint>
             {
@@ -881,6 +953,7 @@ public partial class App : Application
                 ["CautionFill"] = 0xFFFFF4CE, ["CautionIcon"] = 0xFF9D5D00, ["SuccessFill"] = 0xFFDFF6DD, ["SuccessIcon"] = 0xFF0F7B0F,
                 ["DropValueText"] = 0xFF0B6E3B, ["DropValueFill"] = 0xFFE3F4E9,
                 ["CriticalFill"] = 0xFFFDE7E9, ["CriticalIcon"] = 0xFFC42B1C, ["CriticalText"] = 0xFFC42B1C, ["InfoGlyph"] = 0xFFFFFFFF,
+                ["PinGlow"] = 0xFF008F80, ["PinSpark"] = 0xFF008F80, // на светлом фоне чистая бирюза не читается
             };
 
         foreach (var (name, argb) in t)

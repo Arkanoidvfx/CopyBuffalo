@@ -18,7 +18,7 @@ partial class PanelWindow
         ConfirmLanguageRestart = ConfirmRestart;
         foreach (string language in UiText.Languages)
         {
-            var choice = new Button { Content = CultureInfo.GetCultureInfo(language).NativeName, Tag = language, Margin = new Thickness(4, 0, 4, 6) };
+            var choice = new Button { Content = UiText.NativeName(CultureInfo.GetCultureInfo(language)), Tag = language, Margin = new Thickness(4, 0, 4, 6) };
             choice.Click += Language_Click;
             AutomationProperties.SetName(choice, choice.Content.ToString());
             LanguageChoices.Children.Add(choice);

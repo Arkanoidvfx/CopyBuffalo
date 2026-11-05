@@ -13,7 +13,9 @@ namespace ArkCopyBuffer;
 internal static class UiText
 {
     internal static readonly ResourceManager Resources = new("ArkCopyBuffer.Strings", typeof(UiText).Assembly);
-    internal static readonly string[] Languages = ["en", "ru", "zh-Hans", "zh-Hant", "ja", "hi"];
+    internal static readonly string[] Languages = ["en", "ru", "zh-Hans", "zh-Hant", "zh-HK", "ja", "hi"];
+    /// <summary>Cantonese uses zh-HK, the culture every supported Windows knows; Windows only names it "Chinese (Hong Kong)".</summary>
+    internal static string NativeName(CultureInfo culture) => culture.Name == "zh-HK" ? "粵語" : culture.NativeName;
     static string _language = ReadLanguage();
     internal static string Language
     {
@@ -63,7 +65,7 @@ public sealed class UiFontExtension : MarkupExtension
     public override object ProvideValue(IServiceProvider serviceProvider)
     {
         string latin = Mono ? "IBM Plex Mono" : "IBM Plex Sans";
-        string cjk = UiText.Language switch { "zh-Hant" => "TC", "ja" => "JP", _ => "SC" };
+        string cjk = UiText.Language switch { "zh-Hant" => "TC", "zh-HK" => "HK", "ja" => "JP", _ => "SC" };
         return new FontFamily(new Uri("pack://application:,,,/"),
             $"./Assets/Fonts/#{latin}, ./Assets/Fonts/#Noto Sans CJK {cjk}, ./Assets/Fonts/#IBM Plex Sans Devanagari, Segoe UI");
     }

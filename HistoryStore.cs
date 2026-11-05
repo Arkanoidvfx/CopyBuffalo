@@ -162,6 +162,23 @@ public sealed class ClipItem : INotifyPropertyChanged
     [JsonIgnore] public Brush? Swatch => Kind == "color" && ColorConverter.ConvertFromString(TileTitle) is Color c ? new SolidColorBrush(c) : null;
 
     static readonly System.Text.RegularExpressions.Regex HexColor = new(@"^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$");
+    static readonly System.Text.RegularExpressions.Regex SecretParameter = new(
+        @"(?:^|[?&#;])(?:[^=&#;]*[_-])?(?:access|api|auth|client|id|refresh|session)?(?:token|secret|pass|passwd|password|pwd|key|sig|signature|auth|authorization|session|sessionid|sid|otp|code|jwt|credential|credentials)=",
+        System.Text.RegularExpressions.RegexOptions.IgnoreCase | System.Text.RegularExpressions.RegexOptions.CultureInvariant);
+
+    /// <summary>
+    /// Обычная http(s)-ссылка не пароль, даже если источник запретил ей историю Windows: так Chrome помечает копирование
+    /// из окна инкогнито. Ссылка с логином или параметром вроде token= остаётся скрытой.
+    /// ponytail: секрет в самом пути (вебхук, ссылка для входа) не распознаётся; признак источника тут не помог бы, его нет у старых записей.
+    /// </summary>
+    internal static bool IsPlainLink(string text)
+    {
+        var s = text.Trim();
+        return !s.Any(char.IsWhiteSpace)
+            && Uri.TryCreate(s, UriKind.Absolute, out var uri) && uri.Scheme is "http" or "https"
+            && uri.UserInfo.Length == 0
+            && !SecretParameter.IsMatch(uri.Query + uri.Fragment);
+    }
 
     void Describe()
     {
@@ -470,6 +487,7 @@ public sealed class HistoryStore
     {
         string key = TextKey(text);
         sensitive |= Items.Any(i => !i.IsImage && !i.IsMedia && i.IsSensitive && i.Text == text);
+        sensitive &= !ClipItem.IsPlainLink(text);
         var matches = Items.Where(i => !i.IsImage && !i.IsMedia
             && (sensitive ? i.Text == text : !i.IsSensitive && TextKey(i.Text) == key)).ToArray();
         if (sensitive)
@@ -762,6 +780,9 @@ public sealed class HistoryStore
                 Groups.Clear();
             }
         }
+        // Ссылки, которые прежние версии сочли паролем: снимаем звёздочки до объединения дублей.
+        bool unmasked = false;
+        foreach (var i in Items.Where(i => i.IsSensitive && ClipItem.IsPlainLink(i.Text))) { i.IsSensitive = false; unmasked = true; }
         bool deduplicated = false;
         try { deduplicated = ConsolidateTextDuplicates(); }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
@@ -770,7 +791,7 @@ public sealed class HistoryStore
             App.Log(ex);
         }
         bool recovered = RecoverOrphanFiles();
-        if (Prune(nowUtc) | recovered | deduplicated) Save();
+        if (Prune(nowUtc) | recovered | deduplicated | unmasked) Save();
     }
 
     bool ConsolidateTextDuplicates()
@@ -859,6 +880,7 @@ public sealed class HistoryStore
             StabilityChecks.Run(dir, Check);
             PanelWindow.SelfTestAnimation(dir, Check);
             PanelWindow.SelfTestSensitive(dir, Check);
+            PanelWindow.SelfTestClipStack(dir, Check);
             PanelWindow.SelfTestVfx(dir, Check);
             TextMerge.SelfTest(Check);
             DragWheelScroll.SelfTest(Check);

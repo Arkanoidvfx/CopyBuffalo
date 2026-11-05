@@ -2,7 +2,7 @@
 
 The interface keeps Plex Sans/Mono for Latin and Cyrillic text. `UiFont` adds bundled script fallbacks, so selecting a language does not require installing Windows font packs.
 
-- **Noto Sans CJK Regular/Bold** collections from [Noto CJK](https://github.com/notofonts/noto-cjk/tree/523d033d6cb47f4a80c58a35753646f5c3608a78), revision `523d033d6cb47f4a80c58a35753646f5c3608a78` (`Sans2.004`), files `Sans/OTC/NotoSansCJK-Regular.ttc` and `NotoSansCJK-Bold.ttc`. The selected UI language chooses the SC, TC, or JP family. License: `Noto-OFL.txt`.
+- **Noto Sans CJK Regular/Bold** collections from [Noto CJK](https://github.com/notofonts/noto-cjk/tree/523d033d6cb47f4a80c58a35753646f5c3608a78), revision `523d033d6cb47f4a80c58a35753646f5c3608a78` (`Sans2.004`), files `Sans/OTC/NotoSansCJK-Regular.ttc` and `NotoSansCJK-Bold.ttc`. The selected UI language chooses the SC, TC, HK, or JP family. License: `Noto-OFL.txt`.
 - **IBM Plex Sans Devanagari Regular/SemiBold**, from the same pinned IBM Plex revision below, under `packages/plex-sans-devanagari/fonts/complete/ttf/`. License: `IBM-Plex-OFL.txt`.
 
 All font files are unmodified and embedded as WPF resources. Both readable licenses are also copied to `licenses/` in a distribution. Localization checks verify bundled faces and glyph coverage for UI text and the language selector.

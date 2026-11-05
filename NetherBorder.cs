@@ -9,7 +9,7 @@ using System.Windows.Media.Imaging;
 
 namespace ArkCopyBuffer;
 
-/// <summary>One complete Nether frame per tick, using Moment Player's original 170% fit.</summary>
+/// <summary>Complete Nether frames, crossfaded on every tick, using Moment Player's original 170% fit.</summary>
 sealed class NetherBorder : FrameworkElement
 {
     internal const double OuterInset = 80;
@@ -57,24 +57,40 @@ sealed class NetherBorder : FrameworkElement
         return bitmap;
     }
 
-    BitmapSource? _frame;
+    // Changing a brush repaints the window without a layout pass or a new OnRender.
+    readonly ImageBrush _frame = new(), _next = new();
+
     internal BitmapSource? Frame
     {
-        get => _frame;
-        set { if (ReferenceEquals(_frame, value)) return; _frame = value; InvalidateVisual(); }
+        get => (BitmapSource?)_frame.ImageSource;
+        set => Show(value);
+    }
+
+    /// <summary>Crossfades two neighbouring frames: the flipbook runs at 21 fps or less and would otherwise step visibly.</summary>
+    internal void Show(BitmapSource? frame, BitmapSource? next = null, double blend = 0)
+    {
+        bool appeared = _frame.ImageSource == null && frame != null;
+        _frame.ImageSource = frame;
+        _next.ImageSource = next;
+        // Two translucent layers lose alpha mid-blend; 0.85 keeps the flame's typical alpha (0.1-0.7) within about 10%.
+        _frame.Opacity = Math.Pow(1 - blend, 0.85);
+        _next.Opacity = Math.Pow(blend, 0.85);
+        if (appeared) InvalidateVisual();
     }
 
     public NetherBorder() { IsHitTestVisible = false; Focusable = false; }
 
     protected override void OnRender(DrawingContext dc)
     {
-        if (_frame == null || ActualWidth <= Inset * 2 || ActualHeight <= Inset * 2) return;
+        if (_frame.ImageSource == null || ActualWidth <= Inset * 2 || ActualHeight <= Inset * 2) return;
         // Only the external halo is drawn: no coloured film over text or controls.
         var opening = new Rect(Inset, Inset, ActualWidth - Inset * 2, ActualHeight - Inset * 2);
         dc.PushClip(new CombinedGeometry(GeometryCombineMode.Exclude,
             new RectangleGeometry(new Rect(RenderSize)), new RectangleGeometry(opening, 8, 8)));
         double width = opening.Width * 1.7, height = opening.Height * 1.7;
-        dc.DrawImage(_frame, new Rect((ActualWidth - width) / 2, (ActualHeight - height) / 2, width, height));
+        var image = new Rect((ActualWidth - width) / 2, (ActualHeight - height) / 2, width, height);
+        dc.DrawRectangle(_frame, null, image);
+        dc.DrawRectangle(_next, null, image);
         dc.Pop();
     }
 }

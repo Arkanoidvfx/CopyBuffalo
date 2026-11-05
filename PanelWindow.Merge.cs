@@ -31,8 +31,8 @@ partial class PanelWindow
             if (!ForegroundIsOurs() && _mergeWindow == null) FinishMergeSelection(open: false);
             else if (!Native.IsDown(0x12)) ReleaseMergeAlt();
         };
-        List.LayoutUpdated += (_, _) => { if (_collectingMerge) RefreshMergeMarks(); };
-        PinnedList.LayoutUpdated += (_, _) => { if (_collectingMerge) RefreshMergeMarks(); };
+        List.LayoutUpdated += (_, _) => { if (_collectingMerge || _stackOpen) RefreshMergeMarks(); };
+        PinnedList.LayoutUpdated += (_, _) => { if (_collectingMerge || _stackOpen) RefreshMergeMarks(); };
     }
     void ReleaseMergeAlt()
     {
@@ -152,9 +152,10 @@ partial class PanelWindow
     }
     void RefreshMergeMarks()
     {
-        if (!_collectingMerge || _shortcutContainers.Count > 0) return;
+        if (!_collectingMerge && !_stackOpen || _shortcutContainers.Count > 0) return;
+        var parts = _stackOpen ? _stackOrder : _mergeParts; // те же номера на карточках: выбор через Alt или стопка
         foreach (var card in _mergeMarks.ToArray())
-            if (card.DataContext is not ClipItem item || !_mergeParts.Contains(item))
+            if (card.DataContext is not ClipItem item || !parts.Contains(item))
             {
                 card.Tag = null;
                 if (card.Template?.FindName("Key", card) is Border oldKey) oldKey.Visibility = Visibility.Collapsed;
@@ -162,13 +163,13 @@ partial class PanelWindow
                 _mergeMarks.Remove(card);
             }
         foreach (var list in new[] { List, PinnedList })
-            foreach (var item in _mergeParts)
+            foreach (var item in parts)
                 if (list.ItemContainerGenerator.ContainerFromItem(item) is ListBoxItem card)
                 {
                     bool added = _mergeMarks.Add(card); card.Tag = "Merge";
                     if (card.Template?.FindName("Key", card) is Border { Child: TextBlock number } key)
                     {
-                        number.Text = (_mergeParts.IndexOf(item) + 1).ToString();
+                        number.Text = (parts.IndexOf(item) + 1).ToString();
                         key.BeginAnimation(OpacityProperty, null); key.Opacity = 1; key.Visibility = Visibility.Visible;
                         if (added) Motion.Pop(key, 1.08, 0.94);
                     }

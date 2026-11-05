@@ -13,7 +13,7 @@ partial class PanelWindow
     {
         var path = Path.Combine(directory, "passwords", "history.dat");
         var store = new HistoryStore(path);
-        const string secret = "https://example.invalid/private-password";
+        const string secret = "https://user:private-password@example.invalid/";
         var now = DateTime.UtcNow;
         store.Add(secret, "old rtf", "old html", now);
         var item = store.Items[0];
@@ -63,6 +63,32 @@ partial class PanelWindow
             && spacedLoaded.Items.Any(i => i.Text == " "), "password deduplication and reload preserve significant leading/trailing spaces");
         check(!ClipboardWatcher.Sensitive(Paster.TextClipboard("ordinary text"))
             && new ClipItem { Text = "ordinary text" }.Preview == "ordinary text", "unmarked ordinary text remains unmasked");
+
+        foreach (var plain in new[] { "https://github.com/D4Vinci/Scrapling", " http://example.invalid/a?v=1&si=2#top\n", "https://www.youtube.com/watch?v=abc",
+            "https://example.invalid/s?keywords=cat&author=me&design=1&monkey=2" })
+            check(ClipItem.IsPlainLink(plain), "plain link is not a secret: " + plain.Trim());
+        foreach (var hidden in new[] { "https://user:pw@example.invalid/", "https://example.invalid/?access_token=abc", "https://example.invalid/#id_token=abc",
+            "https://example.invalid/?PASSWORD=abc", "https://example.invalid/?apikey=abc", "https://example.invalid/?a=1&X-Amz-Signature=abc", "https://example.invalid/?code=abc",
+            "https://example.invalid/a b", "ftp://example.invalid/", "example.invalid", "hunter2", "" })
+            check(!ClipItem.IsPlainLink(hidden), "value stays maskable: " + hidden);
+        const string link = "https://github.com/VAST-AI-Research/UniRig";
+        var links = new HistoryStore(Path.Combine(directory, "password-links", "history.dat"));
+        links.Add(link, null, null, now, "chrome", sensitive: true);
+        links.Add(link, null, null, now.AddSeconds(1), "chrome", sensitive: true);
+        check(links.Items.Count == 1 && links.Items[0] is { IsSensitive: false, Preview: link, Kind: "url" },
+            "link flagged by its source app stays readable, also when copied again");
+        links.Items.Add(new ClipItem { Text = "https://example.invalid/older", IsSensitive = true, CreatedAt = now, LastUsedAt = now });
+        links.Items.Add(new ClipItem { Text = link, IsSensitive = true, CreatedAt = now, LastUsedAt = now });
+        links.Items.Add(new ClipItem { Text = "https://example.invalid/?token=abc", IsSensitive = true, CreatedAt = now, LastUsedAt = now });
+        links.Save();
+        var reloaded = new HistoryStore(Path.Combine(directory, "password-links", "history.dat"));
+        reloaded.Load(now.AddSeconds(2));
+        check(reloaded.Items.Count == 3 && reloaded.Items.Where(i => i.Text.Contains("token=", StringComparison.Ordinal)).All(i => i.IsSensitive)
+            && reloaded.Items.Where(i => !i.Text.Contains("token=", StringComparison.Ordinal)).All(i => !i.IsSensitive),
+            "links masked by older versions are restored and merged on load; secret parameters stay masked");
+        var persisted = new HistoryStore(Path.Combine(directory, "password-links", "history.dat"));
+        persisted.Load(now.AddSeconds(3));
+        check(persisted.Items.Count(i => i.IsSensitive) == 1, "restored links are saved, not recalculated on every start");
 
         var panel = new PanelWindow(store, new SymbolCatalog(Path.Combine(directory, "passwords", "symbols.json")));
         try

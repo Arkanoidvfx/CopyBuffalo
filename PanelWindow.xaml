@@ -265,6 +265,16 @@
                 </DataTrigger>
             </DataTemplate.Triggers>
         </DataTemplate>
+        <Style x:Key="HintKey" TargetType="Border" BasedOn="{StaticResource KeyCap}">
+            <Setter Property="CornerRadius" Value="4"/>
+            <Setter Property="Padding" Value="7,0,7,1"/>
+            <Setter Property="Margin" Value="0"/>
+        </Style>
+        <Style x:Key="HintLabel" TargetType="TextBlock">
+            <Setter Property="Margin" Value="6,0,0,0"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextSecondary}"/>
+        </Style>
     </Window.Resources>
     <!--
         Прозрачное окно: панель 360×460, по 16 px вокруг — под тень. Скругление, рамку и тень рисуем сами,
@@ -283,6 +293,26 @@
                 <DropShadowEffect BlurRadius="24" ShadowDepth="6" Direction="270" Opacity="0.35" RenderingBias="Performance"/>
             </Border.Effect>
         </Border>
+        <!-- Булавка: панель под напряжением. Лежит под поверхностью панели, наружу выходят только кромка и свечение: PanelWindow.PinEnergy.cs -->
+        <Grid x:Name="PinEnergy" Margin="-1.5" IsHitTestVisible="False" Visibility="Collapsed" Opacity="0">
+            <Border x:Name="PinHalo" Margin="-3" CornerRadius="12.5" BorderThickness="4" BorderBrush="{DynamicResource PinGlow}" Opacity="0.9">
+                <Border.Effect>
+                    <BlurEffect Radius="12" RenderingBias="Performance"/>
+                </Border.Effect>
+                <!-- Размытие считается один раз: дыхание меняет только прозрачность готового снимка -->
+                <Border.CacheMode>
+                    <BitmapCache/>
+                </Border.CacheMode>
+            </Border>
+            <Border CornerRadius="9.5" BorderThickness="1.5" BorderBrush="{DynamicResource PinGlow}" Opacity="0.75"/>
+            <Grid x:Name="PinSpark">
+                <!-- Свечение заряда: полупрозрачные штрихи вместо размытия. Эффект пересчитывал бы всё окно на каждом кадре, это втрое дороже -->
+                <Rectangle x:Name="PinBloom" Margin="-3" RadiusX="12.5" RadiusY="12.5" StrokeThickness="5" StrokeDashCap="Round" Stroke="{DynamicResource PinGlow}" Opacity="0.22"/>
+                <Rectangle x:Name="PinFlare" Margin="-1.5" RadiusX="11" RadiusY="11" StrokeThickness="4" StrokeDashCap="Round" Stroke="{DynamicResource PinSpark}" Opacity="0.28"/>
+                <Rectangle x:Name="PinTail" RadiusX="9.5" RadiusY="9.5" StrokeThickness="1.5" StrokeDashCap="Round" Stroke="{DynamicResource PinSpark}" Opacity="0.55"/>
+                <Rectangle x:Name="PinCore" RadiusX="9.5" RadiusY="9.5" StrokeThickness="1.5" StrokeDashCap="Round" Stroke="{DynamicResource PinSpark}"/>
+            </Grid>
+        </Grid>
         <Border CornerRadius="8" Background="{DynamicResource WindowSurface}"
                 BorderBrush="{DynamicResource WindowStroke}" BorderThickness="1">
     <Grid Margin="11,7,5,9">
@@ -302,13 +332,56 @@
                     Content="&#xE712;" Click="More_HeaderClick" FontSize="14"
                     ToolTip="{local:Loc Key=S36BA2804E029771D}"
                     AutomationProperties.Name="{local:Loc Key=S2734E4685D892F22}"/>
+            <!-- Булавка панели: наклонная и пустая, пока панель скрывается сама; выпрямляется и заливается акцентом, когда панель остаётся на экране -->
+            <ToggleButton x:Name="KeepOpenButton" DockPanel.Dock="Right" Checked="KeepOpen_Changed" Unchecked="KeepOpen_Changed" AutomationProperties.Name="{local:Loc Key=S6BCCE6136CD105CA}">
+                <ToggleButton.Style>
+                    <Style TargetType="ToggleButton">
+                        <Setter Property="Width" Value="32"/>
+                        <Setter Property="Height" Value="32"/>
+                        <Setter Property="FontFamily" Value="{StaticResource IconFont}"/>
+                        <Setter Property="FontSize" Value="14"/>
+                        <Setter Property="Foreground" Value="{DynamicResource TextSecondary}"/>
+                        <Setter Property="Cursor" Value="Hand"/>
+                        <Setter Property="FocusVisualStyle" Value="{StaticResource FocusRing}"/>
+                        <Setter Property="Content" Value="&#xE718;"/>
+                        <Setter Property="ToolTip" Value="{local:Loc Key=S6BCCE6136CD105CA}"/>
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="ToggleButton">
+                                    <Border x:Name="Bd" CornerRadius="4" Background="Transparent">
+                                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </Border>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsChecked" Value="True">
+                                            <Setter TargetName="Bd" Property="Background" Value="{DynamicResource SubtleHover}"/>
+                                        </Trigger>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter TargetName="Bd" Property="Background" Value="{DynamicResource SubtleHover}"/>
+                                        </Trigger>
+                                        <Trigger Property="IsPressed" Value="True">
+                                            <Setter TargetName="Bd" Property="Background" Value="{DynamicResource SubtlePressed}"/>
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                        <Style.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Foreground" Value="{DynamicResource TextPrimary}"/>
+                            </Trigger>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter Property="Content" Value="&#xE842;"/>
+                                <Setter Property="Foreground" Value="{DynamicResource Accent}"/>
+                                <Setter Property="ToolTip" Value="{local:Loc Key=S29D614F401E3483B}"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </ToggleButton.Style>
+            </ToggleButton>
             <Button x:Name="GroupButton" DockPanel.Dock="Right" Style="{StaticResource SubtleIconButton}" Focusable="True" Width="32" Height="32"
                     Content="&#xE710;" Click="Group_Click" FontSize="14" Visibility="Collapsed"
                     ToolTip="{local:Loc Key=SC9FD9FC0E5D2198D}" AutomationProperties.Name="{local:Loc Key=S29FBB6B36971FD46}"/>
-            <Button x:Name="ViewButton" DockPanel.Dock="Right" Style="{StaticResource SubtleIconButton}" Focusable="True" Width="32" Height="32"
-                    Content="&#xE8FD;" Click="View_Click" FontSize="14" Visibility="Collapsed"
-                    ToolTip="{local:Loc Key=S95333A53FC99C364}" AutomationProperties.Name="{local:Loc Key=SB80CF78B9970A398}"/>
-            <Grid x:Name="TabsHost" Margin="-8,0,0,0" HorizontalAlignment="Left">
+            <Grid x:Name="TabsHost" Margin="-7,0,0,0" HorizontalAlignment="Left">
                 <StackPanel Orientation="Horizontal">
                     <RadioButton x:Name="TabAll" Style="{StaticResource HeaderTab}" GroupName="Tabs" IsChecked="True"
                                  Content="{local:Loc Key=S099904B55F08001B}" Checked="Tab_Checked" AutomationProperties.Name="{local:Loc Key=SD8A3846AA2DBAA96}"
@@ -574,7 +647,7 @@
             </ListBox.ItemTemplate>
         </ListBox>
 
-        <!-- Закреплённые: плитки 3 в ряд или список (ViewButton); шаблоны и контейнеры меняет ApplyPinnedView -->
+        <!-- Закреплённые: плитки 3 в ряд или список (меню «⋯»); шаблоны и контейнеры меняет ApplyPinnedView -->
         <ListBox x:Name="PinnedList" Grid.Row="3" Focusable="False" Visibility="Collapsed"
                  Background="Transparent" BorderThickness="0" Padding="0" Margin="-3,-3,0,0"
                  ItemContainerStyle="{StaticResource PinTileContainer}"
@@ -697,31 +770,67 @@
             </StackPanel>
         </Border>
 
-        <!-- Строка-подсказка: сочетания, которые иначе знает только автор. Выключается в настройках -->
-        <Border x:Name="KeyHints" Grid.Row="4" Margin="0,8,6,0" Padding="0,8,0,0" BorderThickness="0,1,0,0"
-                BorderBrush="{DynamicResource WindowStroke}" TextElement.FontSize="11">
-            <Grid>
+        <!-- Строка клавиш: сверху вставка одной записи, снизу нескольких. Зажатый модификатор гасит чужие подсказки (RefreshHintFocus). Выключается в настройках -->
+        <Border x:Name="KeyHints" Grid.Row="4" Margin="-11,8,-5,-9" Padding="12,7,12,8" BorderThickness="0,1,0,0" CornerRadius="0,0,7,7"
+                BorderBrush="{DynamicResource WindowStroke}" Background="{DynamicResource ControlFill}" TextElement.FontSize="11">
+            <Grid Grid.IsSharedSizeScope="True">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
-                <StackPanel Orientation="Horizontal">
-                    <Border Style="{StaticResource KeyCap}"><TextBlock Text="Enter"/></Border>
-                    <TextBlock Text="{local:Loc Key=SADC41711D61237AC}" Foreground="{DynamicResource TextSecondary}" VerticalAlignment="Center"/>
-                </StackPanel>
-                <StackPanel Grid.Column="2" Orientation="Horizontal">
-                    <Border Style="{StaticResource KeyCap}"><TextBlock Text="{local:Loc Key=SA9C61AE59CA81A48}"/></Border>
-                    <TextBlock Text="{local:Loc Key=SDC348037F1B79A33}" Foreground="{DynamicResource TextSecondary}" VerticalAlignment="Center" ToolTip="{local:Loc Key=S7E3BECFF8AF12D2F}"/>
-                </StackPanel>
-                <StackPanel Grid.Column="4" Orientation="Horizontal">
-                    <Border Style="{StaticResource KeyCap}"><TextBlock Text="Ctrl+1-9"/></Border>
-                    <TextBlock Text="{local:Loc Key=SDCD85BADA23A9985}" Foreground="{DynamicResource TextSecondary}" VerticalAlignment="Center"/>
-                </StackPanel>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Grid x:Name="HintPaste" HorizontalAlignment="Left">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="HintKeysLeft"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <Border Style="{StaticResource HintKey}"><TextBlock Text="Enter" HorizontalAlignment="Center"/></Border>
+                    <TextBlock Grid.Column="1" Style="{StaticResource HintLabel}" Text="{local:Loc Key=SADC41711D61237AC}"/>
+                </Grid>
+                <Grid x:Name="HintQuick" Grid.Column="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="HintKeysRight"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <Border Style="{StaticResource HintKey}"><TextBlock Text="Ctrl+1-9" HorizontalAlignment="Center"/></Border>
+                    <TextBlock Grid.Column="1" Style="{StaticResource HintLabel}" Text="{local:Loc Key=SDCD85BADA23A9985}"/>
+                </Grid>
+                <Grid x:Name="HintSelect" Grid.Row="1" Margin="0,4,0,0" HorizontalAlignment="Left" Background="Transparent" ToolTip="{local:Loc Key=S7E3BECFF8AF12D2F}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="HintKeysLeft"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <Border Style="{StaticResource HintKey}"><TextBlock Text="{local:Loc Key=SA9C61AE59CA81A48}" HorizontalAlignment="Center"/></Border>
+                    <TextBlock Grid.Column="1" Style="{StaticResource HintLabel}" Text="{local:Loc Key=SDC348037F1B79A33}"/>
+                </Grid>
+                <Grid x:Name="HintStack" Grid.Row="1" Grid.Column="1" Margin="0,4,0,0" Background="Transparent" ToolTip="{local:Loc Key=SC741550FE8935208}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="HintKeysRight"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <Border Style="{StaticResource HintKey}"><TextBlock Text="{local:Loc Key=S21F2F3E398D92E6A}" HorizontalAlignment="Center"/></Border>
+                    <TextBlock Grid.Column="1" Style="{StaticResource HintLabel}" Text="{local:Loc Key=SE2FE65015C71CA55}"/>
+                </Grid>
             </Grid>
         </Border>
+
+        <!-- Стопка (Shift + колесо): занимает место строки клавиш, поэтому список под курсором не сдвигается -->
+        <Grid x:Name="StackBar" Grid.Row="4" Margin="-11,8,-5,-9" Visibility="Collapsed" TextElement.FontSize="11">
+            <Border CornerRadius="0,0,7,7" Background="{DynamicResource Accent}" Opacity="0.14"/>
+            <Border BorderThickness="0,1,0,0" BorderBrush="{DynamicResource Accent}"/>
+            <DockPanel Margin="12,7,12,8" VerticalAlignment="Center">
+                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Margin="8,0,0,0">
+                    <Border Style="{StaticResource KeyCap}"><TextBlock Text="Esc"/></Border>
+                    <TextBlock Text="{local:Loc Key=S8FBE9B75CBDFBFA6}" Foreground="{DynamicResource TextSecondary}" VerticalAlignment="Center"/>
+                </StackPanel>
+                <Border Style="{StaticResource KeyCap}"><TextBlock Text="Shift"/></Border>
+                <TextBlock x:Name="StackHint" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimary}" VerticalAlignment="Center"
+                           TextTrimming="CharacterEllipsis" AutomationProperties.LiveSetting="Polite"/>
+            </DockPanel>
+        </Grid>
 
         <!--
             Просмотр текста при наведении — как увеличение картинок, но для текста: карточка рядом с панелью
@@ -1034,7 +1143,7 @@
                             <StackPanel IsEnabled="{Binding IsChecked, ElementName=VfxToggle}">
                                 <Grid><TextBlock Text="{local:Loc Key=SF195133BCEFB6A3B}"/>
                                     <TextBlock x:Name="VfxOpacityValue" HorizontalAlignment="Right" Foreground="{DynamicResource TextSecondary}"/></Grid>
-                                <Slider x:Name="VfxOpacitySlider" Minimum="10" Maximum="100" Value="85" TickFrequency="5" IsSnapToTickEnabled="True"
+                                <Slider x:Name="VfxOpacitySlider" Minimum="10" Maximum="100" Value="20" TickFrequency="5" IsSnapToTickEnabled="True"
                                         Margin="0,4,0,12" ValueChanged="Vfx_ValueChanged" AutomationProperties.Name="{local:Loc Key=S05F86AE8582FFC3E}"/>
                                 <Grid><TextBlock Text="{local:Loc Key=S70E98E32147CF4EC}"/>
                                     <TextBlock x:Name="VfxSpeedValue" HorizontalAlignment="Right" Foreground="{DynamicResource TextSecondary}"/></Grid>

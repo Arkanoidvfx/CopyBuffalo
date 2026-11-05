@@ -46,13 +46,13 @@ foreach ($name in @('INSTALL.txt','INSTALL-RU.txt')) { Copy-Item -LiteralPath (J
 Copy-Item -LiteralPath (Join-Path $source 'LICENSE') -Destination $output
 $manifest.version=$version
 $manifest | Add-Member -NotePropertyName sourceCommit -NotePropertyValue $commit -Force
-$manifest | Add-Member -NotePropertyName languages -NotePropertyValue @('en','ru','zh-Hans','zh-Hant','ja','hi') -Force
+$manifest | Add-Member -NotePropertyName languages -NotePropertyValue @('en','ru','zh-Hans','zh-Hant','zh-HK','ja','hi') -Force
 $manifest | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $output 'manifest.json') -Encoding utf8
 Get-ChildItem -LiteralPath $output -Filter '*.exe' -File | ForEach-Object { (Get-FileHash -LiteralPath $_.FullName).Hash.ToLowerInvariant()+'  '+$_.Name } | Set-Content -LiteralPath (Join-Path $output 'SHA256SUMS.txt') -Encoding ascii
 & (Join-Path $source 'packaging\Prepare-GitHubRelease.ps1') -Dist $output *> (Join-Path $root 'split.log')
 & (Join-Path $source 'packaging\Test-AiSetup.ps1') -Directory (Join-Path $root 'packaged-launcher-check') *> (Join-Path $root 'packaged-launcher-check.log')
 if ($LASTEXITCODE -or (Test-Path -LiteralPath (Join-Path $root 'packaged-launcher-check\ERROR.txt'))) { throw 'Packaged AI launcher verification failed.' }
-foreach ($language in @('en','ru','zh-Hans','zh-Hant','ja','hi')) {
+foreach ($language in @('en','ru','zh-Hans','zh-Hant','zh-HK','ja','hi')) {
     $directory=Join-Path $root ('regression-'+$language)
     Run-Low $exe @('--selftest',$directory,$language) (Join-Path $root ('regression-'+$language+'.process.log')) 60000
     $count=(Get-Content -LiteralPath (Join-Path $directory 'selftest.log') | Measure-Object -Line).Lines

@@ -43,7 +43,9 @@ partial class PanelWindow : Window
         && System.Diagnostics.Stopwatch.GetElapsedTime(startedAt) >= SensitivePeekDelay;
     ListBoxItem? _peekHover;
     ClipItem? _peekItem;
-    readonly DispatcherTimer _outsideTimer = new();   // мышь ушла с панели → скрыть через заданную задержку
+    readonly DispatcherTimer _outsideTimer = new() { Interval = TimeSpan.FromMilliseconds(100) }; // опрос курсора, пока панель открыта
+    long _cursorSeenAt;                               // когда курсор последний раз был в зоне панели (TickCount64)
+    internal Func<POINT?> _cursorPosition = () => GetCursorPos(out var p) ? p : null;
     readonly DispatcherTimer _deactivateTimer = new() { Interval = TimeSpan.FromMilliseconds(150) }; // клик вне панели
     bool _menuOpen;
     TextEditorWindow? _textEditor;
@@ -80,7 +82,7 @@ partial class PanelWindow : Window
     public bool Animations
     {
         get => Motion.Enabled;
-        set { Motion.Enabled = value; AnimationsToggle.IsChecked = value; RefreshVfx(); }
+        set { Motion.Enabled = value; AnimationsToggle.IsChecked = value; RefreshVfx(); RestartPinEnergy(); }
     }
     public bool ShowKeyHints { get => KeyHintsToggle.IsChecked == true; set => KeyHintsToggle.IsChecked = value; }
     bool _pinnedAsList;
@@ -100,6 +102,12 @@ partial class PanelWindow : Window
     }
     public int ImageZoomScale { get => (int)ZoomScaleSlider.Value; set => ZoomScaleSlider.Value = Math.Clamp(value, 1, 5); }
     public bool AutoHideOutside { get => OutsideHideToggle.IsChecked == true; set => OutsideHideToggle.IsChecked = value; }
+    /// <summary>Булавка в шапке: панель не прячется сама, ни от мыши, ни от фокуса, ни после вставки. Закрывают её только Esc и Win+V.</summary>
+    public bool KeepOpen { get => KeepOpenButton.IsChecked == true; set => KeepOpenButton.IsChecked = value; }
+    public event Action<bool>? KeepOpenChanged;
+    /// <summary>Закреплённая панель: передний план перешёл к чужому окну, теперь вставлять надо туда.</summary>
+    public event Action<IntPtr>? ExternalForeground;
+    bool HidesWhenAway => AutoHideOutside && !KeepOpen;
     public int OutsideHideDelayMs { get => (int)OutsideHideSlider.Value; set => OutsideHideSlider.Value = Math.Clamp(value, 500, 10000); }
     public event Action<int, int>? TimingsChanged;
     public event Action<int>? ImageZoomDelayChanged;
@@ -186,14 +194,7 @@ partial class PanelWindow : Window
         Closed += (_, _) => { _infoTimer.Stop(); _visibilityVersion++; CancelFrameWait(); };
         _zoomTimer.Tick += (_, _) => OpenZoom();
         _peekTimer.Tick += (_, _) => { _peekTimer.Stop(); OpenPeek(); };
-        _outsideTimer.Tick += (_, _) =>
-        {
-            _outsideTimer.Stop();
-            if (!IsVisible || _hiding || !AutoHideOutside || PointerInsidePanel()) return;
-            if (Busy) { _outsideTimer.Start(); return; }
-            HideAnimated();
-        };
-        Root.MouseEnter += (_, _) => _outsideTimer.Stop();
+        _outsideTimer.Tick += (_, _) => CheckCursorAway(Environment.TickCount64);
         // Настройки закрываются кликом по панели мимо них, как всплывающие окна Windows 11.
         // Клик только закрывает: не вставляет запись и не переключает вкладку, по которой случайно попал.
         Root.PreviewMouseDown += (_, e) =>
@@ -207,7 +208,7 @@ partial class PanelWindow : Window
         _deactivateTimer.Tick += (_, _) =>
         {
             _deactivateTimer.Stop();
-            if (!IsVisible || _hiding || !AutoHideOutside || Busy || ForegroundIsOurs()) return;
+            if (!IsVisible || _hiding || !HidesWhenAway || Busy || ForegroundIsOurs()) return;
             App.Trace("  auto-hide: focus left the panel");
             HideAnimated();
         };
@@ -257,8 +258,13 @@ partial class PanelWindow : Window
         InitializeMergeSelection();
         SeriesQueue.ItemsSource = _seriesQueue;
         InitializeVfx();
+        InitializeClipStack();
+        InitializePinEnergy();
         PreviewKeyUp += (_, e) => { if (e.Key is Key.LeftCtrl or Key.RightCtrl) { HideShortcuts(); RefreshMergeMarks(); } };
+        PreviewKeyUp += (_, _) => RefreshHintFocus(Keyboard.Modifiers);
+        PreviewKeyDown += (_, _) => RefreshHintFocus(Keyboard.Modifiers); // раньше OnKey: он может пометить событие обработанным
         PreviewKeyDown += OnKey;
+        Activated += (_, _) => RefreshHintFocus(Keyboard.Modifiers);
         ValueDropCard.PreviewKeyDown += (_, e) =>
         {
             if (e.Key == Key.Escape) { CloseValueDrop(); Search.Focus(); e.Handled = true; }
@@ -272,7 +278,7 @@ partial class PanelWindow : Window
         // Клик вне панели = фокус ушёл к чужому окну. Прячем почти сразу; пауза отсекает мгновенный возврат фокуса
         // и даёт закрыться контекстному меню, которое гасится тем же кликом. Главный сигнал — EVENT_SYSTEM_FOREGROUND
         // (InitNative): при первом показе WPF мог не прислать Deactivated и держать IsActive = true.
-        Deactivated += (_, _) => { HideShortcuts(); ClosePeek(); OnFocusMaybeLost(); };
+        Deactivated += (_, _) => { HideShortcuts(); ClosePeek(); RefreshHintFocus(ModifierKeys.None); OnFocusMaybeLost(); };
         SourceInitialized += (_, _) => InitNative();
     }
 
@@ -325,13 +331,9 @@ partial class PanelWindow : Window
         PinnedList.ItemTemplate = (DataTemplate)FindResource(_pinnedAsList ? "PinRowTemplate" : "PinTileTemplate");
         PinnedList.ItemsPanel = (ItemsPanelTemplate)FindResource(_pinnedAsList ? "PinRowPanel" : "PinTilePanel");
         PinnedList.Margin = _pinnedAsList ? new Thickness(0, -3, 0, 0) : new Thickness(-3, -3, 0, 0);
-        ViewButton.Content = _pinnedAsList ? "\uF0E2" : "\uE8FD";
-        string hint = _pinnedAsList ? UiText.T("Показать плитками") : UiText.T("Показать списком");
-        ViewButton.ToolTip = hint;
-        AutomationProperties.SetName(ViewButton, hint + UiText.T(" закреплённые"));
     }
 
-    void View_Click(object sender, RoutedEventArgs e)
+    void TogglePinnedView()
     {
         HideShortcuts();
         PinnedAsList = !_pinnedAsList;
@@ -361,7 +363,12 @@ partial class PanelWindow : Window
     {
         _hwnd = new WindowInteropHelper(this).Handle;
         _normalSize = new Size(Width, Height);
-        _onForeground = (_, _, _, _, _, _, _) => OnFocusMaybeLost();
+        _onForeground = (_, _, hwnd, _, _, _, _) =>
+        {
+            OnFocusMaybeLost();
+            SetPinMotion(PinAwake);
+            if (KeepOpen && IsShown && !ForegroundIsOurs()) ExternalForeground?.Invoke(hwnd);
+        };
         var hook = SetWinEventHook(EVENT_SYSTEM_FOREGROUND, EVENT_SYSTEM_FOREGROUND, IntPtr.Zero, _onForeground, 0, 0, WINEVENT_OUTOFCONTEXT);
         Closed += (_, _) => UnhookWinEvent(hook); // иначе хук переживёт окно и вызовет собранный GC делегат
         // Инструментальное окно: нет в Alt+Tab и на панели задач.
@@ -427,6 +434,7 @@ partial class PanelWindow : Window
         FinishMergeSelection(open: false);
         FinishDragVisual();
         CloseValueDrop();
+        CloseStack();
         _outsideTimer.Stop();
         _deactivateTimer.Stop();
         HideShortcuts();
@@ -449,6 +457,23 @@ partial class PanelWindow : Window
                 Hide();
             });
         });
+    }
+
+    /// <summary>Запись вставлена: панель прячется, если её не закрепили булавкой.</summary>
+    public void HideAfterUse() { if (!KeepOpen) HideAnimated(); }
+
+    /// <summary>Win+V при уже закреплённой панели: она остаётся на своём месте и получает клавиатуру.</summary>
+    public void FocusKept() { BringToFront(); Search.Focus(); }
+
+    void KeepOpen_Changed(object sender, RoutedEventArgs e)
+    {
+        Motion.Pop(KeepOpenButton);
+        RefreshPinEnergy();
+        RefreshVfx();
+        KeepOpenChanged?.Invoke(KeepOpen);
+        if (KeepOpen) { _outsideTimer.Stop(); _deactivateTimer.Stop(); }
+        else StartOutsideTimer();
+        Search.Focus();
     }
 
     /// <summary>
@@ -535,7 +560,7 @@ partial class PanelWindow : Window
     }
 
     /// <summary>Своё модальное окно, меню или перетаскивание: уход фокуса/мыши тут не значит «ушли из панели».</summary>
-    bool Busy => _editingGroup || _textEditor != null || _mergeWindow != null || _collectingMerge || _dragging || _mergingDrag || _valueSaving || ValueDrop.IsOpen || _menuOpen || _archiveInfo != null;
+    bool Busy => _editingGroup || _textEditor != null || _mergeWindow != null || _collectingMerge || _dragging || _mergingDrag || _valueSaving || ValueDrop.IsOpen || _menuOpen || _archiveInfo != null || _stackOpen;
 
     /// <summary>
     /// Передний план сейчас у нашего окна (панель, её диалог, окно графа). Спрашиваем Windows, а не IsActive:
@@ -549,32 +574,43 @@ partial class PanelWindow : Window
 
     void OnFocusMaybeLost()
     {
-        if (!IsVisible || _hiding || !AutoHideOutside) return;
+        if (!IsVisible || _hiding || !HidesWhenAway) return;
         _deactivateTimer.Stop();
         _deactivateTimer.Start();
     }
 
     /// <summary>
-    /// Настоящий курсор (GetCursorPos): Mouse.GetPosition вне окна отдаёт последнюю точку, которую окно видело,
-    /// часто ещё внутри панели — из-за этого скрытие то срабатывало, то нет.
+    /// Зона — окно целиком, с полем под тень. Без каретки панель открывается в 6 px от курсора (Place): считать зоной только
+    /// видимую панель значило закрыть её через задержку под неподвижной мышью. Настоящий курсор (GetCursorPos), а не Mouse.GetPosition:
+    /// вне окна тот отдаёт последнюю виденную точку. Курсор неизвестен (окно UAC) — панель не трогаем.
     /// </summary>
-    bool PointerInsidePanel()
+    bool PointerInZone()
     {
-        if (!IsVisible || !GetCursorPos(out var p)) return false;
-        var a = Root.PointToScreen(new Point(0, 0));
-        var b = Root.PointToScreen(new Point(Root.ActualWidth, Root.ActualHeight));
-        return p.X >= Math.Min(a.X, b.X) && p.X < Math.Max(a.X, b.X) && p.Y >= Math.Min(a.Y, b.Y) && p.Y < Math.Max(a.Y, b.Y);
+        if (_cursorPosition() is not { } p || !GetWindowRect(_hwnd, out var r)) return true;
+        return p.X >= r.Left && p.X < r.Right && p.Y >= r.Top && p.Y < r.Bottom;
+    }
+
+    void CheckCursorAway(long now)
+    {
+        if (!IsVisible || _hiding || !HidesWhenAway) { _outsideTimer.Stop(); return; }
+        if (Busy || PointerInZone()) _cursorSeenAt = now;
+        else if (now - _cursorSeenAt >= OutsideHideDelayMs)
+        {
+            App.Trace($"  auto-hide: cursor away for {OutsideHideDelayMs} ms");
+            HideAnimated();
+        }
     }
 
     /// <summary>
-    /// Мышь вне панели (при показе или после ухода): скрыть через заданную задержку, если не вернётся
-    /// и если с панелью не начали работать с клавиатуры — нажатие клавиши отсчёт останавливает.
+    /// Курсор вне зоны дольше заданной задержки (и при показе, и после ухода) — панель скрывается. Опрос, а не MouseLeave:
+    /// в прозрачном поле окна мышиных событий нет, и уход оттуда прошёл бы незамеченным.
+    /// Работа с клавиатуры опрос останавливает, следующий уход мыши запускает снова.
     /// </summary>
     void StartOutsideTimer()
     {
         _outsideTimer.Stop();
-        if (!IsVisible || _hiding || !AutoHideOutside || _menuOpen || PointerInsidePanel()) return;
-        _outsideTimer.Interval = TimeSpan.FromMilliseconds(OutsideHideDelayMs);
+        if (!IsVisible || _hiding || !HidesWhenAway || _menuOpen) return;
+        _cursorSeenAt = Environment.TickCount64;
         _outsideTimer.Start();
     }
 
@@ -685,7 +721,6 @@ partial class PanelWindow : Window
             list.Visibility = list == Active ? Visibility.Visible : Visibility.Collapsed;
         PinnedBackground.Visibility = PinnedTab ? Visibility.Visible : Visibility.Collapsed;
         GroupButton.Visibility = PinnedTab ? Visibility.Visible : Visibility.Collapsed;
-        ViewButton.Visibility = GroupButton.Visibility;
         SourceButton.Visibility = SymbolsTab ? Visibility.Collapsed : Visibility.Visible;
         KindButton.Visibility = SourceButton.Visibility;
         HideShortcuts();
@@ -772,6 +807,7 @@ partial class PanelWindow : Window
         // 0xE8 не назначена, WPF отдаёт её как Key.None.
         if (key is Key.LWin or Key.RWin or Key.None || KeyInterop.VirtualKeyFromKey(key) == VK_MASK) return;
         _outsideTimer.Stop(); // с панелью работают с клавиатуры — мышь снаружи не повод прятать
+        if (HandleStackKey(key, e)) return;
         if (key is Key.LeftAlt or Key.RightAlt) { CancelZoom(); StopGif(); }
         // Ctrl badges are visible immediately, without a timer or stagger.
         if (key is Key.LeftCtrl or Key.RightCtrl)
@@ -848,7 +884,7 @@ partial class PanelWindow : Window
                 KeepingSelection(() => _symbols.TogglePin(symbol.Char));
                 break;
             case Key.Enter when selected != null:
-                RequestPaste(selected, shift);
+                RequestPaste(selected, shift, Keyboard.Modifiers == ModifierKeys.Control);
                 break;
             case Key.Delete when selected != null && Search.Text.Length == 0:
                 RemoveAnimated(selected);
@@ -899,18 +935,25 @@ partial class PanelWindow : Window
     void Item_Click(object sender, MouseButtonEventArgs e)
     {
         if ((e.OriginalSource as DependencyObject)?.FindAncestor<ButtonBase>() != null) return;
+        if (_stackOpen)
+        {
+            if ((e.OriginalSource as DependencyObject)?.FindAncestor<ListBoxItem>()?.DataContext is ClipItem stacked) ToggleStack(stacked);
+            e.Handled = true;
+            return;
+        }
         if (_altClick) { _altClick = false; e.Handled = true; return; }
         if (_collectingMerge) { e.Handled = true; return; }
         if (_dragging || _suppressClick) return;
         switch ((e.OriginalSource as DependencyObject)?.FindAncestor<ListBoxItem>()?.DataContext)
         {
-            case ClipItem item: RequestPaste(item, Keyboard.Modifiers.HasFlag(ModifierKeys.Shift)); break;
+            case ClipItem item: RequestPaste(item, Keyboard.Modifiers.HasFlag(ModifierKeys.Shift), Keyboard.Modifiers == ModifierKeys.Control); break;
             case SymbolItem s: TypeRequested?.Invoke(s.Char); break;
         }
     }
 
     void Item_RightClick(object sender, MouseButtonEventArgs e)
     {
+        if (_stackOpen) { e.Handled = true; return; }
         var container = (e.OriginalSource as DependencyObject)?.FindAncestor<ListBoxItem>();
         if (container?.DataContext is ClipItem item) ShowMenu(item, container, PlacementMode.MousePoint);
         else if (container?.DataContext is PinnedGroup group && group.Id != Guid.Empty) ShowGroupMenu(group, container);
@@ -943,8 +986,8 @@ partial class PanelWindow : Window
         if (ItemOf(sender) is { IsImage: true, Recognizing: false } item) TranslateImageRequested?.Invoke(item);
     }
 
-    /// <summary>Языки перевода текста: английский, русский, китайский, японский, хинди, основные европейские и сербский в обеих графиках.</summary>
-    static readonly string[] TextTranslationTargets = ["en", "ru", "zh-Hans", "ja", "hi", "es", "de", "fr", "sr-Latn", "sr-Cyrl"];
+    /// <summary>Языки перевода текста: английский, русский, китайский, кантонский, японский, хинди, основные европейские и сербский в обеих графиках.</summary>
+    static readonly string[] TextTranslationTargets = ["en", "ru", "zh-Hans", "zh-HK", "ja", "hi", "es", "de", "fr", "sr-Latn", "sr-Cyrl"];
     public event Action<ClipItem, System.Globalization.CultureInfo>? TranslateTextRequested;
 
     void TranslateText_Click(object sender, RoutedEventArgs e)
@@ -955,7 +998,7 @@ partial class PanelWindow : Window
         foreach (var code in TextTranslationTargets)
         {
             var culture = System.Globalization.CultureInfo.GetCultureInfo(code);
-            string name = culture.NativeName;
+            string name = UiText.NativeName(culture);
             menu.Items.Add(Entry(char.ToUpper(name[0], culture) + name[1..], "\uE8C1", () => TranslateTextRequested?.Invoke(item, culture)));
         }
         menu.Closed += (_, _) => Search.Focus();
@@ -1136,14 +1179,15 @@ partial class PanelWindow : Window
         editor.Show();
     }
 
-    /// <summary>«⋯» в шапке: пауза записи, настройки и очистка истории — опасное действие не лежит в одном клике.</summary>
+    /// <summary>«⋯» в шапке: настройки, пауза записи и очистка истории — опасное действие не лежит в одном клике.</summary>
     void More_HeaderClick(object sender, RoutedEventArgs e)
     {
         var menu = new ContextMenu { PlacementTarget = MoreButton };
+        menu.Items.Add(Entry(UiText.T("Настройки"), "\uE713", OpenSettings));
         var pause = Entry(UiText.T("Пауза записи"), "", () => PauseToggleRequested?.Invoke(!_paused));
         pause.IsChecked = _paused;
         menu.Items.Add(pause);
-        menu.Items.Add(Entry(UiText.T("Настройки"), "\uE713", OpenSettings));
+        if (PinnedTab) menu.Items.Add(_pinnedAsList ? Entry(UiText.T("Показать плитками"), "\uF0E2", TogglePinnedView) : Entry(UiText.T("Показать списком"), "\uE8FD", TogglePinnedView));
         menu.Items.Add(new Separator());
         var clear = Entry(UiText.T("Очистить историю…"), "\uE74D", AskClear);
         clear.IsEnabled = _store.Items.Any(i => !i.Pinned);
@@ -1458,7 +1502,7 @@ partial class PanelWindow : Window
 
     void Pinned_MouseMove(object sender, MouseEventArgs e)
     {
-        if (_dragItem == null || _dragStart is not { } start || e.LeftButton != MouseButtonState.Pressed) return;
+        if (_stackOpen || _dragItem == null || _dragStart is not { } start || e.LeftButton != MouseButtonState.Pressed) return;
         var now = e.GetPosition(this);
         if (Math.Abs(now.X - start.X) < SystemParameters.MinimumHorizontalDragDistance &&
             Math.Abs(now.Y - start.Y) < SystemParameters.MinimumVerticalDragDistance) return;
@@ -1560,7 +1604,20 @@ partial class PanelWindow : Window
     {
         Motion.Enabled = AnimationsToggle.IsChecked == true;
         RefreshVfx();
+        RestartPinEnergy();
         AnimationsChanged?.Invoke(Motion.Enabled);
+    }
+
+    ModifierKeys _hintHeld;
+
+    /// <summary>Зажат модификатор: строка клавиш оставляет яркой только его подсказку и отвечает на вопрос «что он делает» в тот момент, когда он возник.</summary>
+    void RefreshHintFocus(ModifierKeys held)
+    {
+        held &= ModifierKeys.Alt | ModifierKeys.Control | ModifierKeys.Shift;
+        if (held == _hintHeld) return;
+        _hintHeld = held;
+        foreach (var (hint, key) in new (UIElement, ModifierKeys)[] { (HintPaste, ModifierKeys.None), (HintQuick, ModifierKeys.Control), (HintSelect, ModifierKeys.Alt), (HintStack, ModifierKeys.Shift) })
+            Motion.To(hint, OpacityProperty, held == ModifierKeys.None || held == key ? 1 : 0.35, Motion.Fast);
     }
 
     void KeyHintsToggle_Changed(object sender, RoutedEventArgs e)
@@ -1649,7 +1706,7 @@ partial class PanelWindow : Window
         if (TextPeekWidthSlider != null) TextPeekChanged?.Invoke(TextPeekEnabled, TextPeekDelayMs, TextPeekWidth);
     }
 
-    bool HoverPreviewBlocked => _dragging || _mergingDrag || _collectingMerge || Native.IsDown(VK_MENU) || Native.IsDown(VK_CONTROL) || Native.IsDown(0x01);
+    bool HoverPreviewBlocked => _dragging || _mergingDrag || _collectingMerge || _stackOpen || Native.IsDown(VK_MENU) || Native.IsDown(VK_CONTROL) || Native.IsDown(0x01);
 
     void StartZoom(Image target)
     {
@@ -2351,8 +2408,8 @@ partial class PanelWindow : Window
             stops.Add(SeriesClear);
         }
         stops.Add(MoreButton);
+        stops.Add(KeepOpenButton);
         if (GroupButton.IsVisible) stops.Add(GroupButton);
-        if (ViewButton.IsVisible) stops.Add(ViewButton);
         if (InfoBar.IsVisible)
             foreach (var b in new[] { InfoPrimary, InfoSecondary, InfoClose }) if (b.IsVisible) stops.Add(b);
         stops.RemoveAll(c => !c.IsEnabled);

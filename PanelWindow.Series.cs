@@ -97,9 +97,14 @@ partial class PanelWindow
         Search.Focus();
     }
 
-    void RequestPaste(ClipItem item, bool plainText)
+    /// <summary>Выбрана запись с Ctrl: вставить в кавычках.</summary>
+    internal event Action<ClipItem>? QuotedPasteRequested;
+
+    /// <param name="quoted">Ctrl: текст и путь папки уходят в кавычках; у картинок, файлов и графов кавычки ни к чему, они вставляются как обычно.</param>
+    void RequestPaste(ClipItem item, bool plainText, bool quoted = false)
     {
-        PasteRequested?.Invoke(item, plainText);
+        if (quoted && !item.IsImage && !item.IsNodeGraph && (!item.IsMedia || item.IsFolder)) QuotedPasteRequested?.Invoke(item);
+        else PasteRequested?.Invoke(item, plainText);
     }
 
     void ToggleSeriesItem(ClipItem item)

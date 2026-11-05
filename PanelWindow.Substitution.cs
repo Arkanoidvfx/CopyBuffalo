@@ -477,13 +477,13 @@ partial class PanelWindow
             store.UpdateText(item, twoSlots);
             panel._valueItem = item; panel._valueOriginal = twoSlots;
             var second = PreviewChange(twoSlots, TextSubstitution.Find(twoSlots, path)[1]);
+            var elapsed = System.Diagnostics.Stopwatch.StartNew(); // до клика: таймер сообщения стартует внутри него
             panel.ValueChoice_Click(new Button { DataContext = second }, new RoutedEventArgs());
             TextEditorWindow.PumpUntil(() => panel._transient?.Title == UiText.T("Значение заменено"));
             check(item.Text == "mpv \"\" \"" + path + "\"" && copied == item.Text, "preview: выбор второй карточки заменяет вторую пару кавычек и копирует итог");
-            var elapsed = System.Diagnostics.Stopwatch.StartNew();
             TextEditorWindow.PumpUntil(() => panel._transient == null);
             check(panel._transient == null && !panel._infoTimer.IsEnabled && elapsed.ElapsedMilliseconds is >= 1700 and < 3500,
-                "сообщение подстановки действительно исчезает через две секунды");
+                $"сообщение подстановки действительно исчезает через две секунды ({elapsed.ElapsedMilliseconds} мс)");
             panel._copyValue = _ => throw new System.Runtime.InteropServices.ExternalException("synthetic clipboard busy");
             string retryOriginal = item.Text;
             panel._valueItem = item; panel._valueOriginal = retryOriginal;

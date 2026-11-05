@@ -7,7 +7,8 @@ namespace ArkCopyBuffer;
 
 partial class PanelWindow
 {
-    readonly DispatcherTimer _vfxTimer = new(DispatcherPriority.Background) { Interval = TimeSpan.FromMilliseconds(16) };
+    // Render, not Background: hovering, scrolling or typing keeps the dispatcher busy, and a lower priority froze the flame for up to 2 s.
+    readonly DispatcherTimer _vfxTimer = new(DispatcherPriority.Render) { Interval = TimeSpan.FromMilliseconds(16) };
     readonly Stopwatch _vfxClock = new();
     BitmapSource[]? _vfxFrames;
     VfxWindow? _vfxWindow;
@@ -76,6 +77,14 @@ partial class PanelWindow
                 if (version != _vfxVersion || !_vfxReady || !IsVisible || !VfxEnabled) return;
                 _vfxFrames = frames;
             }
+            if (KeepOpen)
+            {
+                // A pinned panel can stay on screen for hours, and its lit edge takes over from the flame.
+                _vfxWindow?.Hide();
+                VfxPreview.Frame ??= _vfxFrames[0];
+                VfxStatus.Text = UiText.T("Панель закреплена: эффект остановлен");
+                return;
+            }
             _vfxWindow ??= new VfxWindow(Root) { Owner = this };
             new System.Windows.Interop.WindowInteropHelper(_vfxWindow).EnsureHandle();
             _vfxWindow.Flame.Opacity = VfxOpacity / 100.0;
@@ -102,11 +111,12 @@ partial class PanelWindow
     void DrawVfxFrame()
     {
         if (_vfxFrames == null || _vfxWindow == null) return;
-        int frame = Animations ? (int)(_vfxClock.Elapsed.TotalMilliseconds / (40 / .85) * VfxSpeed / 100) % _vfxFrames.Length : 0;
-        if (frame == _vfxFrame) return;
-        _vfxFrame = frame;
-        _vfxWindow.Flame.Frame = _vfxFrames[frame];
-        VfxPreview.Frame = _vfxFrames[frame];
+        double position = Animations ? _vfxClock.Elapsed.TotalMilliseconds / (40 / .85) * VfxSpeed / 100 : 0;
+        _vfxFrame = (int)position % _vfxFrames.Length;
+        var (frame, next) = (_vfxFrames[_vfxFrame], _vfxFrames[(_vfxFrame + 1) % _vfxFrames.Length]);
+        double blend = position - Math.Floor(position);
+        _vfxWindow.Flame.Show(frame, next, blend);
+        if (VfxPreview.IsVisible) VfxPreview.Show(frame, next, blend); // the page is usually closed: don't repaint an unseen preview
     }
 
     internal static void SelfTestVfx(string dir, Action<bool, string> check)
@@ -118,11 +128,12 @@ partial class PanelWindow
             image.Freeze();
             return image;
         }
-        static RenderTargetBitmap Border(BitmapSource frame, int width = 392, int height = 492, int dpi = 96)
+        static RenderTargetBitmap Border(BitmapSource frame, int width = 392, int height = 492, int dpi = 96, BitmapSource? next = null)
         {
             width += (int)VfxWindow.ExtraInset * 2;
             height += (int)VfxWindow.ExtraInset * 2;
-            var border = new NetherBorder { Frame = frame };
+            var border = new NetherBorder();
+            border.Show(frame, next, next == null ? 0 : .5);
             border.Measure(new Size(width, height)); border.Arrange(new Rect(0, 0, width, height));
             return Render(border, width, height, dpi);
         }
@@ -133,7 +144,7 @@ partial class PanelWindow
             {
                 dc.DrawRectangle(background ?? System.Windows.Media.Brushes.Black, null, new Rect(0, 0, border.PixelWidth, border.PixelHeight));
                 dc.DrawImage(panel, new Rect(VfxWindow.ExtraInset, VfxWindow.ExtraInset, panel.PixelWidth, panel.PixelHeight));
-                dc.PushOpacity(.85); // Match the default VFX intensity in the preview artifacts.
+                dc.PushOpacity(.2); // Match the default VFX intensity in the preview artifacts.
                 dc.DrawImage(border, new Rect(0, 0, border.PixelWidth, border.PixelHeight));
                 dc.Pop();
             }
@@ -229,6 +240,8 @@ partial class PanelWindow
             clearEdges &= pixels[y * first.PixelWidth * 4 + 3] == 0 && pixels[(y * first.PixelWidth + first.PixelWidth - 1) * 4 + 3] == 0;
         check(clearEdges, "VFX: the enlarged overlay leaves clear padding around the complete flame");
         check(!pixels.SequenceEqual(Pixels(Border(frames[32]))), "VFX: advancing the loop changes the actual rendered flame pixels");
+        var blended = Pixels(Border(frames[0], next: frames[1]));
+        check(!blended.SequenceEqual(pixels) && !blended.SequenceEqual(Pixels(Border(frames[1]))), "VFX: a blended tick shows a mix of two frames instead of stepping between them");
         var dpiImage = Border(frames[0], dpi: 144);
         var dpiPixels = Pixels(dpiImage);
         check(dpiImage.PixelWidth == 780 && dpiImage.PixelHeight == 930
@@ -242,6 +255,7 @@ partial class PanelWindow
         bool motion = Motion.Enabled;
         try
         {
+            check(panel.VfxOpacity == 20, "VFX: default intensity is 20%");
             panel.ShowSettingsPage(2);
             check(panel.VfxSettingsView.Visibility == Visibility.Visible && panel.VisualSettingsView.Visibility == Visibility.Collapsed
                 && panel.StorageSettingsView.Visibility == Visibility.Collapsed, "VFX: settings tab selects its own page and hides the other two");
@@ -299,6 +313,20 @@ partial class PanelWindow
             tick.Tick += (_, _) => { tick.Stop(); frame.Continue = false; };
             tick.Start(); Dispatcher.PushFrame(frame);
             check(panel._vfxFrame > 0, "VFX: the native overlay advances through the animation while shown");
+            int beforeBusy = panel._vfxFrame;
+            bool busy = true;
+            void Work() { if (!busy) return; System.Threading.Thread.SpinWait(50000); panel.Dispatcher.BeginInvoke(DispatcherPriority.Input, Work); }
+            Work();
+            var busyFrame = new DispatcherFrame();
+            var busyEnd = new DispatcherTimer(DispatcherPriority.Send) { Interval = TimeSpan.FromMilliseconds(300) };
+            busyEnd.Tick += (_, _) => { busyEnd.Stop(); busy = false; busyFrame.Continue = false; };
+            busyEnd.Start(); Dispatcher.PushFrame(busyFrame);
+            check(panel._vfxFrame != beforeBusy, "VFX: the flame keeps moving while input work keeps the dispatcher busy");
+            panel.KeepOpen = true;
+            check(!panel._vfxWindow.IsVisible && !panel._vfxTimer.IsEnabled && !panel._vfxClock.IsRunning
+                && panel.VfxStatus.Text == UiText.T("Панель закреплена: эффект остановлен"), "VFX: a pinned panel hides the overlay and stops all playback");
+            panel.KeepOpen = false;
+            check(panel._vfxWindow.IsVisible && panel._vfxTimer.IsEnabled, "VFX: unpinning brings the flame back");
             panel.Hide();
             check(!panel._vfxWindow.IsVisible && !panel._vfxTimer.IsEnabled && !panel._vfxClock.IsRunning,
                 "VFX: hiding a previously shown panel hides its overlay and stops all playback");

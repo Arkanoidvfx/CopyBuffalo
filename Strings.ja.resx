@@ -984,6 +984,10 @@
     <value>Google マップ</value>
     <comment>Google Карты</comment>
   </data>
+  <data name="SD11DE7596B8F78CB" xml:space="preserve">
+    <value>パネルを固定中: エフェクトは停止しています</value>
+    <comment>Панель закреплена: эффект остановлен</comment>
+  </data>
   <data name="SDE9D352AD5C8C949" xml:space="preserve">
     <value>このリリースには CopyBuffalo-Setup.exe がありません。</value>
     <comment>В релизе нет установщика CopyBuffalo-Setup.exe.</comment>
@@ -2279,5 +2283,33 @@
   <data name="S13A1601A66B84822" xml:space="preserve">
     <value>テキストを翻訳しています。</value>
     <comment>Текст переводится.</comment>
+  </data>
+  <data name="SF2E6B378918A9586" xml:space="preserve">
+    <value>離すと閉じる</value>
+    <comment>Отпустите, чтобы закрыть</comment>
+  </data>
+  <data name="S6BCCE6136CD105CA" xml:space="preserve">
+    <value>パネルを開いたままにする</value>
+    <comment>Не скрывать панель</comment>
+  </data>
+  <data name="S29D614F401E3483B" xml:space="preserve">
+    <value>パネルを再び自動で隠す</value>
+    <comment>Снова скрывать панель</comment>
+  </data>
+  <data name="S5B3067173F204EB7" xml:space="preserve">
+    <value>離すと {0} 件を貼り付け</value>
+    <comment>Отпустите, чтобы вставить: {0}</comment>
+  </data>
+  <data name="S21F2F3E398D92E6A" xml:space="preserve">
+    <value>Shift+ホイール</value>
+    <comment>Shift+колесо</comment>
+  </data>
+  <data name="SE2FE65015C71CA55" xml:space="preserve">
+    <value>まとめて貼り付け</value>
+    <comment>несколько</comment>
+  </data>
+  <data name="SC741550FE8935208" xml:space="preserve">
+    <value>項目にポインターを合わせ、Shift を押したままホイールを回すと、そこから項目を集められます。Shift を離すとまとめて貼り付けます。</value>
+    <comment>Наведите на запись, держите Shift и крутите колесо: записи копятся от неё. Отпустите Shift, и все вставятся разом.</comment>
   </data>
 </root>
