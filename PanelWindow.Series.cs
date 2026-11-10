@@ -87,7 +87,7 @@ partial class PanelWindow
         _seriesQueue.Clear();
         _seriesView = null; _seriesHistory = null;
         List.ItemsSource = _view;
-        List.Focusable = false;
+        List.Focusable = true;
         SeriesNext.IsEnabled = SeriesAll.IsEnabled = false;
         SeriesBar.Visibility = Visibility.Collapsed;
         KeyHints.Visibility = ShowKeyHints ? Visibility.Visible : Visibility.Collapsed;

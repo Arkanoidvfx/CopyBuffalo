@@ -17,7 +17,7 @@ public partial class App : Application
     static readonly string DataDir = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "ArkCopyBuffer");
     const string RunKey = @"Software\Microsoft\Windows\CurrentVersion\Run";
-    const string SettingsKey = @"Software\ArkCopyBuffer";
+    internal const string SettingsKey = @"Software\ArkCopyBuffer";
 
     Mutex? _single;
     HistoryStore _store = null!;
@@ -85,6 +85,21 @@ public partial class App : Application
         {
             try { Task.Run(() => OcrChecks.TranslationAsync(translationDir)).GetAwaiter().GetResult(); Shutdown(0); }
             catch (Exception ex) { Directory.CreateDirectory(translationDir); File.WriteAllText(Path.Combine(translationDir, "translation-error.log"), ex.ToString()); Shutdown(1); }
+            return;
+        }
+
+        if (e.Args is ["--history-map-selftest", var mapDirectory])
+        {
+            System.Windows.Media.RenderOptions.ProcessRenderMode = RenderMode.SoftwareOnly;
+            ApplyTheme();
+            Directory.CreateDirectory(mapDirectory);
+            var checks = new List<string>();
+            try
+            {
+                HistoryMapWindow.SelfTest(mapDirectory, (ok, message) => { checks.Add((ok ? "ok " : "FAIL ") + message); if (!ok) throw new InvalidOperationException(message); });
+                File.WriteAllLines(Path.Combine(mapDirectory, "selftest.log"), checks); Shutdown(0);
+            }
+            catch (Exception ex) { File.WriteAllText(Path.Combine(mapDirectory, "selftest.log"), string.Join("\n", checks) + "\n" + ex); Shutdown(1); }
             return;
         }
 
@@ -915,10 +930,10 @@ public partial class App : Application
     // ---------- Тема ----------
 
     /// <summary>Кисти-токены Windows 11 под текущую тему приложений и акцентный цвет.</summary>
-    void ApplyTheme()
+    internal void ApplyTheme(bool? dark = null)
     {
         using var key = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Themes\Personalize");
-        IsDarkTheme = key?.GetValue("AppsUseLightTheme") is not int v || v == 0;
+        IsDarkTheme = dark ?? (key?.GetValue("AppsUseLightTheme") is not int v || v == 0);
 
         var accent = ReadAccent();
         // Как в Win11: в тёмной теме акцент светлее, в светлой — темнее.

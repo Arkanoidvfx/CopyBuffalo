@@ -1400,9 +1400,9 @@
     <value>कमांड में पथ</value>
     <comment>Пути в команде</comment>
   </data>
-  <data name="SA02B63A100DB5278" xml:space="preserve">
-    <value>प्रविष्टि के पिन पर क्लिक करें या उसे यहाँ रखने के लिए Ctrl+P दबाएँ।</value>
-    <comment>Нажмите на булавку у записи или Ctrl+P, и она появится здесь.</comment>
+  <data name="S657ED8D046889B5F" xml:space="preserve">
+    <value>किसी प्रविष्टि पर Ctrl+P दबाएँ या उसके मेनू में «पिन करें» चुनें, और वह यहाँ दिखेगी।</value>
+    <comment>Нажмите Ctrl+P на записи или выберите «Закрепить» в её меню, и она появится здесь.</comment>
   </data>
   <data name="SA0F7A780FB6B8F8A" xml:space="preserve">
     <value>{0} · {1:0.#} KB</value>
@@ -2312,4 +2312,59 @@
     <value>किसी प्रविष्टि पर पॉइंटर रखें, Shift दबाए रखें और व्हील घुमाकर वहाँ से प्रविष्टियाँ जोड़ें। Shift छोड़ते ही सभी एक साथ पेस्ट हो जाएँगी।</value>
     <comment>Наведите на запись, держите Shift и крутите колесо: записи копятся от неё. Отпустите Shift, и все вставятся разом.</comment>
   </data>
+<data name="SF44D6C4F88AD4ECE" xml:space="preserve"><value>इतिहास मानचित्र खोलें</value></data>
+<data name="SBFC1F7DFE040A55D" xml:space="preserve"><value>इतिहास मानचित्र</value></data>
+<data name="S0B7D5848503B0590" xml:space="preserve"><value>नवीनतम स्रोत</value></data>
+<data name="SD4A6795C199FB461" xml:space="preserve"><value>प्रकार</value></data>
+<data name="S2A2B4DD6D9D146C8" xml:space="preserve"><value>प्रविष्टि की तारीख</value></data>
+<data name="S05D8DA55DE4B4366" xml:space="preserve"><value>अंतिम उपयोग</value></data>
+<data name="S9BAED4D8DEE51430" xml:space="preserve"><value>पहली बार कॉपी</value></data>
+<data name="SE21250441B160784" xml:space="preserve"><value>मानचित्र ताज़ा करें</value></data>
+<data name="S7FDB43F514CCAFEB" xml:space="preserve"><value>मूल प्रविष्टि पर लौटें</value></data>
+<data name="S26A3AE77BFAA20AB" xml:space="preserve"><value>तारीखें</value></data>
+<data name="SF1163738DEB523A9" xml:space="preserve"><value>पूर्वावलोकन</value></data>
+<data name="SE91607DCA5E39AF1" xml:space="preserve"><value>दिन के अनुसार खोजें</value></data>
+<data name="SF9859CEC491B6151" xml:space="preserve"><value>सभी तारीखें</value></data>
+<data name="SB151B7AC20A05070" xml:space="preserve"><value>मानचित्र फ़िट करें</value></data>
+<data name="S471233C0506BF8E5" xml:space="preserve"><value>यहाँ केंद्रित करें</value></data>
+<data name="SE556E4917F9813A1" xml:space="preserve"><value>वर्तमान सहेजी गई प्रविष्टियाँ, सामग्री के पुराने संस्करण नहीं।</value></data>
+<data name="SB1364C3063013BEF" xml:space="preserve"><value>बदलाव उपलब्ध हैं</value></data>
+<data name="S71E214E1477F66F0" xml:space="preserve"><value>सभी स्रोत</value></data>
+<data name="S19161353D3BF469C" xml:space="preserve"><value>सभी प्रकार</value></data>
+<data name="S4ABF371536C37F84" xml:space="preserve"><value>{0} प्रविष्टियाँ</value></data>
+<data name="S3AAA349B407F9B9D" xml:space="preserve"><value>बदलाव देखने के लिए ताज़ा करें</value></data>
+<data name="S497650D0E27ACD30" xml:space="preserve"><value>संरक्षित सामग्री</value></data>
+<data name="SD1A7FFD7C5B0ACE0" xml:space="preserve"><value>पूर्वावलोकन उपलब्ध नहीं</value></data>
+<data name="SD2D08C715EE66CBD" xml:space="preserve"><value>कॉपी किया गया</value></data>
+<data name="SE55E27836BAFB755" xml:space="preserve"><value>कॉपी नहीं हो सका। फिर प्रयास करें।</value></data>
+<data name="S9C8F4E368F190070" xml:space="preserve"><value>कोई मेल नहीं। तारीखें बदलें या खोज साफ़ करें।</value></data>
+<data name="SE98A4302C211D645" xml:space="preserve"><value>दिन का विस्तार करें</value></data>
+<data name="SAFBA2418D6AEC23D" xml:space="preserve"><value>−</value></data>
+<data name="SA318C24216DEFE20" xml:space="preserve"><value>+</value></data>
+<data name="S2F28D0718C1DB9B0" xml:space="preserve"><value>पिछला महीना</value></data>
+<data name="S913B7BD73FAA2FFB" xml:space="preserve"><value>अगला महीना</value></data>
+<data name="SC341D8B172284D40" xml:space="preserve"><value>मूल प्रविष्टि हटा दी गई है या उसकी अवधि समाप्त हो गई है।</value></data>
+<data name="S47E0CDA1709B4EF7" xml:space="preserve"><value>ज़ूम आउट</value></data>
+<data name="S08235006182D7F7D" xml:space="preserve"><value>ज़ूम इन</value></data>
+<data name="S75AB8906156B7244" xml:space="preserve"><value>दिनों का अवलोकन</value></data>
+<data name="S888A65E2046FCBA8" xml:space="preserve"><value>स्रोत दर्ज नहीं है</value></data>
+<data name="SC230BC4E85E0365E" xml:space="preserve"><value>खोज परिणाम</value></data>
+<data name="S96933B71F5F8ED73" xml:space="preserve"><value>संग्रहीत प्रविष्टियाँ · खिसकाने के लिए खींचें · ज़ूम के लिए स्क्रॉल करें</value></data>
+<data name="SBD3A5BE11E2ADDF7" xml:space="preserve"><value>अवलोकन</value></data>
+<data name="SC37EFE9530BDDE6E" xml:space="preserve"><value>अवलोकन पर वापस</value></data>
+<data name="S81DA2D58E42F3647" xml:space="preserve"><value>प्रविष्टियाँ देखने के लिए समूह चुनें</value></data>
+<data name="SCD45EC7836B5CB5E" xml:space="preserve"><value>फ़िल्टर साफ़ करें</value></data>
+<data name="S822F9FD9BA2D117E" xml:space="preserve"><value>फ़ोन</value></data>
+<data name="S53B97805C229AC7F" xml:space="preserve"><value>फ़ोन सेटिंग</value></data>
+<data name="S30145146CB667514" xml:space="preserve"><value>फ़ोन से टेक्स्ट प्राप्त करें</value></data>
+<data name="S17424EB150B417D3" xml:space="preserve"><value>प्राप्त टेक्स्ट को तुरंत क्लिपबोर्ड पर रखें</value></data>
+<data name="S6DD75BD110D44A90" xml:space="preserve"><value>CopyBuffalo Phone ऐप से QR कोड स्कैन करें, या पता, पोर्ट और कोड हाथ से दर्ज करें। फ़ोन और PC एक ही नेटवर्क में होने चाहिए।</value></data>
+<data name="SDA82E80563D75A61" xml:space="preserve"><value>पता</value></data>
+<data name="S90947197F86BFDEA" xml:space="preserve"><value>पोर्ट</value></data>
+<data name="S1A0517BFD5DCF6AA" xml:space="preserve"><value>नया कोड</value></data>
+<data name="SAACC3EFA772B86E4" xml:space="preserve"><value>प्राप्त हो रहा है · पोर्ट {0}</value></data>
+<data name="S60420FE4F5B6189C" xml:space="preserve"><value>प्राप्ति बंद है</value></data>
+<data name="SED0DB441ADE2DEC4" xml:space="preserve"><value>पोर्ट {0} व्यस्त है: {1}</value></data>
+<data name="SABB504E01C9949B0" xml:space="preserve"><value>नेटवर्क नहीं मिला: PC को लोकल नेटवर्क से जोड़ें।</value></data>
+<data name="SB489324C4EC60F8F" xml:space="preserve"><value>पहली बार चालू करने पर Windows फ़ायरवॉल की अनुमति मांगेगा — निजी नेटवर्क के लिए अनुमति दें।</value></data>
 </root>

@@ -21,6 +21,7 @@ Updates are **on by default**. They download in the background and install when 
 ## Everyday use
 
 - Search your history, filter by app or content type, and pin items in groups.
+- Right-click an entry → **Open history map** to explore retained entries by day, preview them, and copy them. [History Map guide](docs/history-map.md).
 - Keep text formatting, paste plain text, or edit a saved entry.
 - **Ctrl+click** or **Ctrl+Enter** to paste text or a folder path in double quotes.
 - Extract text from screenshots with local OCR.

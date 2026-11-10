@@ -192,6 +192,9 @@ static class Paster
 
     public static void CopyText(string text, bool excludeFromHistory = false, bool sensitive = false) => WriteClipboard(TextClipboard(text, excludeFromHistory, sensitive));
 
+    /// <summary>Картинка в буфер без новой записи в истории (запись уже добавлена вызывающим).</summary>
+    public static void CopyImage(BitmapSource bitmap, byte[] png) => WriteItemClipboard(ImageClipboard(bitmap, png), Guid.Empty, null);
+
     static void WriteClipboard(DataObject data)
     {
         for (int attempt = 0; ; attempt++)

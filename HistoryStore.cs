@@ -887,6 +887,7 @@ public sealed class HistoryStore
             TextMergeWindow.SelfTest(dir, Check);
             PanelWindow.SelfTestMergeSelection(dir, Check);
             PanelWindow.SelfTestSubstitution(dir, Check);
+            PanelWindow.SelfTestInlineEdit(dir, Check);
             PanelWindow.SelfTestImageSeries(dir, Check);
 
             s.Add("a", "{\\rtf a}", null, t0);

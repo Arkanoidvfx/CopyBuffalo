@@ -1400,9 +1400,9 @@ Details: {1}</value>
     <value>Paths in command</value>
     <comment>Пути в команде</comment>
   </data>
-  <data name="SA02B63A100DB5278" xml:space="preserve">
-    <value>Click an entry's pin or press Ctrl+P to keep it here.</value>
-    <comment>Нажмите на булавку у записи или Ctrl+P, и она появится здесь.</comment>
+  <data name="S657ED8D046889B5F" xml:space="preserve">
+    <value>Press Ctrl+P on an entry or choose Pin in its menu to keep it here.</value>
+    <comment>Нажмите Ctrl+P на записи или выберите «Закрепить» в её меню, и она появится здесь.</comment>
   </data>
   <data name="SA0F7A780FB6B8F8A" xml:space="preserve">
     <value>{0} · {1:0.#} KB</value>
@@ -2312,4 +2312,59 @@ Details: {1}</value>
     <value>Point at an entry, hold Shift and roll the wheel to collect entries from it. Release Shift to paste them all at once.</value>
     <comment>Наведите на запись, держите Shift и крутите колесо: записи копятся от неё. Отпустите Shift, и все вставятся разом.</comment>
   </data>
+<data name="SF44D6C4F88AD4ECE" xml:space="preserve"><value>Open history map</value></data>
+<data name="SBFC1F7DFE040A55D" xml:space="preserve"><value>History map</value></data>
+<data name="S0B7D5848503B0590" xml:space="preserve"><value>Latest source</value></data>
+<data name="SD4A6795C199FB461" xml:space="preserve"><value>Type</value></data>
+<data name="S2A2B4DD6D9D146C8" xml:space="preserve"><value>Date meaning</value></data>
+<data name="S05D8DA55DE4B4366" xml:space="preserve"><value>Last used</value></data>
+<data name="S9BAED4D8DEE51430" xml:space="preserve"><value>First copied</value></data>
+<data name="SE21250441B160784" xml:space="preserve"><value>Refresh</value></data>
+<data name="S7FDB43F514CCAFEB" xml:space="preserve"><value>Return to original item</value></data>
+<data name="S26A3AE77BFAA20AB" xml:space="preserve"><value>Dates</value></data>
+<data name="SF1163738DEB523A9" xml:space="preserve"><value>Preview</value></data>
+<data name="SE91607DCA5E39AF1" xml:space="preserve"><value>Browse by day</value></data>
+<data name="SF9859CEC491B6151" xml:space="preserve"><value>All dates</value></data>
+<data name="SB151B7AC20A05070" xml:space="preserve"><value>Fit</value></data>
+<data name="S471233C0506BF8E5" xml:space="preserve"><value>Center here</value></data>
+<data name="SE556E4917F9813A1" xml:space="preserve"><value>Current retained entries, not historical content versions.</value></data>
+<data name="SB1364C3063013BEF" xml:space="preserve"><value>Updates available</value></data>
+<data name="S71E214E1477F66F0" xml:space="preserve"><value>All sources</value></data>
+<data name="S19161353D3BF469C" xml:space="preserve"><value>All types</value></data>
+<data name="S4ABF371536C37F84" xml:space="preserve"><value>{0} entries</value></data>
+<data name="S3AAA349B407F9B9D" xml:space="preserve"><value>Refresh to view changes</value></data>
+<data name="S497650D0E27ACD30" xml:space="preserve"><value>Protected content</value></data>
+<data name="SD1A7FFD7C5B0ACE0" xml:space="preserve"><value>Preview unavailable</value></data>
+<data name="SD2D08C715EE66CBD" xml:space="preserve"><value>Copied</value></data>
+<data name="SE55E27836BAFB755" xml:space="preserve"><value>Could not copy. Try again.</value></data>
+<data name="S9C8F4E368F190070" xml:space="preserve"><value>No entries match. Change the dates or clear the search.</value></data>
+<data name="SE98A4302C211D645" xml:space="preserve"><value>Expand day</value></data>
+<data name="SAFBA2418D6AEC23D" xml:space="preserve"><value>−</value></data>
+<data name="SA318C24216DEFE20" xml:space="preserve"><value>+</value></data>
+<data name="S2F28D0718C1DB9B0" xml:space="preserve"><value>Previous month</value></data>
+<data name="S913B7BD73FAA2FFB" xml:space="preserve"><value>Next month</value></data>
+<data name="SC341D8B172284D40" xml:space="preserve"><value>Original entry was deleted or expired.</value></data>
+<data name="S47E0CDA1709B4EF7" xml:space="preserve"><value>Zoom out</value></data>
+<data name="S08235006182D7F7D" xml:space="preserve"><value>Zoom in</value></data>
+<data name="S75AB8906156B7244" xml:space="preserve"><value>Day overview</value></data>
+<data name="S888A65E2046FCBA8" xml:space="preserve"><value>Source not recorded</value></data>
+<data name="SC230BC4E85E0365E" xml:space="preserve"><value>Search results</value></data>
+<data name="S96933B71F5F8ED73" xml:space="preserve"><value>Retained entries · Drag to pan · Scroll to zoom</value></data>
+<data name="SBD3A5BE11E2ADDF7" xml:space="preserve"><value>Overview</value></data>
+<data name="SC37EFE9530BDDE6E" xml:space="preserve"><value>Back to overview</value></data>
+<data name="S81DA2D58E42F3647" xml:space="preserve"><value>Choose a group to see its entries</value></data>
+<data name="SCD45EC7836B5CB5E" xml:space="preserve"><value>Clear filters</value></data>
+<data name="S822F9FD9BA2D117E" xml:space="preserve"><value>Phone</value></data>
+<data name="S53B97805C229AC7F" xml:space="preserve"><value>Phone settings</value></data>
+<data name="S30145146CB667514" xml:space="preserve"><value>Receive text from the phone</value></data>
+<data name="S17424EB150B417D3" xml:space="preserve"><value>Put received text on the clipboard right away</value></data>
+<data name="S6DD75BD110D44A90" xml:space="preserve"><value>Scan the QR code with the CopyBuffalo Phone app, or enter the address, port and code by hand. The phone and the PC must be on the same network.</value></data>
+<data name="SDA82E80563D75A61" xml:space="preserve"><value>Address</value></data>
+<data name="S90947197F86BFDEA" xml:space="preserve"><value>Port</value></data>
+<data name="S1A0517BFD5DCF6AA" xml:space="preserve"><value>New code</value></data>
+<data name="SAACC3EFA772B86E4" xml:space="preserve"><value>Receiving · port {0}</value></data>
+<data name="S60420FE4F5B6189C" xml:space="preserve"><value>Receiving is off</value></data>
+<data name="SED0DB441ADE2DEC4" xml:space="preserve"><value>Port {0} is busy: {1}</value></data>
+<data name="SABB504E01C9949B0" xml:space="preserve"><value>No network found: connect the PC to a local network.</value></data>
+<data name="SB489324C4EC60F8F" xml:space="preserve"><value>The first time you turn it on, Windows asks for firewall permission — allow it for private networks.</value></data>
 </root>

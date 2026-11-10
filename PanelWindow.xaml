@@ -116,8 +116,8 @@
                     <!-- Кнопки в строке сверху: не закрывают текст -->
                     <StackPanel x:Name="TileActions" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top"
                                 Margin="0,4,4,0" Opacity="0">
-                        <Button Style="{StaticResource TileActionButton}" Content="&#xE77A;" Click="Pin_Click"
-                                ToolTip="{local:Loc Key=SD6667D915584518C}" AutomationProperties.Name="{local:Loc Key=S9FB423FBC9181142}"/>
+                        <Button x:Name="EditButton" Style="{StaticResource TileActionButton}" Content="&#xE70F;" Click="InlineEdit_Click"
+                                ToolTip="{local:Loc Key=S5C51EDD2D64E5120}" AutomationProperties.Name="{local:Loc Key=S5C51EDD2D64E5120}"/>
                         <StackPanel x:Name="ImageActions" Orientation="Horizontal" Visibility="Collapsed">
                             <Button Style="{StaticResource TileActionButton}" Content="&#xE8D2;" Click="Ocr_Click" Margin="2,0,0,0"
                                     ToolTip="{local:Loc Key=S9B45DFE62C689B6E}" AutomationProperties.Name="{local:Loc Key=S9B45DFE62C689B6E}"/>
@@ -132,8 +132,15 @@
                 <DataTrigger Binding="{Binding Path=(local:PanelWindow.SensitiveRevealed), RelativeSource={RelativeSource AncestorType=ListBoxItem}}" Value="True">
                     <Setter TargetName="TextPreview" Property="Text" Value="{Binding CardText}"/>
                 </DataTrigger>
+                <DataTrigger Binding="{Binding IsMedia}" Value="True">
+                    <Setter TargetName="EditButton" Property="Visibility" Value="Collapsed"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding IsNodeGraph}" Value="True">
+                    <Setter TargetName="EditButton" Property="Visibility" Value="Collapsed"/>
+                </DataTrigger>
                 <DataTrigger Binding="{Binding IsImage}" Value="True">
                     <Setter TargetName="ImageActions" Property="Visibility" Value="Visible"/>
+                    <Setter TargetName="EditButton" Property="Visibility" Value="Collapsed"/>
                 </DataTrigger>
                 <DataTrigger Binding="{Binding Recognizing}" Value="True">
                     <Setter TargetName="ImageActions" Property="IsEnabled" Value="False"/>
@@ -212,8 +219,8 @@
                                    Foreground="{DynamicResource TextSecondary}"/>
                     </StackPanel>
                     <StackPanel x:Name="RowActions" Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center" Opacity="0" Margin="6,0,0,0">
-                        <Button Style="{StaticResource SubtleIconButton}" Content="&#xE77A;" Click="Pin_Click"
-                                ToolTip="{local:Loc Key=SD6667D915584518C}" AutomationProperties.Name="{local:Loc Key=S9FB423FBC9181142}"/>
+                        <Button x:Name="EditButton" Style="{StaticResource SubtleIconButton}" Content="&#xE70F;" Click="InlineEdit_Click"
+                                ToolTip="{local:Loc Key=S5C51EDD2D64E5120}" AutomationProperties.Name="{local:Loc Key=S5C51EDD2D64E5120}"/>
                         <StackPanel x:Name="ImageActions" Orientation="Horizontal" Visibility="Collapsed">
                             <Button Style="{StaticResource SubtleIconButton}" Content="&#xE8D2;" Click="Ocr_Click"
                                     ToolTip="{local:Loc Key=S9B45DFE62C689B6E}" AutomationProperties.Name="{local:Loc Key=S9B45DFE62C689B6E}"/>
@@ -232,8 +239,15 @@
                 <DataTrigger Binding="{Binding Path=(local:PanelWindow.SensitiveRevealed), RelativeSource={RelativeSource AncestorType=ListBoxItem}}" Value="True">
                     <Setter TargetName="RowTitle" Property="Text" Value="{Binding CardText}"/>
                 </DataTrigger>
+                <DataTrigger Binding="{Binding IsMedia}" Value="True">
+                    <Setter TargetName="EditButton" Property="Visibility" Value="Collapsed"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding IsNodeGraph}" Value="True">
+                    <Setter TargetName="EditButton" Property="Visibility" Value="Collapsed"/>
+                </DataTrigger>
                 <DataTrigger Binding="{Binding IsImage}" Value="True">
                     <Setter TargetName="ImageActions" Property="Visibility" Value="Visible"/>
+                    <Setter TargetName="EditButton" Property="Visibility" Value="Collapsed"/>
                 </DataTrigger>
                 <DataTrigger Binding="{Binding Recognizing}" Value="True">
                     <Setter TargetName="ImageActions" Property="IsEnabled" Value="False"/>
@@ -455,7 +469,7 @@
         <Border x:Name="PinnedBackground" Grid.Row="3" Background="Transparent" Visibility="Collapsed"
                 MouseRightButtonUp="Pinned_EmptyRightClick"/>
 
-        <ListBox x:Name="List" Grid.Row="3" Focusable="False"
+        <ListBox x:Name="List" Grid.Row="3" Focusable="True" FocusVisualStyle="{StaticResource FocusRing}"
                  Background="Transparent" BorderThickness="0" Padding="0"
                  ItemContainerStyle="{StaticResource ClipItemContainer}"
                  AllowDrop="True" PreviewMouseLeftButtonDown="Pinned_MouseDown" PreviewMouseMove="Pinned_MouseMove"
@@ -567,8 +581,8 @@
                                     Visibility="Collapsed" Click="Graph_Click" ToolTip="{local:Loc Key=SF8D92D9F2C398D8F}" AutomationProperties.Name="{local:Loc Key=S19CE8F92856A9D18}"/>
                             <Button x:Name="TranslateTextButton" Style="{StaticResource SubtleIconButton}" Content="&#xE8C1;"
                                     Click="TranslateText_Click" ToolTip="{local:Loc Key=S9FCAEEA7E9A16A2B}" AutomationProperties.Name="{local:Loc Key=S9FCAEEA7E9A16A2B}"/>
-                            <Button x:Name="PinButton" Style="{StaticResource SubtleIconButton}" Content="&#xE718;"
-                                    Click="Pin_Click" ToolTip="{local:Loc Key=SFAB397155D4AFDEF}" AutomationProperties.Name="{local:Loc Key=S340E3C751299C910}"/>
+                            <Button x:Name="EditButton" Style="{StaticResource SubtleIconButton}" Content="&#xE70F;"
+                                    Click="InlineEdit_Click" ToolTip="{local:Loc Key=S5C51EDD2D64E5120}" AutomationProperties.Name="{local:Loc Key=S5C51EDD2D64E5120}"/>
                             <StackPanel x:Name="ImageActions" Orientation="Horizontal" Visibility="Collapsed">
                                 <Button Style="{StaticResource SubtleIconButton}" Content="&#xE8D2;" Click="Ocr_Click"
                                         ToolTip="{local:Loc Key=S9B45DFE62C689B6E}" AutomationProperties.Name="{local:Loc Key=S9B45DFE62C689B6E}"/>
@@ -603,6 +617,7 @@
                             <Setter TargetName="ImagePreview" Property="Visibility" Value="Visible"/>
                             <Setter TargetName="ImageActions" Property="Visibility" Value="Visible"/>
                             <Setter TargetName="TranslateTextButton" Property="Visibility" Value="Collapsed"/>
+                            <Setter TargetName="EditButton" Property="Visibility" Value="Collapsed"/>
                         </DataTrigger>
                         <DataTrigger Binding="{Binding Compressing}" Value="True">
                             <Setter TargetName="TranslateTextButton" Property="IsEnabled" Value="False"/>
@@ -618,21 +633,21 @@
                             <Setter TargetName="GraphPreview" Property="Visibility" Value="Visible"/>
                             <Setter TargetName="GraphButton" Property="Visibility" Value="Visible"/>
                             <Setter TargetName="TranslateTextButton" Property="Visibility" Value="Collapsed"/>
+                            <Setter TargetName="EditButton" Property="Visibility" Value="Collapsed"/>
                         </DataTrigger>
                         <DataTrigger Binding="{Binding IsMedia}" Value="True">
                             <Setter TargetName="TextPreview" Property="Visibility" Value="Collapsed"/>
                             <Setter TargetName="MediaRow" Property="Visibility" Value="Visible"/>
                             <Setter TargetName="TranslateTextButton" Property="Visibility" Value="Collapsed"/>
+                            <Setter TargetName="EditButton" Property="Visibility" Value="Collapsed"/>
                         </DataTrigger>
                         <DataTrigger Binding="{Binding IsFolder}" Value="True">
                             <Setter TargetName="MediaRow" Property="ToolTip" Value="{Binding Text}"/>
                             <Setter TargetName="TranslateTextButton" Property="Visibility" Value="Collapsed"/>
+                            <Setter TargetName="EditButton" Property="Visibility" Value="Collapsed"/>
                         </DataTrigger>
                         <DataTrigger Binding="{Binding Pinned}" Value="True">
                             <Setter TargetName="PinnedMark" Property="Visibility" Value="Visible"/>
-                            <Setter TargetName="PinButton" Property="Content" Value="&#xE77A;"/>
-                            <Setter TargetName="PinButton" Property="ToolTip" Value="{local:Loc Key=SD6667D915584518C}"/>
-                            <Setter TargetName="PinButton" Property="AutomationProperties.Name" Value="{local:Loc Key=S9FB423FBC9181142}"/>
                         </DataTrigger>
                         <DataTrigger Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType=ListBoxItem}}" Value="True">
                             <Setter TargetName="Actions" Property="Opacity" Value="1"/>
@@ -648,7 +663,7 @@
         </ListBox>
 
         <!-- Закреплённые: плитки 3 в ряд или список (меню «⋯»); шаблоны и контейнеры меняет ApplyPinnedView -->
-        <ListBox x:Name="PinnedList" Grid.Row="3" Focusable="False" Visibility="Collapsed"
+        <ListBox x:Name="PinnedList" Grid.Row="3" Focusable="True" FocusVisualStyle="{StaticResource FocusRing}" Visibility="Collapsed"
                  Background="Transparent" BorderThickness="0" Padding="0" Margin="-3,-3,0,0"
                  ItemContainerStyle="{StaticResource PinTileContainer}"
                  ItemTemplate="{StaticResource PinTileTemplate}"
@@ -683,6 +698,18 @@
                 </GroupStyle>
             </ListBox.GroupStyle>
         </ListBox>
+
+        <!-- Быстрая правка текста: одно поле поверх строки записи (PanelWindow.InlineEdit.cs). Enter — новая строка -->
+        <Border x:Name="InlineEdit" Grid.Row="3" Visibility="Collapsed" VerticalAlignment="Top" CornerRadius="4"
+                Background="{DynamicResource MenuSurface}" BorderBrush="{DynamicResource Accent}" BorderThickness="1">
+            <TextBox x:Name="InlineEditor" Background="Transparent" BorderThickness="0" Padding="9,6,6,6"
+                     Foreground="{DynamicResource TextPrimary}" CaretBrush="{DynamicResource TextPrimary}"
+                     SelectionBrush="{DynamicResource Accent}" AcceptsReturn="True" TextWrapping="Wrap"
+                     VerticalContentAlignment="Center" TextBlock.LineHeight="20" TextBlock.LineStackingStrategy="BlockLineHeight"
+                     LostKeyboardFocus="InlineEditor_LostFocus"
+                     VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
+                     AutomationProperties.Name="{local:Loc Key=S5C51EDD2D64E5120}"/>
+        </Border>
 
         <!-- Пустое состояние -->
         <StackPanel x:Name="Empty" Grid.Row="3" VerticalAlignment="Center" HorizontalAlignment="Center"
@@ -999,7 +1026,7 @@
                     <Button x:Name="StorageSettingsTab" Grid.Column="1" Content="{local:Loc Key=S349065E9C4467894}" Style="{StaticResource StandardButton}"
                             Margin="4,0,4,0" Click="ShowStorageSettings_Click" AutomationProperties.Name="{local:Loc Key=S4EBEB45A877CDD5E}"/>
                     <Button x:Name="VfxSettingsTab" Grid.Column="2" Content="VFX" Style="{StaticResource StandardButton}"
-                            Margin="4,0,0,0" Click="ShowVfxSettings_Click" AutomationProperties.Name="{local:Loc Key=SFD1E6F563F5BACAD}"/>
+                            Margin="4,0,4,0" Click="ShowVfxSettings_Click" AutomationProperties.Name="{local:Loc Key=SFD1E6F563F5BACAD}"/>
                 </Grid>
             <ScrollViewer x:Name="VisualSettingsView" Grid.Row="1" VerticalScrollBarVisibility="Auto" Focusable="False" Padding="16,8,6,8">
                 <Grid Margin="0,0,6,0">

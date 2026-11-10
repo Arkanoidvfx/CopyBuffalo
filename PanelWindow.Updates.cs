@@ -5,7 +5,7 @@ namespace ArkCopyBuffer;
 partial class PanelWindow
 {
     Info? _updateInfo;
-    internal bool UpdateBlocked => Busy || SeriesActive || _mergeTextFilter;
+    internal bool UpdateBlocked => Busy || SeriesActive || _mergeTextFilter || _historyMap != null;
     public event Action<bool>? AutoUpdateChanged;
     public event Action? UpdateRequested;
     internal bool AutoUpdate

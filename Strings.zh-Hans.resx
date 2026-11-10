@@ -1400,9 +1400,9 @@
     <value>命令中的路径</value>
     <comment>Пути в команде</comment>
   </data>
-  <data name="SA02B63A100DB5278" xml:space="preserve">
-    <value>点击记录的固定按钮或按 Ctrl+P，即可在此保留。</value>
-    <comment>Нажмите на булавку у записи или Ctrl+P, и она появится здесь.</comment>
+  <data name="S657ED8D046889B5F" xml:space="preserve">
+    <value>在记录上按 Ctrl+P，或在其菜单中选择“固定”，即可在此保留。</value>
+    <comment>Нажмите Ctrl+P на записи или выберите «Закрепить» в её меню, и она появится здесь.</comment>
   </data>
   <data name="SA0F7A780FB6B8F8A" xml:space="preserve">
     <value>{0} · {1:0.#} KB</value>
@@ -2312,4 +2312,59 @@
     <value>指向一条记录，按住 Shift 并滚动滚轮，从它开始收集记录。松开 Shift 即可一次全部粘贴。</value>
     <comment>Наведите на запись, держите Shift и крутите колесо: записи копятся от неё. Отпустите Shift, и все вставятся разом.</comment>
   </data>
+<data name="SF44D6C4F88AD4ECE" xml:space="preserve"><value>打开历史地图</value></data>
+<data name="SBFC1F7DFE040A55D" xml:space="preserve"><value>历史地图</value></data>
+<data name="S0B7D5848503B0590" xml:space="preserve"><value>最近来源</value></data>
+<data name="SD4A6795C199FB461" xml:space="preserve"><value>类型</value></data>
+<data name="S2A2B4DD6D9D146C8" xml:space="preserve"><value>记录日期</value></data>
+<data name="S05D8DA55DE4B4366" xml:space="preserve"><value>最近使用</value></data>
+<data name="S9BAED4D8DEE51430" xml:space="preserve"><value>首次复制</value></data>
+<data name="SE21250441B160784" xml:space="preserve"><value>刷新地图</value></data>
+<data name="S7FDB43F514CCAFEB" xml:space="preserve"><value>返回原始条目</value></data>
+<data name="S26A3AE77BFAA20AB" xml:space="preserve"><value>日期</value></data>
+<data name="SF1163738DEB523A9" xml:space="preserve"><value>预览</value></data>
+<data name="SE91607DCA5E39AF1" xml:space="preserve"><value>按日期浏览</value></data>
+<data name="SF9859CEC491B6151" xml:space="preserve"><value>所有日期</value></data>
+<data name="SB151B7AC20A05070" xml:space="preserve"><value>适应窗口</value></data>
+<data name="S471233C0506BF8E5" xml:space="preserve"><value>居中此处</value></data>
+<data name="SE556E4917F9813A1" xml:space="preserve"><value>当前保留的条目，并非内容的历史版本。</value></data>
+<data name="SB1364C3063013BEF" xml:space="preserve"><value>有更新</value></data>
+<data name="S71E214E1477F66F0" xml:space="preserve"><value>所有来源</value></data>
+<data name="S19161353D3BF469C" xml:space="preserve"><value>所有类型</value></data>
+<data name="S4ABF371536C37F84" xml:space="preserve"><value>{0} 条记录</value></data>
+<data name="S3AAA349B407F9B9D" xml:space="preserve"><value>刷新以查看更改</value></data>
+<data name="S497650D0E27ACD30" xml:space="preserve"><value>受保护内容</value></data>
+<data name="SD1A7FFD7C5B0ACE0" xml:space="preserve"><value>预览不可用</value></data>
+<data name="SD2D08C715EE66CBD" xml:space="preserve"><value>已复制</value></data>
+<data name="SE55E27836BAFB755" xml:space="preserve"><value>无法复制，请重试。</value></data>
+<data name="S9C8F4E368F190070" xml:space="preserve"><value>没有匹配项。更改日期或清除搜索。</value></data>
+<data name="SE98A4302C211D645" xml:space="preserve"><value>展开日期</value></data>
+<data name="SAFBA2418D6AEC23D" xml:space="preserve"><value>−</value></data>
+<data name="SA318C24216DEFE20" xml:space="preserve"><value>+</value></data>
+<data name="S2F28D0718C1DB9B0" xml:space="preserve"><value>上个月</value></data>
+<data name="S913B7BD73FAA2FFB" xml:space="preserve"><value>下个月</value></data>
+<data name="SC341D8B172284D40" xml:space="preserve"><value>原始条目已删除或过期。</value></data>
+<data name="S47E0CDA1709B4EF7" xml:space="preserve"><value>缩小</value></data>
+<data name="S08235006182D7F7D" xml:space="preserve"><value>放大</value></data>
+<data name="S75AB8906156B7244" xml:space="preserve"><value>日期概览</value></data>
+<data name="S888A65E2046FCBA8" xml:space="preserve"><value>未记录来源</value></data>
+<data name="SC230BC4E85E0365E" xml:space="preserve"><value>搜索结果</value></data>
+<data name="S96933B71F5F8ED73" xml:space="preserve"><value>保留的条目 · 拖动平移 · 滚轮缩放</value></data>
+<data name="SBD3A5BE11E2ADDF7" xml:space="preserve"><value>概览</value></data>
+<data name="SC37EFE9530BDDE6E" xml:space="preserve"><value>返回概览</value></data>
+<data name="S81DA2D58E42F3647" xml:space="preserve"><value>选择分组以查看条目</value></data>
+<data name="SCD45EC7836B5CB5E" xml:space="preserve"><value>清除筛选</value></data>
+<data name="S822F9FD9BA2D117E" xml:space="preserve"><value>手机</value></data>
+<data name="S53B97805C229AC7F" xml:space="preserve"><value>手机设置</value></data>
+<data name="S30145146CB667514" xml:space="preserve"><value>接收来自手机的文本</value></data>
+<data name="S17424EB150B417D3" xml:space="preserve"><value>立即将收到的文本放入剪贴板</value></data>
+<data name="S6DD75BD110D44A90" xml:space="preserve"><value>用 CopyBuffalo Phone 应用扫描二维码，或手动输入地址、端口和代码。手机和电脑必须在同一网络。</value></data>
+<data name="SDA82E80563D75A61" xml:space="preserve"><value>地址</value></data>
+<data name="S90947197F86BFDEA" xml:space="preserve"><value>端口</value></data>
+<data name="S1A0517BFD5DCF6AA" xml:space="preserve"><value>新代码</value></data>
+<data name="SAACC3EFA772B86E4" xml:space="preserve"><value>正在接收 · 端口 {0}</value></data>
+<data name="S60420FE4F5B6189C" xml:space="preserve"><value>接收已关闭</value></data>
+<data name="SED0DB441ADE2DEC4" xml:space="preserve"><value>端口 {0} 被占用：{1}</value></data>
+<data name="SABB504E01C9949B0" xml:space="preserve"><value>未找到网络：请将电脑连接到局域网。</value></data>
+<data name="SB489324C4EC60F8F" xml:space="preserve"><value>首次开启时，Windows 会请求防火墙权限，请为专用网络允许。</value></data>
 </root>

@@ -1,0 +1,43 @@
+# History Map
+
+Right-click a history or pinned entry and choose **Open history map**. The exact entry opens centered in a separate window, surrounded by its closest history. Select an item, then open **Preview** to inspect its full content; center another item to move through its neighbors; **Copy** copies without pasting.
+
+The map starts with its calendar, inspector and search filters hidden. Open them when needed; **Copy** stays available in the compact command bar. When a search, source, type or date filter is active, **Clear filters** appears in the bar; its tooltip lists the active restrictions. Search, source/type filters and the calendar operate independently of the compact panel. Select a day; Shift-click another day for a range. Last used is the default; First copied uses the entry's creation timestamp. Source means latest recorded source. Editing an entry does not preserve its previous content.
+
+The displayed snapshot stays stable when copying changes an item's latest-use date. **Updates available** offers a refresh. Deleted entries disappear immediately; changed or newly protected content becomes unavailable until refresh. Return to original clears filters and refreshes around the opening entry, when it still exists.
+
+Drag the map background to pan; wheel to zoom around the pointer. The timeline zooms continuously down to 25%, spreading nearby entries over several readable rows instead of a thin strip. Image entries show asynchronously loaded thumbnails when available; protected content remains masked. Hover for a full preview. Zooming out never replaces the timeline. **Day overview** opens readable date groups, and Fit uses that overview when individual cards would become too small. Groups show entry counts, plus latest-source summaries and safe sample previews when space permits; every matching entry remains represented by a group count. Long histories are summarized into consecutive date ranges, not anonymous dots.
+
+Click a group, or wheel up over it, to drill in. A date range splits into smaller groups; a single day opens readable entries at 100% and applies that day to the calendar filter. The current selection survives when it belongs to the group; otherwise the first matching entry is selected. Navigation never copies. **Back to overview** (or Alt+Left) restores the prior date selection and selected entry; search, source and type filters stay independent. Zooming out at the broadest overview stops there, with the minus button disabled, rather than shrinking the summaries.
+
+Dates and Preview open their side panels on demand; compact windows show one at a time. With the detailed canvas focused, arrows pan and +/− zoom; in overview, + drills into the selected item's group. Ctrl+F opens search; F5 refreshes; Escape clears search text, then collapses the search panel, then closes the window. In the compact panel, F6 reaches the history list: Ctrl+V substitutes a value there, while Ctrl+V/Ctrl+Z in search perform native text editing.
+
+Entries follow chronological order from left to right. The connections show recorded time order, not inferred semantic relationships. Missing source metadata is labeled Source not recorded and can be filtered explicitly.
+
+## Validation
+Build Release, then run `pwsh -File packaging/Test-HistoryMap.ps1`. The runner uses a separate noninteractive Windows station, synthetic history and an isolated clipboard. Direct execution of `--history-map-selftest` on the interactive station is refused. Captures and checks are written under `.tmp/history-map/checks`; 801/802 capture names denote short-window inspector/calendar states.
+
+Implementation validation (2026-11-05): Release built with zero warnings/errors; 648 existing regression assertions, 41 map assertions and all seven localization suites passed. Light/dark captures cover wide, compact and short windows, with additional 125/150/200% render-density samples. Impeccable finish review: ship after clipping, localized dates, calendar navigation, short-window scrolling and empty-state fixes. Physical mixed-DPI transitions, live screen-reader output and real clipboard workflows remain manual checks. The running app was subsequently updated at the user's request after the packaged build passed both regression and map checks; Explorer restart, responsiveness and deployed hashes were verified. Installers were not rebuilt.
+
+Follow-up UX review (2026-11-05): removed the 75% zoom-out floor and implicit overview switch, added true Fit and zoom percentage, compacted dense source lanes, enabled full-width workspace and corrected first narrow opening. Dense markers retain exact-ID selection and hover previews; large entry/day sets use bounded drawing visuals. Final packaged build passed 648 regression and 55 map assertions; all seven localization suites passed. Synthetic light/dark centered, fitted, day-overview, full-width and compact-initial captures were reviewed; Impeccable disposition: ship after the compact-default fix. Updated the running copy through the existing rollback-capable Explorer restart flow and verified deployed hashes/responsiveness. Physical mixed-DPI and live screen-reader checks remain outstanding.
+
+Semantic zoom correction (2026-11-05, supersedes marker behavior above): anonymous low-scale markers were removed. Overview now groups all matches into readable dates/ranges, with reversible drill-down and safe previews. Packaged build passed 648 regression and 71 map assertions, including coverage of 6,000 entries/dates, exact selected-ID retention, no implicit clipboard changes, rapid navigation, short-window bounds, nested range progress, Back restoration, and distinct pointer versus keyboard zoom targets. All seven localization suites passed. Finish review: ship after correcting toolbar/keyboard + to target the selected group. Updated and hash-verified the running copy; Explorer restart remained responsive and preserved the foreground. Physical mixed-DPI and screen-reader checks remain outstanding.
+
+Map-first rework (2026-11-05, supersedes earlier layout descriptions): larger chronological neighbor cards occupy the canvas; filters, dates and preview start closed. An active-filter reset and updates action appear only when needed. Floating controls reserve space in overview even when wrapped. Final packaged build passed 648 regression and 91 map assertions; all seven localization suites passed. Light/dark wide and compact captures were reviewed, with the hidden-filter cue corrected in finish review. Running copy updated and verified; physical mixed-DPI and screen-reader checks remain outstanding.
+
+Zoom follow-up (2026-11-05): timeline zoom now reaches 25% without automatically entering overview. Compact cards use a readable minimum size and staggered rows, with full previews in tooltips. Packaged build passed 648 regression and 97 map assertions; wide/compact light/dark captures and focused finish review passed. Updated and verified the running copy. Physical mixed-DPI and live screen-reader behavior remain unchecked.
+
+Canvas follow-up (2026-11-05): zoomed-out entries now use four to six vertical rows, larger readable cards and uncropped image thumbnails. Navigation controls moved outside the canvas; Fit measures rendered card bounds. Pending image reads are cancelled or invalidated when content changes or the map closes. Packaged build passed 648 regression and 128 isolated map assertions; synthetic image/privacy, pan, zoom, overlap and Fit checks and focused visual review passed. Updated and verified the running copy. Physical mixed-DPI and live screen-reader checks remain outstanding.
+
+## Direction contract
+THESIS: A stable temporal map with the requested item at its center; deliberate navigation never copies implicitly.
+
+OWN-WORLD: Inherit CopyBuffalo's Fluent surface/contrast tokens, Plex type, restrained accent selection, compact controls and native window chrome.
+
+STORY: Locate a day, narrow by source or type, inspect an entry, and explicitly copy it.
+
+FIRST VIEWPORT: A full-width map centers the opening item and its nearest entries. Controls stay compact; search, the calendar/results rail and the inspector open on demand.
+
+FORM: A restrained, navigable canvas whose readable cards follow time around the opening entry. Detailed zoom preserves the pointer anchor; zoom-out and Fit summarize into readable date/source/count groups with reversible drill-down. On-demand navigation and preview panes keep the map primary. Code-led native extension.
+
+FINISH: Verify synthetic interaction, expiry and privacy states; inspect compact/wide theme captures and complete the Impeccable finish review before claiming visual completion.

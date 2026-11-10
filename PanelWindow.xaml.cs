@@ -431,6 +431,7 @@ partial class PanelWindow : Window
         if (!IsVisible || _hiding) return;
         int version = ++_visibilityVersion;
         CancelFrameWait();
+        EndInlineEdit(save: true);
         FinishMergeSelection(open: false);
         FinishDragVisual();
         CloseValueDrop();
@@ -560,7 +561,7 @@ partial class PanelWindow : Window
     }
 
     /// <summary>Своё модальное окно, меню или перетаскивание: уход фокуса/мыши тут не значит «ушли из панели».</summary>
-    bool Busy => _editingGroup || _textEditor != null || _mergeWindow != null || _collectingMerge || _dragging || _mergingDrag || _valueSaving || ValueDrop.IsOpen || _menuOpen || _archiveInfo != null || _stackOpen;
+    bool Busy => _editingGroup || _inlineItem != null || _textEditor != null || _mergeWindow != null || _collectingMerge || _dragging || _mergingDrag || _valueSaving || ValueDrop.IsOpen || _menuOpen || _archiveInfo != null || _stackOpen;
 
     /// <summary>
     /// Передний план сейчас у нашего окна (панель, её диалог, окно графа). Спрашиваем Windows, а не IsActive:
@@ -714,6 +715,7 @@ partial class PanelWindow : Window
     void Tab_Checked(object sender, RoutedEventArgs e)
     {
         if (PinnedList == null) return; // IsChecked из XAML срабатывает до создания остальных элементов
+        EndInlineEdit(save: true);
         CancelZoom();
         StopGif();
         if (SettingsFlyout != null) SettingsFlyout.Visibility = Visibility.Collapsed;
@@ -758,7 +760,7 @@ partial class PanelWindow : Window
         {
             (true, _) when SymbolsTab => (UiText.T("Ничего не найдено"), UiText.T("Ищите по символу, коду (2014) или группе («валют»).")),
             (true, _) => (UiText.T("Ничего не найдено"), UiText.T("Измените поиск, приложение или вид записей.")),
-            (false, true) => (UiText.T("Закреплённых пока нет"), UiText.T("Нажмите на булавку у записи или Ctrl+P, и она появится здесь.")),
+            (false, true) => (UiText.T("Закреплённых пока нет"), UiText.T("Нажмите Ctrl+P на записи или выберите «Закрепить» в её меню, и она появится здесь.")),
             _ => (UiText.T("Здесь пока пусто"), UiText.T("Скопируйте текст или картинку, и они появятся в этом списке.")),
         };
     }
@@ -807,6 +809,7 @@ partial class PanelWindow : Window
         // 0xE8 не назначена, WPF отдаёт её как Key.None.
         if (key is Key.LWin or Key.RWin or Key.None || KeyInterop.VirtualKeyFromKey(key) == VK_MASK) return;
         _outsideTimer.Stop(); // с панелью работают с клавиатуры — мышь снаружи не повод прятать
+        if (HandleInlineEditKey(key, e)) return;
         if (HandleStackKey(key, e)) return;
         if (key is Key.LeftAlt or Key.RightAlt) { CancelZoom(); StopGif(); }
         // Ctrl badges are visible immediately, without a timer or stagger.
@@ -851,14 +854,17 @@ partial class PanelWindow : Window
                     else if (container.DataContext is PinnedGroup) ShowEmptyMenu(container);
                 }
                 break;
-            case Key.V when ctrl && selected != null && Search.Text.Length == 0:
+            case Key.V when ctrl && selected != null && Active.IsKeyboardFocusWithin:
                 PasteValue();
                 break;
-            case Key.Z when ctrl && _valueUndo != null && Search.Text.Length == 0:
+            case Key.Z when ctrl && _valueUndo != null && Active.IsKeyboardFocusWithin:
                 UndoValue();
                 break;
             case Key.E when ctrl && selected is { IsImage: false, IsMedia: false }:
                 EditText(selected);
+                break;
+            case Key.F2 when selected != null && InlineEditable(selected):
+                BeginInlineEdit(selected);
                 break;
             case Key.Escape:
                 if (_transient != null) CloseTransient();
@@ -963,17 +969,6 @@ partial class PanelWindow : Window
         e.Handled = true;
     }
 
-    void Pin_Click(object sender, RoutedEventArgs e)
-    {
-        if (ItemOf(sender) is { } item)
-        {
-            _store.TogglePin(item);
-            if (sender is UIElement button) Motion.Pop(button);
-            if (item.Pinned) Motion.Pop(TabPinned, 1.12, 1); // запись ушла во вкладку «Закреплённые» — вкладка подпрыгивает
-        }
-        Search.Focus();
-    }
-
     void Ocr_Click(object sender, RoutedEventArgs e)
     {
         e.Handled = true;
@@ -1041,6 +1036,7 @@ partial class PanelWindow : Window
     {
         var menu = new ContextMenu { PlacementTarget = target, Placement = placement };
         menu.Items.Add(Entry(UiText.T("Вставить"), "\uE77F", () => RequestPaste(item, false), "Enter"));
+        menu.Items.Add(Entry(UiText.T("Открыть карту истории"), "\uE8A7", () => Dispatcher.BeginInvoke(new Action(() => OpenHistoryMap(item)))));
         if (item.IsImage) menu.Items.Add(Entry(item.InSeries ? UiText.T("Снять отметку") : UiText.T("Выбрать картинку"), "\uE762", () => ToggleSeriesItem(item), UiText.T("Ctrl+клик")));
         if (item.ImageHash == null) menu.Items.Add(Entry(item.IsFolder ? UiText.T("Вставить путь") : UiText.T("Вставить как текст"), "\uE8D2", () => RequestPaste(item, true), "Shift+Enter"));
         if (item.ImageHash == null) menu.Items.Add(new Separator());
@@ -2399,6 +2395,7 @@ partial class PanelWindow : Window
         var stops = new List<Control> { Search };
         if (SourceButton.IsVisible) stops.Add(SourceButton);
         if (KindButton.IsVisible) stops.Add(KindButton);
+        if (!SymbolsTab && !SeriesActive && !_mergeTextFilter) stops.Add(Active);
         if (SeriesActive || _mergeTextFilter)
         {
             stops.Add(List);

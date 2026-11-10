@@ -1400,9 +1400,9 @@
     <value>Пути в команде</value>
     <comment>Пути в команде</comment>
   </data>
-  <data name="SA02B63A100DB5278" xml:space="preserve">
-    <value>Нажмите на булавку у записи или Ctrl+P, и она появится здесь.</value>
-    <comment>Нажмите на булавку у записи или Ctrl+P, и она появится здесь.</comment>
+  <data name="S657ED8D046889B5F" xml:space="preserve">
+    <value>Нажмите Ctrl+P на записи или выберите «Закрепить» в её меню, и она появится здесь.</value>
+    <comment>Нажмите Ctrl+P на записи или выберите «Закрепить» в её меню, и она появится здесь.</comment>
   </data>
   <data name="SA0F7A780FB6B8F8A" xml:space="preserve">
     <value>{0} · {1:0.#} КБ</value>
@@ -2312,4 +2312,59 @@
     <value>Наведите на запись, держите Shift и крутите колесо: записи копятся от неё. Отпустите Shift, и все вставятся разом.</value>
     <comment>Наведите на запись, держите Shift и крутите колесо: записи копятся от неё. Отпустите Shift, и все вставятся разом.</comment>
   </data>
+<data name="SF44D6C4F88AD4ECE" xml:space="preserve"><value>Открыть карту истории</value></data>
+<data name="SBFC1F7DFE040A55D" xml:space="preserve"><value>Карта истории</value></data>
+<data name="S0B7D5848503B0590" xml:space="preserve"><value>Последний источник</value></data>
+<data name="SD4A6795C199FB461" xml:space="preserve"><value>Тип</value></data>
+<data name="S2A2B4DD6D9D146C8" xml:space="preserve"><value>Дата записи</value></data>
+<data name="S05D8DA55DE4B4366" xml:space="preserve"><value>Последнее использование</value></data>
+<data name="S9BAED4D8DEE51430" xml:space="preserve"><value>Первое копирование</value></data>
+<data name="SE21250441B160784" xml:space="preserve"><value>Обновить карту</value></data>
+<data name="S7FDB43F514CCAFEB" xml:space="preserve"><value>К исходной записи</value></data>
+<data name="S26A3AE77BFAA20AB" xml:space="preserve"><value>Даты</value></data>
+<data name="SF1163738DEB523A9" xml:space="preserve"><value>Просмотр</value></data>
+<data name="SE91607DCA5E39AF1" xml:space="preserve"><value>По дням</value></data>
+<data name="SF9859CEC491B6151" xml:space="preserve"><value>Все даты</value></data>
+<data name="SB151B7AC20A05070" xml:space="preserve"><value>Вписать карту</value></data>
+<data name="S471233C0506BF8E5" xml:space="preserve"><value>Центрировать здесь</value></data>
+<data name="SE556E4917F9813A1" xml:space="preserve"><value>Текущие сохранённые записи, а не прошлые версии содержимого.</value></data>
+<data name="SB1364C3063013BEF" xml:space="preserve"><value>Есть изменения</value></data>
+<data name="S71E214E1477F66F0" xml:space="preserve"><value>Все источники</value></data>
+<data name="S19161353D3BF469C" xml:space="preserve"><value>Все типы</value></data>
+<data name="S4ABF371536C37F84" xml:space="preserve"><value>Записей: {0}</value></data>
+<data name="S3AAA349B407F9B9D" xml:space="preserve"><value>Обновите карту для просмотра изменений</value></data>
+<data name="S497650D0E27ACD30" xml:space="preserve"><value>Защищённое содержимое</value></data>
+<data name="SD1A7FFD7C5B0ACE0" xml:space="preserve"><value>Просмотр недоступен</value></data>
+<data name="SD2D08C715EE66CBD" xml:space="preserve"><value>Скопировано</value></data>
+<data name="SE55E27836BAFB755" xml:space="preserve"><value>Не удалось скопировать. Повторите попытку.</value></data>
+<data name="S9C8F4E368F190070" xml:space="preserve"><value>Нет совпадений. Измените даты или очистите поиск.</value></data>
+<data name="SE98A4302C211D645" xml:space="preserve"><value>Развернуть день</value></data>
+<data name="SAFBA2418D6AEC23D" xml:space="preserve"><value>−</value></data>
+<data name="SA318C24216DEFE20" xml:space="preserve"><value>+</value></data>
+<data name="S2F28D0718C1DB9B0" xml:space="preserve"><value>Предыдущий месяц</value></data>
+<data name="S913B7BD73FAA2FFB" xml:space="preserve"><value>Следующий месяц</value></data>
+<data name="SC341D8B172284D40" xml:space="preserve"><value>Исходная запись удалена или срок хранения истёк.</value></data>
+<data name="S47E0CDA1709B4EF7" xml:space="preserve"><value>Уменьшить масштаб</value></data>
+<data name="S08235006182D7F7D" xml:space="preserve"><value>Увеличить масштаб</value></data>
+<data name="S75AB8906156B7244" xml:space="preserve"><value>Обзор дней</value></data>
+<data name="S888A65E2046FCBA8" xml:space="preserve"><value>Источник не записан</value></data>
+<data name="SC230BC4E85E0365E" xml:space="preserve"><value>Результаты поиска</value></data>
+<data name="S96933B71F5F8ED73" xml:space="preserve"><value>Сохранённые записи · Перетаскивание — перемещение · Колесо — масштаб</value></data>
+<data name="SBD3A5BE11E2ADDF7" xml:space="preserve"><value>Обзор</value></data>
+<data name="SC37EFE9530BDDE6E" xml:space="preserve"><value>Назад к обзору</value></data>
+<data name="S81DA2D58E42F3647" xml:space="preserve"><value>Выберите группу, чтобы увидеть записи</value></data>
+<data name="SCD45EC7836B5CB5E" xml:space="preserve"><value>Сбросить фильтры</value></data>
+<data name="S822F9FD9BA2D117E" xml:space="preserve"><value>Телефон</value></data>
+<data name="S53B97805C229AC7F" xml:space="preserve"><value>Настройки телефона</value></data>
+<data name="S30145146CB667514" xml:space="preserve"><value>Принимать текст с телефона</value></data>
+<data name="S17424EB150B417D3" xml:space="preserve"><value>Сразу класть принятый текст в буфер обмена</value></data>
+<data name="S6DD75BD110D44A90" xml:space="preserve"><value>Отсканируйте QR-код приложением CopyBuffalo Phone или введите адрес, порт и код вручную. Телефон и ПК должны быть в одной сети.</value></data>
+<data name="SDA82E80563D75A61" xml:space="preserve"><value>Адрес</value></data>
+<data name="S90947197F86BFDEA" xml:space="preserve"><value>Порт</value></data>
+<data name="S1A0517BFD5DCF6AA" xml:space="preserve"><value>Новый код</value></data>
+<data name="SAACC3EFA772B86E4" xml:space="preserve"><value>Приём включён · порт {0}</value></data>
+<data name="S60420FE4F5B6189C" xml:space="preserve"><value>Приём выключен</value></data>
+<data name="SED0DB441ADE2DEC4" xml:space="preserve"><value>Порт {0} занят: {1}</value></data>
+<data name="SABB504E01C9949B0" xml:space="preserve"><value>Сеть не найдена: подключите ПК к локальной сети.</value></data>
+<data name="SB489324C4EC60F8F" xml:space="preserve"><value>При первом включении Windows спросит разрешение брандмауэра — разрешите для частных сетей.</value></data>
 </root>

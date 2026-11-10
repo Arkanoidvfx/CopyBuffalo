@@ -196,7 +196,7 @@ partial class PanelWindow
             KeepSelectionPosition(Active.SelectedItem as ClipItem, () =>
             {
                 _mergeTextFilter = false; _mergeView = null; _mergeHistory = null;
-                List.ItemsSource = _view; List.Focusable = false;
+                List.ItemsSource = _view; List.Focusable = true;
                 SeriesBar.Visibility = Visibility.Collapsed;
                 KeyHints.Visibility = ShowKeyHints ? Visibility.Visible : Visibility.Collapsed;
                 _view.Refresh(); UpdatePinnedLayout(); UpdateEmptyState();

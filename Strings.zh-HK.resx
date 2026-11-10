@@ -1400,9 +1400,9 @@
     <value>命令入面嘅路徑</value>
     <comment>Пути в команде</comment>
   </data>
-  <data name="SA02B63A100DB5278" xml:space="preserve">
-    <value>撳記錄嘅釘選按鈕或者撳 Ctrl+P，就可以留喺呢度。</value>
-    <comment>Нажмите на булавку у записи или Ctrl+P, и она появится здесь.</comment>
+  <data name="S657ED8D046889B5F" xml:space="preserve">
+    <value>喺記錄上面撳 Ctrl+P，或者喺佢個選單揀「釘選」，就可以留喺呢度。</value>
+    <comment>Нажмите Ctrl+P на записи или выберите «Закрепить» в её меню, и она появится здесь.</comment>
   </data>
   <data name="SA0F7A780FB6B8F8A" xml:space="preserve">
     <value>{0} · {1:0.#} KB</value>
@@ -2312,4 +2312,59 @@
     <value>指住一條記錄，撳住 Shift 再轆滾輪，由嗰條開始收集記錄。放開 Shift 就一次過全部貼上。</value>
     <comment>Наведите на запись, держите Shift и крутите колесо: записи копятся от неё. Отпустите Shift, и все вставятся разом.</comment>
   </data>
+<data name="SF44D6C4F88AD4ECE" xml:space="preserve"><value>開啟歷史地圖</value></data>
+<data name="SBFC1F7DFE040A55D" xml:space="preserve"><value>歷史地圖</value></data>
+<data name="S0B7D5848503B0590" xml:space="preserve"><value>最近來源</value></data>
+<data name="SD4A6795C199FB461" xml:space="preserve"><value>類型</value></data>
+<data name="S2A2B4DD6D9D146C8" xml:space="preserve"><value>記錄日期</value></data>
+<data name="S05D8DA55DE4B4366" xml:space="preserve"><value>最近使用</value></data>
+<data name="S9BAED4D8DEE51430" xml:space="preserve"><value>首次複製</value></data>
+<data name="SE21250441B160784" xml:space="preserve"><value>重新整理地圖</value></data>
+<data name="S7FDB43F514CCAFEB" xml:space="preserve"><value>返回原始項目</value></data>
+<data name="S26A3AE77BFAA20AB" xml:space="preserve"><value>日期</value></data>
+<data name="SF1163738DEB523A9" xml:space="preserve"><value>預覽</value></data>
+<data name="SE91607DCA5E39AF1" xml:space="preserve"><value>按日期瀏覽</value></data>
+<data name="SF9859CEC491B6151" xml:space="preserve"><value>所有日期</value></data>
+<data name="SB151B7AC20A05070" xml:space="preserve"><value>符合視窗</value></data>
+<data name="S471233C0506BF8E5" xml:space="preserve"><value>置中此處</value></data>
+<data name="SE556E4917F9813A1" xml:space="preserve"><value>目前保留嘅項目，並非內容嘅歷史版本。</value></data>
+<data name="SB1364C3063013BEF" xml:space="preserve"><value>有更新</value></data>
+<data name="S71E214E1477F66F0" xml:space="preserve"><value>所有來源</value></data>
+<data name="S19161353D3BF469C" xml:space="preserve"><value>所有類型</value></data>
+<data name="S4ABF371536C37F84" xml:space="preserve"><value>{0} 筆記錄</value></data>
+<data name="S3AAA349B407F9B9D" xml:space="preserve"><value>重新整理以查看變更</value></data>
+<data name="S497650D0E27ACD30" xml:space="preserve"><value>受保護內容</value></data>
+<data name="SD1A7FFD7C5B0ACE0" xml:space="preserve"><value>無法預覽</value></data>
+<data name="SD2D08C715EE66CBD" xml:space="preserve"><value>已複製</value></data>
+<data name="SE55E27836BAFB755" xml:space="preserve"><value>複製唔到，請再試。</value></data>
+<data name="S9C8F4E368F190070" xml:space="preserve"><value>冇符合項目。更改日期或清除搜尋。</value></data>
+<data name="SE98A4302C211D645" xml:space="preserve"><value>展開日期</value></data>
+<data name="SAFBA2418D6AEC23D" xml:space="preserve"><value>−</value></data>
+<data name="SA318C24216DEFE20" xml:space="preserve"><value>+</value></data>
+<data name="S2F28D0718C1DB9B0" xml:space="preserve"><value>上個月</value></data>
+<data name="S913B7BD73FAA2FFB" xml:space="preserve"><value>下個月</value></data>
+<data name="SC341D8B172284D40" xml:space="preserve"><value>原始項目已刪除或過期。</value></data>
+<data name="S47E0CDA1709B4EF7" xml:space="preserve"><value>縮小</value></data>
+<data name="S08235006182D7F7D" xml:space="preserve"><value>放大</value></data>
+<data name="S75AB8906156B7244" xml:space="preserve"><value>日期總覽</value></data>
+<data name="S888A65E2046FCBA8" xml:space="preserve"><value>未有來源記錄</value></data>
+<data name="SC230BC4E85E0365E" xml:space="preserve"><value>搜尋結果</value></data>
+<data name="S96933B71F5F8ED73" xml:space="preserve"><value>已保留項目 · 拖曳移動 · 滾輪縮放</value></data>
+<data name="SBD3A5BE11E2ADDF7" xml:space="preserve"><value>總覽</value></data>
+<data name="SC37EFE9530BDDE6E" xml:space="preserve"><value>返回總覽</value></data>
+<data name="S81DA2D58E42F3647" xml:space="preserve"><value>選擇群組查看項目</value></data>
+<data name="SCD45EC7836B5CB5E" xml:space="preserve"><value>清除篩選</value></data>
+<data name="S822F9FD9BA2D117E" xml:space="preserve"><value>手機</value></data>
+<data name="S53B97805C229AC7F" xml:space="preserve"><value>手機設定</value></data>
+<data name="S30145146CB667514" xml:space="preserve"><value>接收來自手機嘅文字</value></data>
+<data name="S17424EB150B417D3" xml:space="preserve"><value>即刻將收到嘅文字放入剪貼簿</value></data>
+<data name="S6DD75BD110D44A90" xml:space="preserve"><value>用 CopyBuffalo Phone 應用程式掃描 QR 碼，或者手動輸入地址、連接埠同代碼。手機同電腦要喺同一個網絡。</value></data>
+<data name="SDA82E80563D75A61" xml:space="preserve"><value>地址</value></data>
+<data name="S90947197F86BFDEA" xml:space="preserve"><value>連接埠</value></data>
+<data name="S1A0517BFD5DCF6AA" xml:space="preserve"><value>新代碼</value></data>
+<data name="SAACC3EFA772B86E4" xml:space="preserve"><value>接收緊 · 連接埠 {0}</value></data>
+<data name="S60420FE4F5B6189C" xml:space="preserve"><value>接收已關閉</value></data>
+<data name="SED0DB441ADE2DEC4" xml:space="preserve"><value>連接埠 {0} 俾人佔用咗：{1}</value></data>
+<data name="SABB504E01C9949B0" xml:space="preserve"><value>搵唔到網絡：請將電腦連接到區域網絡。</value></data>
+<data name="SB489324C4EC60F8F" xml:space="preserve"><value>第一次開啟時，Windows 會問防火牆權限，請為私人網絡允許。</value></data>
 </root>

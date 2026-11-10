@@ -1400,9 +1400,9 @@
     <value>コマンド内のパス</value>
     <comment>Пути в команде</comment>
   </data>
-  <data name="SA02B63A100DB5278" xml:space="preserve">
-    <value>項目のピンをクリックするか Ctrl+P を押すと、ここに保持できます。</value>
-    <comment>Нажмите на булавку у записи или Ctrl+P, и она появится здесь.</comment>
+  <data name="S657ED8D046889B5F" xml:space="preserve">
+    <value>項目で Ctrl+P を押すか、メニューの「ピン留め」を選ぶと、ここに保持できます。</value>
+    <comment>Нажмите Ctrl+P на записи или выберите «Закрепить» в её меню, и она появится здесь.</comment>
   </data>
   <data name="SA0F7A780FB6B8F8A" xml:space="preserve">
     <value>{0} · {1:0.#} KB</value>
@@ -2312,4 +2312,59 @@
     <value>項目にポインターを合わせ、Shift を押したままホイールを回すと、そこから項目を集められます。Shift を離すとまとめて貼り付けます。</value>
     <comment>Наведите на запись, держите Shift и крутите колесо: записи копятся от неё. Отпустите Shift, и все вставятся разом.</comment>
   </data>
+<data name="SF44D6C4F88AD4ECE" xml:space="preserve"><value>履歴マップを開く</value></data>
+<data name="SBFC1F7DFE040A55D" xml:space="preserve"><value>履歴マップ</value></data>
+<data name="S0B7D5848503B0590" xml:space="preserve"><value>最新の取得元</value></data>
+<data name="SD4A6795C199FB461" xml:space="preserve"><value>種類</value></data>
+<data name="S2A2B4DD6D9D146C8" xml:space="preserve"><value>記録の日付</value></data>
+<data name="S05D8DA55DE4B4366" xml:space="preserve"><value>最終使用</value></data>
+<data name="S9BAED4D8DEE51430" xml:space="preserve"><value>初回コピー</value></data>
+<data name="SE21250441B160784" xml:space="preserve"><value>マップを更新</value></data>
+<data name="S7FDB43F514CCAFEB" xml:space="preserve"><value>元の項目に戻る</value></data>
+<data name="S26A3AE77BFAA20AB" xml:space="preserve"><value>日付</value></data>
+<data name="SF1163738DEB523A9" xml:space="preserve"><value>プレビュー</value></data>
+<data name="SE91607DCA5E39AF1" xml:space="preserve"><value>日付で探す</value></data>
+<data name="SF9859CEC491B6151" xml:space="preserve"><value>すべての日付</value></data>
+<data name="SB151B7AC20A05070" xml:space="preserve"><value>全体を表示</value></data>
+<data name="S471233C0506BF8E5" xml:space="preserve"><value>ここを中心に</value></data>
+<data name="SE556E4917F9813A1" xml:space="preserve"><value>現在保存されている項目です。内容の過去の版ではありません。</value></data>
+<data name="SB1364C3063013BEF" xml:space="preserve"><value>更新があります</value></data>
+<data name="S71E214E1477F66F0" xml:space="preserve"><value>すべての取得元</value></data>
+<data name="S19161353D3BF469C" xml:space="preserve"><value>すべての種類</value></data>
+<data name="S4ABF371536C37F84" xml:space="preserve"><value>{0} 件</value></data>
+<data name="S3AAA349B407F9B9D" xml:space="preserve"><value>更新して変更を表示</value></data>
+<data name="S497650D0E27ACD30" xml:space="preserve"><value>保護された内容</value></data>
+<data name="SD1A7FFD7C5B0ACE0" xml:space="preserve"><value>プレビューできません</value></data>
+<data name="SD2D08C715EE66CBD" xml:space="preserve"><value>コピーしました</value></data>
+<data name="SE55E27836BAFB755" xml:space="preserve"><value>コピーできませんでした。再試行してください。</value></data>
+<data name="S9C8F4E368F190070" xml:space="preserve"><value>一致する項目がありません。日付を変更するか検索を消去してください。</value></data>
+<data name="SE98A4302C211D645" xml:space="preserve"><value>この日を展開</value></data>
+<data name="SAFBA2418D6AEC23D" xml:space="preserve"><value>−</value></data>
+<data name="SA318C24216DEFE20" xml:space="preserve"><value>+</value></data>
+<data name="S2F28D0718C1DB9B0" xml:space="preserve"><value>前の月</value></data>
+<data name="S913B7BD73FAA2FFB" xml:space="preserve"><value>次の月</value></data>
+<data name="SC341D8B172284D40" xml:space="preserve"><value>元の項目は削除されたか保存期限を過ぎています。</value></data>
+<data name="S47E0CDA1709B4EF7" xml:space="preserve"><value>縮小</value></data>
+<data name="S08235006182D7F7D" xml:space="preserve"><value>拡大</value></data>
+<data name="S75AB8906156B7244" xml:space="preserve"><value>日別の概要</value></data>
+<data name="S888A65E2046FCBA8" xml:space="preserve"><value>ソースの記録なし</value></data>
+<data name="SC230BC4E85E0365E" xml:space="preserve"><value>検索結果</value></data>
+<data name="S96933B71F5F8ED73" xml:space="preserve"><value>保存中の項目 · ドラッグで移動 · ホイールで拡大縮小</value></data>
+<data name="SBD3A5BE11E2ADDF7" xml:space="preserve"><value>概要</value></data>
+<data name="SC37EFE9530BDDE6E" xml:space="preserve"><value>概要に戻る</value></data>
+<data name="S81DA2D58E42F3647" xml:space="preserve"><value>グループを選んで項目を表示</value></data>
+<data name="SCD45EC7836B5CB5E" xml:space="preserve"><value>フィルターをクリア</value></data>
+<data name="S822F9FD9BA2D117E" xml:space="preserve"><value>電話</value></data>
+<data name="S53B97805C229AC7F" xml:space="preserve"><value>電話の設定</value></data>
+<data name="S30145146CB667514" xml:space="preserve"><value>電話からテキストを受信</value></data>
+<data name="S17424EB150B417D3" xml:space="preserve"><value>受信したテキストをすぐにクリップボードへ</value></data>
+<data name="S6DD75BD110D44A90" xml:space="preserve"><value>CopyBuffalo Phone アプリで QR コードを読み取るか、アドレス、ポート、コードを手動で入力してください。電話と PC は同じネットワークにある必要があります。</value></data>
+<data name="SDA82E80563D75A61" xml:space="preserve"><value>アドレス</value></data>
+<data name="S90947197F86BFDEA" xml:space="preserve"><value>ポート</value></data>
+<data name="S1A0517BFD5DCF6AA" xml:space="preserve"><value>新しいコード</value></data>
+<data name="SAACC3EFA772B86E4" xml:space="preserve"><value>受信中 · ポート {0}</value></data>
+<data name="S60420FE4F5B6189C" xml:space="preserve"><value>受信はオフ</value></data>
+<data name="SED0DB441ADE2DEC4" xml:space="preserve"><value>ポート {0} は使用中です: {1}</value></data>
+<data name="SABB504E01C9949B0" xml:space="preserve"><value>ネットワークが見つかりません: PC をローカルネットワークに接続してください。</value></data>
+<data name="SB489324C4EC60F8F" xml:space="preserve"><value>初めてオンにすると Windows がファイアウォールの許可を求めます。プライベートネットワークで許可してください。</value></data>
 </root>
