@@ -22,7 +22,11 @@ Updates are **on by default**. They download in the background and install when 
 
 - Search your history, filter by app or content type, and pin items in groups.
 - Right-click an entry → **Open history map** to explore retained entries by day, preview them, and copy them. [History Map guide](docs/history-map.md).
-- Keep text formatting, paste plain text, or edit a saved entry.
+- Use the pencil or **F2** to edit a saved text entry. Use the save button to finish or the copy button to save and copy the whole entry. In **Settings → View**, enable **Hold a row to edit** to use a long press in place of the pencil.
+- Hover over or select an image and press **F11**, or choose **Full screen** from its menu. F11 works before the hover preview appears. Press **Esc** to return to the panel.
+- In the full text editor, press **Ctrl+H** to find and replace every literal match in the current text. **Ctrl+Z** undoes the replacement.
+- While editing a settings field, press **Win+V** and choose a text entry. CopyBuffalo copies it and returns to the same field. Press **Ctrl+V** to paste.
+- Under **Settings → View**, adjust panel background and entry text transparency independently or link them. Enable **Replace text on copy and paste** to apply a recurring rule when pasting from the panel or using **Copy** in quick edit. For example, set **Find** to `ЯС42-` and **Replace with** to `ЯС42вн` to convert document numbers while keeping other hyphens. Leave **Replace with** blank to remove the match. The rule changes the outgoing plain text and keeps the saved entry as edited.
 - **Ctrl+click** or **Ctrl+Enter** to paste text or a folder path in double quotes.
 - Extract text from screenshots with local OCR.
 - **Alt+click** to start selecting multiple entries. Combine text, fill paths into a command, or queue images and videos for pasting.

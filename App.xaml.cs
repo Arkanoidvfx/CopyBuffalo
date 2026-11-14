@@ -38,6 +38,7 @@ public partial class App : Application
     int _pasteVersion;
     CancellationTokenSource? _archiveCancel;
     readonly CancellationTokenSource _audioCancel = new();
+    PasteReplacement _pasteReplacement = new();
     bool _started;
 
     public static bool IsDarkTheme { get; private set; }
@@ -187,6 +188,20 @@ public partial class App : Application
         };
         _panel.PasteRequested += OnPasteRequested;
         _panel.StackPasteRequested += OnStackPasteRequested;
+        using (var key = Registry.CurrentUser.OpenSubKey(SettingsKey))
+        {
+            _panel.PasteReplacementRule = new(key?.GetValue("PasteReplacementEnabled") is 1,
+                key?.GetValue("PasteReplacementFrom") as string ?? "", key?.GetValue("PasteReplacementTo") as string ?? "");
+            _pasteReplacement = _panel.PasteReplacementRule;
+        }
+        _panel.PasteReplacementChanged += rule =>
+        {
+            _pasteReplacement = rule;
+            using var key = Registry.CurrentUser.CreateSubKey(SettingsKey);
+            key.SetValue("PasteReplacementEnabled", rule.Enabled ? 1 : 0, RegistryValueKind.DWord);
+            key.SetValue("PasteReplacementFrom", rule.From, RegistryValueKind.String);
+            key.SetValue("PasteReplacementTo", rule.To, RegistryValueKind.String);
+        };
         _panel.QuotedPasteRequested += OnQuotedPasteRequested;
         _panel.ExternalForeground += foreground => _target = foreground;
         _panel.SeriesPasteAllRequested += items => { if (items.Count > 0) OnPasteRequested(items[0], false, items); };
@@ -202,6 +217,10 @@ public partial class App : Application
             // Своя настройка, а не системные «Эффекты анимации»: у многих они выключены ради скорости, а анимацию панели просили отдельно.
             _panel.Animations = key?.GetValue("Animations") is not int a || a != 0;
             _panel.ShowKeyHints = key?.GetValue("KeyHints") is not int hints || hints != 0;
+            _panel.SetPanelTransparency(key?.GetValue("PanelBackgroundTransparency") is int background ? background : 0,
+                key?.GetValue("PanelTextTransparency") is int text ? text : 0,
+                key?.GetValue("LinkPanelTransparency") is int link && link != 0);
+            _panel.InlineEditOnHold = key?.GetValue("InlineEditOnHold") is int hold && hold != 0;
             _panel.PinnedAsList = key?.GetValue("PinnedView") is int view && view == 1;
             _panel.VfxEnabled = key?.GetValue("VfxEnabled") is not int vfx || vfx != 0;
             _panel.VfxOpacity = key?.GetValue("VfxOpacity") is int vfxOpacity ? vfxOpacity : 20;
@@ -258,6 +277,18 @@ public partial class App : Application
         {
             using var key = Registry.CurrentUser.CreateSubKey(SettingsKey);
             key.SetValue("KeyHints", on ? 1 : 0, RegistryValueKind.DWord);
+        };
+        _panel.PanelTransparencyChanged += (background, text, linked) =>
+        {
+            using var key = Registry.CurrentUser.CreateSubKey(SettingsKey);
+            key.SetValue("PanelBackgroundTransparency", background, RegistryValueKind.DWord);
+            key.SetValue("PanelTextTransparency", text, RegistryValueKind.DWord);
+            key.SetValue("LinkPanelTransparency", linked ? 1 : 0, RegistryValueKind.DWord);
+        };
+        _panel.InlineEditOnHoldChanged += on =>
+        {
+            using var key = Registry.CurrentUser.CreateSubKey(SettingsKey);
+            key.SetValue("InlineEditOnHold", on ? 1 : 0, RegistryValueKind.DWord);
         };
         _panel.VfxChanged += (on, opacity, speed) =>
         {
@@ -325,6 +356,7 @@ public partial class App : Application
         double Ms(long from) => System.Diagnostics.Stopwatch.GetElapsedTime(from).TotalMilliseconds;
         double queued = Ms(pressed);
         Trace($"Win+V: fg={ProcessOf(foreground)} visible={_panel.IsVisible} active={_panel.IsActive}");
+        if (_panel.HandleSettingsHistoryHotkey(foreground)) return;
         // Видна, но фокус у другого окна — показываем заново, а не прячем. Фокус — по Windows на момент нажатия:
         // IsActive WPF после первого показа бывает устаревшим.
         Native.GetWindowThreadProcessId(foreground, out var fgPid);
@@ -382,7 +414,12 @@ public partial class App : Application
         bool Current() => version == _pasteVersion;
         _panel.HideAfterUse();
         var target = _target;
-        try { Paster.CopyText(Paster.Quoted(item.Text), excludeFromHistory: true, sensitive: item.IsSensitive); }
+        try { Paster.CopyText(Paster.Quoted(_pasteReplacement.For(item) ?? item.Text), excludeFromHistory: true, sensitive: item.IsSensitive); }
+        catch (PasteReplacement.LimitExceededException)
+        {
+            Notify(InfoKind.Caution, UiText.T("После автозамены текст слишком длинный."), "");
+            return;
+        }
         catch (System.Runtime.InteropServices.ExternalException ex)
         {
             Log(ex);
@@ -406,14 +443,14 @@ public partial class App : Application
         try
         {
             bool first = true;
-            foreach (var step in ClipStack.Plan(items))
+            foreach (var step in ClipStack.Plan(items, _pasteReplacement))
             {
                 if (!first) await Task.Delay(ClipStack.PasteGapMs);
                 first = false;
                 if (!Current()) return;
-                if (step.Text is { } text) Paster.CopyText(text, excludeFromHistory: true);
-                else if (step.Items.Count > 1) await Paster.SetImageSeriesClipboardAsync(step.Items, _store.ImagesDir, Current);
-                else await Paster.SetClipboardAsync(step.Items[0], false, _store.ImagesDir, Current);
+                if (step.Items.Count == 1) await Paster.SetClipboardAsync(step.Items[0], false, _store.ImagesDir, Current, step.Text);
+                else if (step.Text is { } text) Paster.CopyText(text, excludeFromHistory: true);
+                else await Paster.SetImageSeriesClipboardAsync(step.Items, _store.ImagesDir, Current);
                 if (target == IntPtr.Zero) return; // открыто из трея — вставлять некуда, остаётся первая часть в буфере
                 if (!await Paster.PasteInto(target, Current))
                 {
@@ -426,6 +463,10 @@ public partial class App : Application
             for (int i = 0; i < items.Count; i++) _store.Touch(items[i].Id, now.AddMilliseconds(i));
         }
         catch (OperationCanceledException) { }
+        catch (PasteReplacement.LimitExceededException)
+        {
+            Notify(InfoKind.Caution, UiText.T("После автозамены текст слишком длинный."), "");
+        }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or InvalidDataException
             or System.Security.Cryptography.CryptographicException or System.Runtime.InteropServices.ExternalException)
         {
@@ -448,7 +489,7 @@ public partial class App : Application
             var target = _target;
             try
             {
-                if (batch == null) await Paster.SetClipboardAsync(item, plainText, _store.ImagesDir, Current);
+                if (batch == null) await Paster.SetClipboardAsync(item, plainText, _store.ImagesDir, Current, _pasteReplacement.For(item));
                 else
                 {
                     await Paster.SetImageSeriesClipboardAsync(batch, _store.ImagesDir, Current);
@@ -458,6 +499,11 @@ public partial class App : Application
                 }
             }
             catch (OperationCanceledException) { return; }
+            catch (PasteReplacement.LimitExceededException)
+            {
+                Notify(InfoKind.Caution, UiText.T("После автозамены текст слишком длинный."), "");
+                return;
+            }
             catch (DirectoryNotFoundException) when (item.IsFolder)
             {
                 Notify(InfoKind.Caution, UiText.T("Исходная папка недоступна."), UiText.T("Она могла быть перемещена, удалена или находиться на отключённом диске."));
@@ -975,6 +1021,11 @@ public partial class App : Application
             Resources[name] = Frozen(Color.FromArgb((byte)(argb >> 24), (byte)(argb >> 16), (byte)(argb >> 8), (byte)argb));
         Resources["Accent"] = Frozen(accent);
         Resources["AccentRing"] = Frozen(Color.FromArgb(0x99, accent.R, accent.G, accent.B)); // обводка выбранной записи
+        Resources["PanelEntryText"] = Resources["TextPrimary"];
+        Resources["PanelCardFill"] = Resources["CardFill"];
+        Resources["PanelCardHover"] = Resources["CardHover"];
+        Resources["PanelCardSubtleHover"] = Resources["SubtleHover"];
+        _panel?.RefreshPanelTransparency();
     }
 
     static Color ReadAccent()

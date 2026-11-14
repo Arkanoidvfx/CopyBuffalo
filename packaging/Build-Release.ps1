@@ -1,14 +1,15 @@
-param([string]$WorkRoot)
+param([string]$WorkRoot, [string]$InputsRepo)
 $ErrorActionPreference='Stop'
 $repo=Split-Path $PSScriptRoot
-$root=if ($WorkRoot) { [IO.Path]::GetFullPath($WorkRoot) } else { Join-Path $repo '.tmp\release-v0.2.10' }
+$inputs=if ($InputsRepo) { (Resolve-Path -LiteralPath $InputsRepo).Path } else { $repo }
+$root=if ($WorkRoot) { [IO.Path]::GetFullPath($WorkRoot) } else { Join-Path $repo '.tmp\release-v0.2.11' }
 $commit=(& git -C $repo rev-parse HEAD).Trim()
-$version='0.2.10'
+$version='0.2.11'
 $source=Join-Path $root 'source'
 $stage=Join-Path $root 'main'
 $output=Join-Path $root 'dist'
-$ai=Join-Path $repo '.cache\distribution-ai'
-$sdk=Join-Path $repo '.cache\distribution-tools\dotnet\dotnet.exe'
+$ai=Join-Path $inputs '.cache\distribution-ai'
+$sdk=Join-Path $inputs '.cache\distribution-tools\dotnet\dotnet.exe'
 
 $env:TEMP=Join-Path $root 'temp'; $env:TMP=$env:TEMP
 [Diagnostics.Process]::GetCurrentProcess().PriorityClass='BelowNormal'
@@ -25,20 +26,20 @@ $archive=Join-Path $root 'source.zip'
 & git -C $repo archive --format=zip -o $archive $commit
 if ($LASTEXITCODE) { throw 'Source export failed.' }
 Expand-Archive -LiteralPath $archive -DestinationPath $source
-Copy-Item -LiteralPath (Join-Path $repo 'Assets\Ocr') -Destination (Join-Path $source 'Assets') -Recurse
+Copy-Item -LiteralPath (Join-Path $inputs 'Assets\Ocr') -Destination (Join-Path $source 'Assets') -Recurse
 Run-Low $sdk @('publish',(Join-Path $source 'ArkCopyBuffer.csproj'),'-c','Release','-m:1','-p:UseSharedCompilation=false','-p:DebugType=None',('-p:SourceRevisionId='+$commit),'--nologo','-o',$stage) (Join-Path $root 'publish.log')
 $exe=Join-Path $stage 'ArkCopyBuffer.exe'
 $product=(Get-Item -LiteralPath $exe).VersionInfo
 if ($product.ProductVersion -ne ($version+'+'+$commit) -or $product.ProductName -ne 'CopyBuffalo') { throw 'Staged source/version mismatch.' }
-foreach ($name in @('ffmpeg.exe','ffprobe.exe')) { Copy-Item -LiteralPath (Join-Path $repo ('publish\'+$name)) -Destination $stage }
-Get-ChildItem -LiteralPath (Join-Path $repo '.cache\distribution-licenses') -File | Copy-Item -Destination (Join-Path $stage 'licenses') -Force
+foreach ($name in @('ffmpeg.exe','ffprobe.exe')) { Copy-Item -LiteralPath (Join-Path $inputs ('publish\'+$name)) -Destination $stage }
+Get-ChildItem -LiteralPath (Join-Path $inputs '.cache\distribution-licenses') -File | Copy-Item -Destination (Join-Path $stage 'licenses') -Force
 foreach ($name in @('INSTALL.txt','INSTALL-RU.txt','THIRD-PARTY-NOTICES.txt')) { Copy-Item -LiteralPath (Join-Path $source ('packaging\'+$name)) -Destination $stage }
 $runtime=@(Get-ChildItem -LiteralPath $stage -File -Recurse | ForEach-Object { @{name=[IO.Path]::GetRelativePath($stage,$_.FullName);hash=(Get-FileHash -LiteralPath $_.FullName).Hash} })
 $runtime | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $root 'runtime-files.json')
 $model=Join-Path $ai 'models\Qwen3.5-4B-Q4_K_M.gguf'
-$manifest=Get-Content -LiteralPath (Join-Path $repo 'dist\manifest.json') -Raw | ConvertFrom-Json
+$manifest=Get-Content -LiteralPath (Join-Path $inputs 'dist\manifest.json') -Raw | ConvertFrom-Json
 if ((Get-FileHash -LiteralPath $model).Hash.ToLowerInvariant() -ne $manifest.modelSha256) { throw 'Cached model hash mismatch.' }
-$compiler=Join-Path $repo '.cache\distribution-tools\inno\ISCC.exe'
+$compiler=Join-Path $inputs '.cache\distribution-tools\inno\ISCC.exe'
 $iss=Join-Path $source 'packaging\ArkCopyBuffer.iss'
 Run-Low $compiler @(('/DAppVersion='+$version),('/DStageDir='+$stage),('/DOutputDir='+$output),$iss) (Join-Path $root 'core-setup.log')
 Run-Low $compiler @('/DFullPack=1',('/DAppVersion='+$version),('/DStageDir='+$stage),('/DAiDir='+$ai),('/DOutputDir='+$output),$iss) (Join-Path $root 'full-setup.log')

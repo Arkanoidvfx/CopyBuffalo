@@ -13,6 +13,8 @@ internal sealed partial class HistoryMapWindow
         var station = new System.Text.StringBuilder(256);
         if (!GetUserObjectInformation(GetProcessWindowStation(), 2, station, station.Capacity * 2, out _) || station.ToString().Equals("WinSta0", StringComparison.OrdinalIgnoreCase))
             throw new InvalidOperationException("History map clipboard checks require an isolated noninteractive window station.");
+        PanelWindow.CheckImageViewerLifecycle(directory, check);
+        PanelWindow.CheckSettingsHistory(directory, check);
         Directory.CreateDirectory(directory);
         bool motion = Motion.Enabled; Motion.Enabled = false;
         var store = new HistoryStore(Path.Combine(directory, "map.dat"));
@@ -156,6 +158,13 @@ internal sealed partial class HistoryMapWindow
             check(System.Windows.Clipboard.GetText() == anchor.Text, "explicit map copy writes text without pasting");
             var cancelled = Paster.SetClipboardAsync(a, false, store.ImagesDir, () => false); Pump(() => cancelled.IsCompleted);
             check(cancelled.IsCanceled && System.Windows.Clipboard.GetText() == anchor.Text, "cancelled copy leaves clipboard intact");
+            var original = new ClipItem { Text = "ЯС42-000839", Html = "<b>ЯС42-000839</b>" };
+            var rule = new PasteReplacement(true, "-", "вн");
+            Paster.SetClipboardAsync(original, false, store.ImagesDir, textOverride: rule.For(original)).GetAwaiter().GetResult();
+            var replacementData = System.Windows.Clipboard.GetDataObject();
+            check(System.Windows.Clipboard.GetText() == "ЯС42вн000839" && original.Text == "ЯС42-000839"
+                && replacementData?.GetDataPresent(DataFormats.Html, false) == false && replacementData.GetDataPresent(Paster.OwnFormat),
+                "paste replacement writes plain text and the history marker to the isolated clipboard");
             foreach (bool dark in new[] { true, false })
             foreach (var width in new[] { 1280, 800, 801, 802 })
             {
@@ -341,6 +350,53 @@ internal sealed partial class HistoryMapWindow
 
 partial class PanelWindow
 {
+    internal static void CheckSettingsHistory(string directory, Action<bool, string> check)
+    {
+        var store = new HistoryStore(Path.Combine(directory, "settings-history.dat"));
+        const string source = "ЯС42-000839";
+        store.Items.Add(new ClipItem { Text = source });
+        store.Items.Add(new ClipItem { Text = "Protected text", IsSensitive = true });
+        store.Items.Add(new ClipItem { Text = "Image", ImageHash = "synthetic" });
+        var panel = new PanelWindow(store, new SymbolCatalog(Path.Combine(directory, "settings-symbols.json")));
+        int externalPastes = 0;
+        panel.PasteRequested += (_, _) => externalPastes++;
+        try
+        {
+            panel.Show();
+            panel.OpenSettings();
+            panel.Dispatcher.Invoke(() => { }, DispatcherPriority.Background);
+            panel.PasteReplacementRule = new(true, "ЯС42-", "first-second");
+            panel.PasteReplacementTo.Focus();
+            panel.PasteReplacementTo.Select(6, 6);
+            check(!panel.HandleSettingsHistoryHotkey(IntPtr.Zero) && panel.HandleSettingsHistoryHotkey(panel._hwnd)
+                && panel.SettingsFlyout.IsVisible && panel.SettingsHistoryPicker.IsVisible,
+                "settings history: Win+V opens a picker only from the settings window");
+            check(panel.SettingsHistoryList.Items.Count == 1 && panel.SettingsHistoryCopy.IsEnabled,
+                "settings history: the picker offers only eligible text");
+            panel.SettingsHistorySearch.Text = "no match";
+            check(!panel.SettingsHistoryList.HasItems && !panel.SettingsHistoryCopy.IsEnabled,
+                "settings history: filtering removes the stale selection");
+            panel.SettingsHistorySearch.Text = "000839";
+            LocalizationChecks.Save(panel.Root, 792, 600, Path.Combine(directory, "settings-history.png"));
+            panel.SettingsHistoryCopy.RaiseEvent(new RoutedEventArgs(System.Windows.Controls.Button.ClickEvent));
+            check(System.Windows.Clipboard.GetText() == source && store.Items.Count == 3 && externalPastes == 0
+                && panel.PasteReplacementTo.Text == "first-second" && !panel.PickingSettingsHistory,
+                "settings history: copying uses the original text without external paste or a duplicate");
+            check(panel.PasteReplacementTo.IsKeyboardFocused && panel.PasteReplacementTo.SelectionStart == 6 && panel.PasteReplacementTo.SelectionLength == 6,
+                "settings history: focus and selection return to the same field");
+            System.Windows.Input.ApplicationCommands.Paste.Execute(null, panel.PasteReplacementTo);
+            check(panel.PasteReplacementTo.Text == "first-" + source && panel.PasteReplacementFrom.Text == "ЯС42-",
+                "settings history: Ctrl+V changes only the selected range in the original field");
+            panel.PasteReplacementFrom.Focus();
+            panel.PasteReplacementFrom.Select(1, 2);
+            bool cancelled = panel.HandleSettingsHistoryHotkey(panel._hwnd) && panel.HandleSettingsHistoryHotkey(panel._hwnd);
+            check(cancelled && !panel.PickingSettingsHistory && panel.PasteReplacementFrom.IsKeyboardFocused
+                && panel.PasteReplacementFrom.SelectionStart == 1 && panel.PasteReplacementFrom.SelectionLength == 2
+                && System.Windows.Clipboard.GetText() == source, "settings history: pressing Win+V again returns to the field without copying");
+        }
+        finally { panel.Close(); }
+    }
+
     internal static void CheckSearchPaste(string directory, Action<bool, string> check)
     {
         var panel = new PanelWindow(new HistoryStore(Path.Combine(directory, "search.dat")), new SymbolCatalog(Path.Combine(directory, "symbols.json")));

@@ -77,12 +77,14 @@ static class OcrChecks
             Layout();
             var actions=Descendants(content).OfType<StackPanel>().Single(p=>p.Name=="ImageActions");
             var buttons=Descendants(actions).OfType<Button>().ToArray();
-            check(actions.Visibility==Visibility.Visible && buttons.Length==2 && buttons.All(b=>b.ToolTip!=null), "Карточки: OCR и перевод доступны в каждом представлении картинки");
-            buttons[0].RaiseEvent(new RoutedEventArgs(ButtonBase.ClickEvent));
-            buttons[1].RaiseEvent(new RoutedEventArgs(ButtonBase.ClickEvent));
+            check(actions.Visibility==Visibility.Visible && buttons.Length==3 && buttons.All(b=>b.ToolTip!=null), "Карточки: просмотр, OCR и перевод доступны в каждом представлении картинки");
+            var ocr=buttons.Single(b=>b.Name=="OcrButton");
+            var translate=buttons.Single(b=>b.Name=="TranslateImageButton");
+            ocr.RaiseEvent(new RoutedEventArgs(ButtonBase.ClickEvent));
+            translate.RaiseEvent(new RoutedEventArgs(ButtonBase.ClickEvent));
             check(invoked>1 && translated>1 && pasted==0, "Карточки: прямые кнопки запускают обработку без вставки");
             image.Recognizing=true; Layout();
-            check(buttons.All(b=>!b.IsEnabled), "Карточки: обе кнопки блокируются во время обработки");
+            check(!ocr.IsEnabled && !translate.IsEnabled && buttons.Count(b=>b.IsEnabled)==1, "Карточки: просмотр доступен во время обработки");
             image.Recognizing=false;
             content.Content=new ClipItem {Text="Synthetic text"}; Layout();
             var textActions=Descendants(content).OfType<StackPanel>().Single(p=>p.Name=="ImageActions");
@@ -181,8 +183,8 @@ static class OcrChecks
         foreach (var card in sheet.Children.OfType<ListBoxItem>())
         {
             var buttons=Descendants(card).OfType<Button>().Where(b=>b.Visibility==Visibility.Visible).ToArray();
-            check(buttons.Length==2 && buttons.All(b=> { var p=b.TranslatePoint(new Point(),card); return p.X>=0 && p.Y>=0 && p.X+b.ActualWidth<=card.ActualWidth && p.Y+b.ActualHeight<=card.ActualHeight; }),
-                "Карточки: OCR и перевод помещаются без обрезки");
+            check(buttons.Length==3 && buttons.All(b=> { var p=b.TranslatePoint(new Point(),card); return p.X>=0 && p.Y>=0 && p.X+b.ActualWidth<=card.ActualWidth && p.Y+b.ActualHeight<=card.ActualHeight; }),
+                "Карточки: просмотр, OCR и перевод помещаются без обрезки");
         }
         var preview=new RenderTargetBitmap(412,(int)Math.Ceiling(sheet.ActualHeight+32),96,96,PixelFormats.Pbgra32); preview.Render(sheet);
         var output=new PngBitmapEncoder(); output.Frames.Add(BitmapFrame.Create(preview));

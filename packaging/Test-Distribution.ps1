@@ -18,7 +18,7 @@ try {
     if ($product.ProductName -ne 'CopyBuffalo' -or $product.FileDescription -ne 'CopyBuffalo') { throw 'Incorrect app branding.' }
     $license = Join-Path $StageRoot 'main\LICENSE'
     if (!(Test-Path -LiteralPath $license) -or (Get-Content -LiteralPath $license -Raw) -notmatch 'MIT License[\s\S]+Copyright \(c\) 2026 Arkanoidvfx') { throw 'Missing CopyBuffalo MIT license.' }
-    Check-Process $exe @('--selftest')
+    Check-Process $exe @('--selftest', ('"' + (Join-Path $StageRoot 'distribution-selftest') + '"'))
     $audioDir = Join-Path $StageRoot 'audio-check'
     Check-Process $exe @('--audio-selftest', ('"' + $audioDir + '"'))
     foreach ($part in @('copybuffalo-ocr.exe','det\inference.onnx','det\inference.yml','rec\inference.onnx','rec\inference.yml','licenses\NOTICE.txt')) {

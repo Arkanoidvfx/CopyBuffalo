@@ -18,16 +18,24 @@ internal static class ClipStack
 
     static bool IsText(ClipItem item) => !item.IsImage && !item.IsMedia && !item.IsNodeGraph;
 
-    internal static List<Step> Plan(IReadOnlyList<ClipItem> items)
+    internal static List<Step> Plan(IReadOnlyList<ClipItem> items, PasteReplacement? replacement = null)
     {
         var steps = new List<Step>();
+        int remainingGrowth = PasteReplacement.MaxExpandedText;
+        string? Replace(ClipItem item)
+        {
+            var result = replacement?.For(item, remainingGrowth);
+            if (result != null) remainingGrowth -= Math.Max(0, result.Length - item.Text.Length);
+            return result;
+        }
         for (int i = 0, end; i < items.Count; i = end)
         {
             bool text = IsText(items[i]), visual = items[i].IsVisualMedia;
             for (end = i + 1; end < items.Count && (text && IsText(items[end]) || visual && items[end].IsVisualMedia); end++) { }
             var run = items.Skip(i).Take(end - i).ToArray();
-            // Одна запись идёт обычным путём: сохраняет форматирование и поднимается в истории.
-            steps.Add(new(run, text && run.Length > 1 ? Join(run.Select(item => item.Text)) : null));
+            steps.Add(new(run, text && run.Length > 1
+                ? Join(run.Select(item => Replace(item) ?? item.Text))
+                : Replace(run[0])));
         }
         return steps;
     }
@@ -213,6 +221,14 @@ partial class PanelWindow
         check(plan.Count == 3 && plan[0].Text == "a\r\nb" && plan[0].Items.Count == 2 && plan[1].Text == null && plan[1].Items.SequenceEqual([shot1, shot2])
             && plan[2].Text == null && plan[2].Items.Single() == c, "стопка: подряд идущие тексты одним блоком, картинки пачкой, порядок сохраняется");
         check(ClipStack.Plan([a]).Single() is { Text: null } && ClipStack.Plan([shot1]).Single() is { Text: null }, "стопка: одна запись идёт обычным путём, с форматированием");
+        var replacement = new PasteReplacement(true, "a", "A");
+        check(ClipStack.Plan([a, b], replacement).Single().Text == "A\r\nb"
+            && ClipStack.Plan([a], replacement).Single().Text == "A", "paste replacement applies to single and grouped text in a stack");
+        bool rejected = false;
+        var longText = new string('a', 500_001);
+        try { _ = ClipStack.Plan([Text(longText), Text(longText), Text(longText)], replacement with { To = "AAA" }); }
+        catch (PasteReplacement.LimitExceededException) { rejected = true; }
+        check(rejected, "paste replacement bounds the combined growth of a stack before joining");
         check(ClipStack.Join(["one", "two"]) == "one\r\ntwo" && ClipStack.Join(["line 1\nline 2", "two"]) == "line 1\nline 2\r\n\r\ntwo", "стопка: многострочные блоки разделяет пустая строка");
         check(ClipStack.Plan([]).Count == 0, "стопка: пустая стопка ничего не вставляет");
 

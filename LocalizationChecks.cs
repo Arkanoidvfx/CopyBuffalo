@@ -176,6 +176,15 @@ partial class PanelWindow
             LocalizationChecks.Require(chosen == other, "Language selection emits preference without restarting");
             panel.SetLanguagePreference(UiText.Language);
             LocalizationChecks.Save(panel.Root, 392, 492, Path.Combine(directory, "language.png"));
+            var rule = new PasteReplacement(true, "-", "вн");
+            panel.PasteReplacementRule = rule;
+            PasteReplacement? changedRule = null;
+            panel.PasteReplacementChanged += value => changedRule = value;
+            panel.PasteReplacementTo.Text = "";
+            LocalizationChecks.Require(changedRule == rule with { To = "" } && panel.PasteReplacementFrom.IsEnabled,
+                "Enabled replacement accepts a literal sequence and can delete it");
+            panel.PasteReplacementTo.Text = rule.To;
+            LocalizationChecks.Save(panel.Root, 792, 650, Path.Combine(directory, "view-settings.png"));
             panel.AutoUpdate = true;
             panel.SetUpdateStatus(UiText.T("У вас последняя версия."), false, false);
             LocalizationChecks.Require(panel.UpdateVersion.Text == $"CopyBuffalo {AppUpdater.VersionText}", "Update section uses the product name");
@@ -205,6 +214,13 @@ partial class TextEditorWindow
         {
             LocalizationChecks.Save(window.Sheet, 1060, 640, Path.Combine(directory, "editor.png"));
             LocalizationChecks.Require(window.Title == UiText.T("Редактировать текст — CopyBuffalo") && window.Editor.Text == item.Text, "Editor title is localized without changing the entry");
+            window.ToggleFindReplace_Click(window, new RoutedEventArgs());
+            window.ReplaceFrom.Text = "ЯС42-";
+            window.ReplaceTo.Text = "ЯС42вн";
+            LocalizationChecks.Save(window.Sheet, 760, 420, Path.Combine(directory, "editor-replace.png"));
+            LocalizationChecks.Require(window.ReplaceFrom.ActualWidth >= 64 && window.ReplaceTo.ActualWidth >= 64
+                && window.ReplaceAllButton.ActualWidth >= window.ReplaceAllButton.DesiredSize.Width - 1,
+                "Find and replace fields and action fit the editor's minimum size");
         }
         finally { window.Close(); PumpUntil(() => closed); }
     }

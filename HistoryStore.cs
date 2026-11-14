@@ -377,19 +377,20 @@ static class ImageFiles
     /// <summary>Полный файл: PNG для картинок, исходный GIF для гифок.</summary>
     public static byte[] ReadFull(string dir, string hash) => Open(File.ReadAllBytes(Path.Combine(dir, hash + ".dat")));
 
-    public static BitmapSource? LoadBitmap(string sealedPath, int decodeWidth = 0)
+    public static BitmapSource? LoadBitmap(string sealedPath, int decodeWidth = 0, int decodeHeight = 0)
     {
-        try { return Decode(Open(File.ReadAllBytes(sealedPath)), decodeWidth); }
+        try { return Decode(Open(File.ReadAllBytes(sealedPath)), decodeWidth, decodeHeight); }
         catch { return null; } // файл удалён/битый — карточка покажется без миниатюры
     }
 
-    /// <param name="decodeWidth">0 — исходный размер; иначе сразу уменьшить при декодировании (экономит память).</param>
-    public static BitmapSource Decode(byte[] png, int decodeWidth = 0)
+    /// <summary>Уменьшает при декодировании до заданного размера. Оба размера равны нулю для исходного размера.</summary>
+    public static BitmapSource Decode(byte[] png, int decodeWidth = 0, int decodeHeight = 0)
     {
         var bmp = new BitmapImage();
         bmp.BeginInit();
         bmp.CacheOption = BitmapCacheOption.OnLoad;
         if (decodeWidth > 0) bmp.DecodePixelWidth = decodeWidth;
+        if (decodeHeight > 0) bmp.DecodePixelHeight = decodeHeight;
         bmp.StreamSource = new MemoryStream(png);
         bmp.EndInit();
         bmp.Freeze();
@@ -875,6 +876,7 @@ public sealed class HistoryStore
             UpdateChecks.SelfTest(dir, Check);
             TextEditorWindow.SelfTest(dir, Check);
             TextSubstitution.SelfTest(Check);
+            PasteReplacement.SelfTest(Check);
             OcrChecks.SelfTest(dir, Check);
             ClipboardWatcher.SelfTest(dir, Check);
             StabilityChecks.Run(dir, Check);
@@ -888,7 +890,9 @@ public sealed class HistoryStore
             PanelWindow.SelfTestMergeSelection(dir, Check);
             PanelWindow.SelfTestSubstitution(dir, Check);
             PanelWindow.SelfTestInlineEdit(dir, Check);
+            PanelWindow.SelfTestPanelTransparency(dir, Check);
             PanelWindow.SelfTestImageSeries(dir, Check);
+            PanelWindow.SelfTestImageViewer(dir, Check);
 
             s.Add("a", "{\\rtf a}", null, t0);
             s.Add("b", null, null, t0.AddMinutes(1));

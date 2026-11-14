@@ -106,7 +106,7 @@
                                        TextTrimming="CharacterEllipsis" LineStackingStrategy="BlockLineHeight" LineHeight="16" MaxHeight="48"/>
                             <TextBlock x:Name="TileSub" Text="{Binding TileSub}" FontSize="11" TextWrapping="Wrap" TextTrimming="CharacterEllipsis"
                                        LineStackingStrategy="BlockLineHeight" LineHeight="15" MaxHeight="60" Margin="0,3,0,0"
-                                       Foreground="{DynamicResource TextSecondary}"/>
+                                       Foreground="{DynamicResource PanelEntryTextSecondary}"/>
                         </StackPanel>
                         <StackPanel x:Name="ColorPreview" Visibility="Collapsed">
                             <Ellipse Width="30" Height="30" Fill="{Binding Swatch}" Stroke="#26FFFFFF" HorizontalAlignment="Left"/>
@@ -119,9 +119,11 @@
                         <Button x:Name="EditButton" Style="{StaticResource TileActionButton}" Content="&#xE70F;" Click="InlineEdit_Click"
                                 ToolTip="{local:Loc Key=S5C51EDD2D64E5120}" AutomationProperties.Name="{local:Loc Key=S5C51EDD2D64E5120}"/>
                         <StackPanel x:Name="ImageActions" Orientation="Horizontal" Visibility="Collapsed">
-                            <Button Style="{StaticResource TileActionButton}" Content="&#xE8D2;" Click="Ocr_Click" Margin="2,0,0,0"
+                            <Button Style="{StaticResource TileActionButton}" Content="&#xE740;" Click="ImageViewer_Click"
+                                    ToolTip="{local:Loc Key=S9EA39974988478C1}" AutomationProperties.Name="{local:Loc Key=S9EA39974988478C1}"/>
+                            <Button x:Name="OcrButton" Style="{StaticResource TileActionButton}" Content="&#xE8D2;" Click="Ocr_Click" Margin="2,0,0,0"
                                     ToolTip="{local:Loc Key=S9B45DFE62C689B6E}" AutomationProperties.Name="{local:Loc Key=S9B45DFE62C689B6E}"/>
-                            <Button Style="{StaticResource TileActionButton}" Content="&#xE8C1;" Click="TranslateImage_Click" Margin="2,0,0,0"
+                            <Button x:Name="TranslateImageButton" Style="{StaticResource TileActionButton}" Content="&#xE8C1;" Click="TranslateImage_Click" Margin="2,0,0,0"
                                     ToolTip="{local:Loc Key=SD675C9D5A093B6AA}" AutomationProperties.Name="{local:Loc Key=S98C1BFB8F849D1CC}"/>
                         </StackPanel>
                     </StackPanel>
@@ -129,6 +131,9 @@
                 <ContentPresenter x:Name="GroupBody" Content="{Binding}" ContentTemplate="{StaticResource PinGroupHeader}" Visibility="Collapsed"/>
             </Grid>
             <DataTemplate.Triggers>
+                <DataTrigger Binding="{Binding InlineEditOnHold, RelativeSource={RelativeSource AncestorType=Window}}" Value="True">
+                    <Setter TargetName="EditButton" Property="Visibility" Value="Collapsed"/>
+                </DataTrigger>
                 <DataTrigger Binding="{Binding Path=(local:PanelWindow.SensitiveRevealed), RelativeSource={RelativeSource AncestorType=ListBoxItem}}" Value="True">
                     <Setter TargetName="TextPreview" Property="Text" Value="{Binding CardText}"/>
                 </DataTrigger>
@@ -143,7 +148,8 @@
                     <Setter TargetName="EditButton" Property="Visibility" Value="Collapsed"/>
                 </DataTrigger>
                 <DataTrigger Binding="{Binding Recognizing}" Value="True">
-                    <Setter TargetName="ImageActions" Property="IsEnabled" Value="False"/>
+                    <Setter TargetName="OcrButton" Property="IsEnabled" Value="False"/>
+                    <Setter TargetName="TranslateImageButton" Property="IsEnabled" Value="False"/>
                 </DataTrigger>
                 <DataTrigger Binding="{Binding IsGroupHeader}" Value="True">
                     <Setter TargetName="TileBody" Property="Visibility" Value="Collapsed"/>
@@ -216,15 +222,17 @@
                     <StackPanel Grid.Column="1" VerticalAlignment="Center">
                         <TextBlock x:Name="RowTitle" Text="{Binding TileTitle}" FontSize="13" FontWeight="SemiBold" TextTrimming="CharacterEllipsis"/>
                         <TextBlock x:Name="RowSub" Text="{Binding TileSub}" FontSize="12" TextTrimming="CharacterEllipsis"
-                                   Foreground="{DynamicResource TextSecondary}"/>
+                                   Foreground="{DynamicResource PanelEntryTextSecondary}"/>
                     </StackPanel>
                     <StackPanel x:Name="RowActions" Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center" Opacity="0" Margin="6,0,0,0">
                         <Button x:Name="EditButton" Style="{StaticResource SubtleIconButton}" Content="&#xE70F;" Click="InlineEdit_Click"
                                 ToolTip="{local:Loc Key=S5C51EDD2D64E5120}" AutomationProperties.Name="{local:Loc Key=S5C51EDD2D64E5120}"/>
                         <StackPanel x:Name="ImageActions" Orientation="Horizontal" Visibility="Collapsed">
-                            <Button Style="{StaticResource SubtleIconButton}" Content="&#xE8D2;" Click="Ocr_Click"
+                            <Button Style="{StaticResource SubtleIconButton}" Content="&#xE740;" Click="ImageViewer_Click"
+                                    ToolTip="{local:Loc Key=S9EA39974988478C1}" AutomationProperties.Name="{local:Loc Key=S9EA39974988478C1}"/>
+                            <Button x:Name="OcrButton" Style="{StaticResource SubtleIconButton}" Content="&#xE8D2;" Click="Ocr_Click"
                                     ToolTip="{local:Loc Key=S9B45DFE62C689B6E}" AutomationProperties.Name="{local:Loc Key=S9B45DFE62C689B6E}"/>
-                            <Button Style="{StaticResource SubtleIconButton}" Content="&#xE8C1;" Click="TranslateImage_Click"
+                            <Button x:Name="TranslateImageButton" Style="{StaticResource SubtleIconButton}" Content="&#xE8C1;" Click="TranslateImage_Click"
                                     ToolTip="{local:Loc Key=SD675C9D5A093B6AA}" AutomationProperties.Name="{local:Loc Key=S98C1BFB8F849D1CC}"/>
                         </StackPanel>
                     </StackPanel>
@@ -232,6 +240,9 @@
                 <ContentPresenter x:Name="GroupBody" Content="{Binding}" ContentTemplate="{StaticResource PinGroupHeader}" Visibility="Collapsed"/>
             </Grid>
             <DataTemplate.Triggers>
+                <DataTrigger Binding="{Binding InlineEditOnHold, RelativeSource={RelativeSource AncestorType=Window}}" Value="True">
+                    <Setter TargetName="EditButton" Property="Visibility" Value="Collapsed"/>
+                </DataTrigger>
                 <DataTrigger Binding="{Binding IsGroupHeader}" Value="True">
                     <Setter TargetName="RowBody" Property="Visibility" Value="Collapsed"/>
                     <Setter TargetName="GroupBody" Property="Visibility" Value="Visible"/>
@@ -250,7 +261,8 @@
                     <Setter TargetName="EditButton" Property="Visibility" Value="Collapsed"/>
                 </DataTrigger>
                 <DataTrigger Binding="{Binding Recognizing}" Value="True">
-                    <Setter TargetName="ImageActions" Property="IsEnabled" Value="False"/>
+                    <Setter TargetName="OcrButton" Property="IsEnabled" Value="False"/>
+                    <Setter TargetName="TranslateImageButton" Property="IsEnabled" Value="False"/>
                 </DataTrigger>
                 <DataTrigger Binding="{Binding HasTileColor}" Value="True">
                     <Setter TargetName="Ico" Property="Background" Value="{Binding TileTint}"/>
@@ -302,11 +314,13 @@
             </TransformGroup>
         </Grid.RenderTransform>
         <!-- Тень отдельным слоем: эффект не пересчитывает содержимое при каждом кадре -->
-        <Border CornerRadius="8" Background="{DynamicResource WindowSurface}">
-            <Border.Effect>
-                <DropShadowEffect BlurRadius="24" ShadowDepth="6" Direction="270" Opacity="0.35" RenderingBias="Performance"/>
-            </Border.Effect>
-        </Border>
+        <Grid x:Name="PanelShadow" IsHitTestVisible="False">
+            <Border CornerRadius="8" Background="{DynamicResource WindowSurface}">
+                <Border.Effect>
+                    <DropShadowEffect BlurRadius="24" ShadowDepth="6" Direction="270" Opacity="0.35" RenderingBias="Performance"/>
+                </Border.Effect>
+            </Border>
+        </Grid>
         <!-- Булавка: панель под напряжением. Лежит под поверхностью панели, наружу выходят только кромка и свечение: PanelWindow.PinEnergy.cs -->
         <Grid x:Name="PinEnergy" Margin="-1.5" IsHitTestVisible="False" Visibility="Collapsed" Opacity="0">
             <Border x:Name="PinHalo" Margin="-3" CornerRadius="12.5" BorderThickness="4" BorderBrush="{DynamicResource PinGlow}" Opacity="0.9">
@@ -327,7 +341,7 @@
                 <Rectangle x:Name="PinCore" RadiusX="9.5" RadiusY="9.5" StrokeThickness="1.5" StrokeDashCap="Round" Stroke="{DynamicResource PinSpark}"/>
             </Grid>
         </Grid>
-        <Border CornerRadius="8" Background="{DynamicResource WindowSurface}"
+        <Border CornerRadius="8" Background="{DynamicResource PanelSurface}"
                 BorderBrush="{DynamicResource WindowStroke}" BorderThickness="1">
     <Grid Margin="11,7,5,9">
         <Grid.RowDefinitions>
@@ -492,7 +506,7 @@
                                    LineStackingStrategy="BlockLineHeight" LineHeight="20" MaxHeight="60"
                                    VerticalAlignment="Center" Margin="0,2,8,2"/>
                         <StackPanel x:Name="GraphPreview" Visibility="Collapsed" Margin="0,2,8,2" HorizontalAlignment="Left">
-                            <TextBlock Text="{Binding GraphLabel}" FontSize="11" Foreground="{DynamicResource TextSecondary}" Margin="0,0,0,3"/>
+                            <TextBlock Text="{Binding GraphLabel}" FontSize="11" Foreground="{DynamicResource PanelEntryTextSecondary}" Margin="0,0,0,3"/>
                             <Grid>
                                 <!-- Вектор из сотен нод и подписей: кэшируем растром, чтобы анимация панели не перерисовывала его каждый кадр -->
                                 <Image Source="{Binding GraphPreview, IsAsync=True}" Width="260" Height="100" Stretch="Uniform"
@@ -572,7 +586,7 @@
                             </Border>
                             <StackPanel Grid.Column="1" Margin="10,0,0,0" VerticalAlignment="Center">
                                 <TextBlock Text="{Binding FileName}" TextTrimming="CharacterEllipsis"/>
-                                <TextBlock Text="{Binding MediaMeta}" FontSize="12" Foreground="{DynamicResource TextSecondary}"/>
+                                <TextBlock Text="{Binding MediaMeta}" FontSize="12" Foreground="{DynamicResource PanelEntryTextSecondary}"/>
                             </StackPanel>
                         </Grid>
                         <!-- Кнопки в ряд: высоту однострочной карточки задаёт одна кнопка (28), а не столбик из двух -->
@@ -584,9 +598,11 @@
                             <Button x:Name="EditButton" Style="{StaticResource SubtleIconButton}" Content="&#xE70F;"
                                     Click="InlineEdit_Click" ToolTip="{local:Loc Key=S5C51EDD2D64E5120}" AutomationProperties.Name="{local:Loc Key=S5C51EDD2D64E5120}"/>
                             <StackPanel x:Name="ImageActions" Orientation="Horizontal" Visibility="Collapsed">
-                                <Button Style="{StaticResource SubtleIconButton}" Content="&#xE8D2;" Click="Ocr_Click"
+                                <Button Style="{StaticResource SubtleIconButton}" Content="&#xE740;" Click="ImageViewer_Click"
+                                        ToolTip="{local:Loc Key=S9EA39974988478C1}" AutomationProperties.Name="{local:Loc Key=S9EA39974988478C1}"/>
+                                <Button x:Name="OcrButton" Style="{StaticResource SubtleIconButton}" Content="&#xE8D2;" Click="Ocr_Click"
                                         ToolTip="{local:Loc Key=S9B45DFE62C689B6E}" AutomationProperties.Name="{local:Loc Key=S9B45DFE62C689B6E}"/>
-                                <Button Style="{StaticResource SubtleIconButton}" Content="&#xE8C1;" Click="TranslateImage_Click"
+                                <Button x:Name="TranslateImageButton" Style="{StaticResource SubtleIconButton}" Content="&#xE8C1;" Click="TranslateImage_Click"
                                         ToolTip="{local:Loc Key=SD675C9D5A093B6AA}" AutomationProperties.Name="{local:Loc Key=S98C1BFB8F849D1CC}"/>
                             </StackPanel>
                         </StackPanel>
@@ -602,6 +618,9 @@
                         </StackPanel>
                     </Grid>
                     <DataTemplate.Triggers>
+                        <DataTrigger Binding="{Binding InlineEditOnHold, RelativeSource={RelativeSource AncestorType=Window}}" Value="True">
+                            <Setter TargetName="EditButton" Property="Visibility" Value="Collapsed"/>
+                        </DataTrigger>
                         <DataTrigger Binding="{Binding Path=(local:PanelWindow.SensitiveRevealed), RelativeSource={RelativeSource AncestorType=ListBoxItem}}" Value="True">
                             <Setter TargetName="TextPreview" Property="Text" Value="{Binding CardText}"/>
                         </DataTrigger>
@@ -623,7 +642,8 @@
                             <Setter TargetName="TranslateTextButton" Property="IsEnabled" Value="False"/>
                         </DataTrigger>
                         <DataTrigger Binding="{Binding Recognizing}" Value="True">
-                            <Setter TargetName="ImageActions" Property="IsEnabled" Value="False"/>
+                            <Setter TargetName="OcrButton" Property="IsEnabled" Value="False"/>
+                            <Setter TargetName="TranslateImageButton" Property="IsEnabled" Value="False"/>
                         </DataTrigger>
                         <DataTrigger Binding="{Binding IsGif}" Value="True">
                             <Setter TargetName="GifBadge" Property="Visibility" Value="Visible"/>
@@ -701,14 +721,38 @@
 
         <!-- Быстрая правка текста: одно поле поверх строки записи (PanelWindow.InlineEdit.cs). Enter — новая строка -->
         <Border x:Name="InlineEdit" Grid.Row="3" Visibility="Collapsed" VerticalAlignment="Top" CornerRadius="4"
-                Background="{DynamicResource MenuSurface}" BorderBrush="{DynamicResource Accent}" BorderThickness="1">
-            <TextBox x:Name="InlineEditor" Background="Transparent" BorderThickness="0" Padding="9,6,6,6"
-                     Foreground="{DynamicResource TextPrimary}" CaretBrush="{DynamicResource TextPrimary}"
-                     SelectionBrush="{DynamicResource Accent}" AcceptsReturn="True" TextWrapping="Wrap"
-                     VerticalContentAlignment="Center" TextBlock.LineHeight="20" TextBlock.LineStackingStrategy="BlockLineHeight"
-                     LostKeyboardFocus="InlineEditor_LostFocus"
-                     VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
-                     AutomationProperties.Name="{local:Loc Key=S5C51EDD2D64E5120}"/>
+                Background="{DynamicResource MenuSurface}" BorderBrush="{DynamicResource Accent}" BorderThickness="1" Panel.ZIndex="1"
+                KeyboardNavigation.TabNavigation="Cycle" LostKeyboardFocus="InlineEditor_LostFocus">
+            <Grid>
+                <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                <Grid.RowDefinitions><RowDefinition/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+                <TextBox x:Name="InlineEditor" Background="Transparent" BorderThickness="0" Padding="9,6,6,6"
+                         Foreground="{DynamicResource TextPrimary}" CaretBrush="{DynamicResource TextPrimary}"
+                         SelectionBrush="{DynamicResource Accent}" AcceptsReturn="True" TextWrapping="Wrap"
+                         VerticalContentAlignment="Center" TextBlock.LineHeight="20" TextBlock.LineStackingStrategy="BlockLineHeight"
+                         VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
+                         AutomationProperties.Name="{local:Loc Key=S5C51EDD2D64E5120}"/>
+                <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="0,4,4,4" VerticalAlignment="Top">
+                    <Button x:Name="InlineCopy" Content="{local:Loc Key=S1ECDDF40BFEB28AB}" Click="InlineCopy_Click"
+                            Height="28" FontSize="12" Padding="8,0" Margin="0,0,4,0">
+                        <Button.Style>
+                            <Style TargetType="Button" BasedOn="{StaticResource StandardButton}">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Text, ElementName=InlineEditor}" Value="">
+                                        <Setter Property="IsEnabled" Value="False"/>
+                                        <Setter Property="Opacity" Value="0.5"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+                    <Button x:Name="InlineSave" Content="{local:Loc Key=SB4D30CAE52894CF0}" Click="InlineSave_Click"
+                            Style="{StaticResource AccentButton}" Height="28" FontSize="12" Padding="8,0"/>
+                </StackPanel>
+                <TextBlock x:Name="InlineError" Grid.Row="1" Grid.ColumnSpan="2" Visibility="Collapsed" Margin="9,0,8,5"
+                           FontSize="12" TextWrapping="Wrap" Foreground="{DynamicResource CriticalText}"
+                           AutomationProperties.LiveSetting="Polite"/>
+            </Grid>
         </Border>
 
         <!-- Пустое состояние -->
@@ -746,7 +790,7 @@
                                     <ControlTemplate TargetType="ListBoxItem">
                                         <Grid>
                                             <Border x:Name="Card" Width="54" Height="44" CornerRadius="4" BorderThickness="2"
-                                                    BorderBrush="{DynamicResource CardStroke}" Background="{DynamicResource CardFill}">
+                                                    BorderBrush="{DynamicResource CardStroke}" Background="{DynamicResource PanelCardFill}">
                                                 <ContentPresenter/>
                                             </Border>
                                             <Border x:Name="Before" Width="2" HorizontalAlignment="Left" Background="{DynamicResource Accent}" Visibility="Collapsed"/>
@@ -754,7 +798,7 @@
                                         </Grid>
                                         <ControlTemplate.Triggers>
                                             <Trigger Property="IsSelected" Value="True"><Setter TargetName="Card" Property="BorderBrush" Value="{DynamicResource Accent}"/></Trigger>
-                                            <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="Card" Property="Background" Value="{DynamicResource CardHover}"/></Trigger>
+                                            <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="Card" Property="Background" Value="{DynamicResource PanelCardHover}"/></Trigger>
                                             <Trigger Property="Tag" Value="Before"><Setter TargetName="Before" Property="Visibility" Value="Visible"/></Trigger>
                                             <Trigger Property="Tag" Value="After"><Setter TargetName="After" Property="Visibility" Value="Visible"/></Trigger>
                                             <DataTrigger Binding="{Binding SeriesInserted}" Value="True"><Setter TargetName="Card" Property="Opacity" Value="0.45"/></DataTrigger>
@@ -799,7 +843,7 @@
 
         <!-- Строка клавиш: сверху вставка одной записи, снизу нескольких. Зажатый модификатор гасит чужие подсказки (RefreshHintFocus). Выключается в настройках -->
         <Border x:Name="KeyHints" Grid.Row="4" Margin="-11,8,-5,-9" Padding="12,7,12,8" BorderThickness="0,1,0,0" CornerRadius="0,0,7,7"
-                BorderBrush="{DynamicResource WindowStroke}" Background="{DynamicResource ControlFill}" TextElement.FontSize="11">
+                BorderBrush="{DynamicResource WindowStroke}" Background="{DynamicResource PanelFooterFill}" TextElement.FontSize="11">
             <Grid Grid.IsSharedSizeScope="True">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
@@ -1008,6 +1052,7 @@
                 <DropShadowEffect BlurRadius="18" ShadowDepth="4" Direction="270" Opacity="0.3"/>
             </Border.Effect>
             <Grid>
+            <Grid x:Name="SettingsPages">
                 <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
                 <Grid.Resources>
                     <Style x:Key="SettingsCard" TargetType="Border">
@@ -1026,7 +1071,7 @@
                     <Button x:Name="StorageSettingsTab" Grid.Column="1" Content="{local:Loc Key=S349065E9C4467894}" Style="{StaticResource StandardButton}"
                             Margin="4,0,4,0" Click="ShowStorageSettings_Click" AutomationProperties.Name="{local:Loc Key=S4EBEB45A877CDD5E}"/>
                     <Button x:Name="VfxSettingsTab" Grid.Column="2" Content="VFX" Style="{StaticResource StandardButton}"
-                            Margin="4,0,4,0" Click="ShowVfxSettings_Click" AutomationProperties.Name="{local:Loc Key=SFD1E6F563F5BACAD}"/>
+                            Margin="4,0,0,0" Click="ShowVfxSettings_Click" AutomationProperties.Name="{local:Loc Key=SFD1E6F563F5BACAD}"/>
                 </Grid>
             <ScrollViewer x:Name="VisualSettingsView" Grid.Row="1" VerticalScrollBarVisibility="Auto" Focusable="False" Padding="16,8,6,8">
                 <Grid Margin="0,0,6,0">
@@ -1036,6 +1081,29 @@
                             <TextBlock Text="{local:Loc Key=S5BD57038DBADD651}" FontWeight="SemiBold" Margin="0,0,0,8"/>
                             <UniformGrid x:Name="LanguageChoices" Columns="2" Margin="-4,0,-4,-6"/>
                             </StackPanel></Border>
+                            <Border Style="{StaticResource SettingsCard}">
+                                <StackPanel>
+                                    <TextBlock Text="{local:Loc Key=S9F8AA1C788B92C6C}" FontWeight="SemiBold" TextWrapping="Wrap" Margin="0,0,0,8"/>
+                                    <DockPanel LastChildFill="True">
+                                        <TextBlock x:Name="BackgroundTransparencyValue" DockPanel.Dock="Right" Margin="8,0,0,0"
+                                                   FontSize="13" Foreground="{DynamicResource TextSecondary}"/>
+                                        <TextBlock Text="{local:Loc Key=S7F0D916BD1254F85}" TextWrapping="Wrap"/>
+                                    </DockPanel>
+                                    <Slider x:Name="BackgroundTransparencySlider" Maximum="75" TickFrequency="1" IsSnapToTickEnabled="True"
+                                            Margin="0,4,0,8" AutomationProperties.Name="{local:Loc Key=S7F0D916BD1254F85}"/>
+                                    <DockPanel LastChildFill="True">
+                                        <TextBlock x:Name="TextTransparencyValue" DockPanel.Dock="Right" Margin="8,0,0,0"
+                                                   FontSize="13" Foreground="{DynamicResource TextSecondary}"/>
+                                        <TextBlock Text="{local:Loc Key=S0C6E6816598FB539}" TextWrapping="Wrap"/>
+                                    </DockPanel>
+                                    <Slider x:Name="TextTransparencySlider" Maximum="75" TickFrequency="1" IsSnapToTickEnabled="True"
+                                            Margin="0,4,0,8" AutomationProperties.Name="{local:Loc Key=S0C6E6816598FB539}"/>
+                                    <ToggleButton x:Name="LinkTransparencyToggle" Style="{StaticResource ToggleSwitch}"
+                                                  ToolTip="{local:Loc Key=SE84F3F8325FB6AD1}" AutomationProperties.Name="{local:Loc Key=SE84F3F8325FB6AD1}">
+                                        <TextBlock Text="{local:Loc Key=S4C6F1D8EA8195DE6}" TextWrapping="Wrap"/>
+                                    </ToggleButton>
+                                </StackPanel>
+                            </Border>
                             <Border Style="{StaticResource SettingsCard}"><StackPanel>
                             <ToggleButton x:Name="AnimationsToggle" Style="{StaticResource ToggleSwitch}" IsChecked="True"
                                           Checked="AnimationsToggle_Changed" Unchecked="AnimationsToggle_Changed"
@@ -1093,6 +1161,21 @@
                                     AutomationProperties.Name="{local:Loc Key=SBF4D6267A5A07968}"/>
                             </StackPanel></Border>
                             <Border Style="{StaticResource SettingsCard}"><StackPanel>
+                            <ToggleButton x:Name="PasteReplacementToggle" Style="{StaticResource ToggleSwitch}"
+                                          Checked="PasteReplacement_Changed" Unchecked="PasteReplacement_Changed"
+                                          AutomationProperties.Name="{local:Loc Key=SEBD89AC17156AEF0}">
+                                <TextBlock Text="{local:Loc Key=SEBD89AC17156AEF0}" FontWeight="SemiBold" TextWrapping="Wrap"/>
+                            </ToggleButton>
+                            <StackPanel IsEnabled="{Binding IsChecked, ElementName=PasteReplacementToggle}">
+                                <TextBlock Text="{local:Loc Key=S34663EE4FE51BC25}" Margin="0,8,0,4"/>
+                                <TextBox x:Name="PasteReplacementFrom" Style="{StaticResource FieldBox}" MaxLength="256"
+                                         AutomationProperties.Name="{local:Loc Key=S34663EE4FE51BC25}" TextChanged="PasteReplacement_Changed"/>
+                                <TextBlock Text="{local:Loc Key=S44FF00B55F82A825}" Margin="0,8,0,4"/>
+                                <TextBox x:Name="PasteReplacementTo" Style="{StaticResource FieldBox}" MaxLength="256"
+                                         AutomationProperties.Name="{local:Loc Key=S44FF00B55F82A825}" TextChanged="PasteReplacement_Changed"/>
+                            </StackPanel>
+                            </StackPanel></Border>
+                            <Border Style="{StaticResource SettingsCard}"><StackPanel>
                             <ToggleButton x:Name="TextPeekToggle" Style="{StaticResource ToggleSwitch}" IsChecked="True"
                                           Checked="TextPeekToggle_Changed" Unchecked="TextPeekToggle_Changed"
                                           AutomationProperties.Name="{local:Loc Key=S01C9518EFEFA5B99}">
@@ -1135,6 +1218,11 @@
                                           Checked="KeyHintsToggle_Changed" Unchecked="KeyHintsToggle_Changed"
                                           AutomationProperties.Name="{local:Loc Key=S317D2C78ED442353}">
                                 <TextBlock Text="{local:Loc Key=SA8F576F608D69D5E}" TextWrapping="Wrap"/>
+                            </ToggleButton>
+                            <ToggleButton x:Name="InlineEditHoldToggle" Style="{StaticResource ToggleSwitch}" Margin="0,10,0,0"
+                                          IsChecked="{Binding InlineEditOnHold, RelativeSource={RelativeSource AncestorType=Window}, Mode=TwoWay}"
+                                          AutomationProperties.Name="{local:Loc Key=S775FA80A5F1D8D8D}">
+                                <TextBlock Text="{local:Loc Key=S775FA80A5F1D8D8D}" TextWrapping="Wrap"/>
                             </ToggleButton>
                             </StackPanel></Border>
                         </StackPanel>
@@ -1256,6 +1344,73 @@
                         </StackPanel>
                 </Grid>
             </ScrollViewer>
+            </Grid>
+            <Border x:Name="SettingsHistoryPicker" Visibility="Collapsed" Focusable="False"
+                    KeyboardNavigation.TabNavigation="Cycle" CornerRadius="8"
+                    Background="{DynamicResource MenuSurface}" Padding="20,16"
+                    AutomationProperties.Name="{local:Loc Key=S0451B76C2F7FC56E}">
+                <Grid MaxWidth="600">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <StackPanel Margin="0,0,0,12">
+                        <TextBlock Text="{local:Loc Key=S0451B76C2F7FC56E}" FontSize="17" FontWeight="SemiBold"/>
+                        <TextBlock Text="{local:Loc Key=S9691B7FD73FF8AF9}" FontSize="12" Margin="0,4,0,0"
+                                   TextWrapping="Wrap" Foreground="{DynamicResource TextSecondary}"/>
+                    </StackPanel>
+                    <TextBox x:Name="SettingsHistorySearch" Grid.Row="1" Style="{StaticResource SearchBox}"
+                             Tag="{local:Loc Key=S858AD7688ABF60CF}" AutomationProperties.Name="{local:Loc Key=S858AD7688ABF60CF}"
+                             TextChanged="SettingsHistorySearch_Changed" Margin="0,0,0,10"/>
+                    <Grid Grid.Row="2">
+                        <ListBox x:Name="SettingsHistoryList" Background="Transparent" BorderThickness="0"
+                                 Foreground="{DynamicResource TextPrimary}" ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                 ScrollViewer.CanContentScroll="True" VirtualizingPanel.VirtualizationMode="Recycling"
+                                 SelectionChanged="SettingsHistoryList_SelectionChanged" PreviewMouseLeftButtonUp="SettingsHistoryList_Click"
+                                 AutomationProperties.Name="{local:Loc Key=S0451B76C2F7FC56E}">
+                            <ListBox.ItemContainerStyle>
+                                <Style TargetType="ListBoxItem" BasedOn="{StaticResource ClipItemContainer}">
+                                    <Setter Property="Focusable" Value="True"/>
+                                    <Setter Property="Cursor" Value="Hand"/>
+                                </Style>
+                            </ListBox.ItemContainerStyle>
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Preview}" Foreground="{DynamicResource TextPrimary}"
+                                               TextWrapping="Wrap" TextTrimming="CharacterEllipsis"
+                                               LineStackingStrategy="BlockLineHeight" LineHeight="18" MaxHeight="54"/>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                        <TextBlock Text="{local:Loc Key=S420EB0375E6574F7}" TextWrapping="Wrap" HorizontalAlignment="Center"
+                                   VerticalAlignment="Center" Foreground="{DynamicResource TextSecondary}" IsHitTestVisible="False">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding HasItems, ElementName=SettingsHistoryList}" Value="False">
+                                            <Setter Property="Visibility" Value="Visible"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                    </Grid>
+                    <Grid Grid.Row="3" Margin="0,10,0,0">
+                        <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                        <TextBlock x:Name="SettingsHistoryStatus" TextWrapping="Wrap" VerticalAlignment="Center" Margin="0,0,12,0"
+                                   Foreground="{DynamicResource TextSecondary}" AutomationProperties.LiveSetting="Polite"/>
+                        <StackPanel Grid.Column="1" Orientation="Horizontal">
+                            <Button x:Name="SettingsHistoryCopy" Content="{local:Loc Key=S1ECDDF40BFEB28AB}" Style="{StaticResource AccentButton}"
+                                    Click="SettingsHistoryCopy_Click" IsEnabled="False"/>
+                            <Button Content="{local:Loc Key=S8FBE9B75CBDFBFA6}" Style="{StaticResource StandardButton}"
+                                    Click="SettingsHistoryCancel_Click" Margin="8,0,0,0"/>
+                        </StackPanel>
+                    </Grid>
+                </Grid>
+            </Border>
             </Grid>
         </Border>
     </Grid>

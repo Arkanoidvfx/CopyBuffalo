@@ -24,7 +24,7 @@ static class Paster
     }
 
     /// <summary>Кладёт запись в буфер. Расшифровка и подготовка файлов — вне UI-потока.</summary>
-    public static async Task SetClipboardAsync(ClipItem item, bool plainText, string imagesDir, Func<bool>? isCurrent = null)
+    public static async Task SetClipboardAsync(ClipItem item, bool plainText, string imagesDir, Func<bool>? isCurrent = null, string? textOverride = null)
     {
         (string[] paths, byte[]? gif)? files = null;
         if (item.IsFolder && !plainText)
@@ -51,8 +51,8 @@ static class Paster
             });
             data = ImageClipboard(bitmap, png);
         }
-        else data.SetData(DataFormats.UnicodeText, item.Text);
-        if (!plainText && !item.IsSensitive && item.ImageHash == null)
+        else data.SetData(DataFormats.UnicodeText, textOverride ?? item.Text);
+        if (!plainText && textOverride == null && !item.IsSensitive && item.ImageHash == null)
         {
             if (item.Rtf != null) data.SetData(DataFormats.Rtf, item.Rtf);
             if (item.Html != null) data.SetData(DataFormats.Html, item.Html);

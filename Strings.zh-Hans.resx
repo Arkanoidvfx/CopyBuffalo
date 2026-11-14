@@ -2367,4 +2367,26 @@
 <data name="SED0DB441ADE2DEC4" xml:space="preserve"><value>端口 {0} 被占用：{1}</value></data>
 <data name="SABB504E01C9949B0" xml:space="preserve"><value>未找到网络：请将电脑连接到局域网。</value></data>
 <data name="SB489324C4EC60F8F" xml:space="preserve"><value>首次开启时，Windows 会请求防火墙权限，请为专用网络允许。</value></data>
+<data name="S775FA80A5F1D8D8D" xml:space="preserve"><value>长按条目以编辑</value></data>
+<data name="S9F8AA1C788B92C6C" xml:space="preserve"><value>面板透明度</value></data>
+<data name="S7F0D916BD1254F85" xml:space="preserve"><value>面板背景</value></data>
+<data name="S0C6E6816598FB539" xml:space="preserve"><value>条目文本</value></data>
+<data name="SE84F3F8325FB6AD1" xml:space="preserve"><value>联动背景与文本透明度</value></data>
+<data name="S4C6F1D8EA8195DE6" xml:space="preserve"><value>联动背景与文本</value></data>
+<data name="S9EA39974988478C1" xml:space="preserve"><value>全屏</value></data>
+<data name="S6E6BE01AF8E57005" xml:space="preserve"><value>正在加载图像…</value></data>
+<data name="S840FA11B396BF513" xml:space="preserve"><value>无法打开图像。</value></data>
+<data name="SEBD89AC17156AEF0" xml:space="preserve"><value>复制和粘贴时替换文本</value></data>
+<data name="S34663EE4FE51BC25" xml:space="preserve"><value>查找内容</value></data>
+<data name="S44FF00B55F82A825" xml:space="preserve"><value>替换为</value></data>
+<data name="S48CE590DDA208A8D" xml:space="preserve"><value>替换后的文本过长。</value></data>
+<data name="S5F08BADFBF2FFBCF" xml:space="preserve"><value>查找和替换</value></data>
+<data name="S33993EE16CA361BD" xml:space="preserve"><value>查找和替换 (Ctrl+H)</value></data>
+<data name="SBE6156B8E4DE367A" xml:space="preserve"><value>查找</value></data>
+<data name="S6E4964D15BAC8365" xml:space="preserve"><value>替换为</value></data>
+<data name="S6A5B5A135EDB4BAA" xml:space="preserve"><value>全部替换</value></data>
+<data name="SFC4C8B783A355911" xml:space="preserve"><value>文本未更改。</value></data>
+<data name="S0451B76C2F7FC56E" xml:space="preserve"><value>历史文本</value></data>
+<data name="S9691B7FD73FF8AF9" xml:space="preserve"><value>选择一条记录，然后在字段中按 Ctrl+V。</value></data>
+<data name="S420EB0375E6574F7" xml:space="preserve"><value>未找到文本记录。</value></data>
 </root>

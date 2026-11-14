@@ -42,7 +42,22 @@ partial class TextEditorWindow : Window
         Closed += (_, _) => { _debounce.Stop(); store.Changed -= RefreshSources; };
         PreviewKeyDown += (_, e) =>
         {
-            if (e.Key == Key.Escape) { Close(); e.Handled = true; }
+            if (e.Key == Key.H && Keyboard.Modifiers == ModifierKeys.Control)
+            {
+                if (!e.IsRepeat) ToggleFindReplace_Click(this, e);
+                e.Handled = true;
+            }
+            else if (e.Key == Key.Escape)
+            {
+                if (FindReplacePanel.IsVisible) ToggleFindReplace_Click(this, e);
+                else Close();
+                e.Handled = true;
+            }
+            else if (e.Key == Key.Enter && Keyboard.Modifiers == ModifierKeys.None && (ReplaceFrom.IsKeyboardFocused || ReplaceTo.IsKeyboardFocused))
+            {
+                if (!e.IsRepeat && ReplaceAllButton.IsEnabled) ReplaceAll_Click(this, e);
+                e.Handled = true;
+            }
             else if (e.Key == Key.Tab && Keyboard.Modifiers.HasFlag(ModifierKeys.Control))
             {
                 Editor.MoveFocus(new TraversalRequest(Keyboard.Modifiers.HasFlag(ModifierKeys.Shift) ? FocusNavigationDirection.Previous : FocusNavigationDirection.Next));
@@ -82,6 +97,47 @@ partial class TextEditorWindow : Window
     }
     void Undo_Click(object sender, RoutedEventArgs e) { Editor.Undo(); UpdateTools(); Editor.Focus(); }
     void Redo_Click(object sender, RoutedEventArgs e) { Editor.Redo(); UpdateTools(); Editor.Focus(); }
+
+    void ToggleFindReplace_Click(object sender, RoutedEventArgs e)
+    {
+        if (_closing) return;
+        bool open = FindReplacePanel.Visibility != Visibility.Visible;
+        FindReplacePanel.Visibility = open ? Visibility.Visible : Visibility.Collapsed;
+        FindReplaceStatus.Visibility = Visibility.Collapsed;
+        if (open) { ReplaceFrom.Focus(); ReplaceFrom.SelectAll(); }
+        else Editor.Focus();
+    }
+
+    void ReplaceAll_Click(object sender, RoutedEventArgs e)
+    {
+        if (_closing || ReplaceFrom.Text.Length == 0) return;
+        string? result;
+        try { result = PasteReplacement.ReplaceAll(Editor.Text, ReplaceFrom.Text, ReplaceTo.Text, _store.Storage.MaxChars); }
+        catch (PasteReplacement.LimitExceededException)
+        {
+            ShowFindReplaceStatus(UiText.F($"Лимит текста в настройках: {_store.Storage.MaxChars:N0} символов. Сократите текст или увеличьте лимит."));
+            return;
+        }
+        if (result == null) { ShowFindReplaceStatus(UiText.T("Текст не изменился.")); return; }
+
+        FindReplaceStatus.Visibility = Visibility.Collapsed;
+        int caret = Math.Min(Editor.CaretIndex, result.Length);
+        using (Editor.DeclareChangeBlock())
+        {
+            Editor.SelectAll();
+            Editor.SelectedText = result;
+            Editor.Select(caret, 0);
+        }
+        Editor.Focus();
+    }
+
+    void ShowFindReplaceStatus(string message)
+    {
+        FindReplaceStatus.Text = message;
+        FindReplaceStatus.Visibility = Visibility.Visible;
+        System.Windows.Automation.Peers.UIElementAutomationPeer.CreatePeerForElement(FindReplaceStatus)?.RaiseAutomationEvent(
+            System.Windows.Automation.Peers.AutomationEvents.LiveRegionChanged);
+    }
 
     void RefreshSources() { _sources.Refresh(); UpdateSourceActions(); }
     void HistorySearch_TextChanged(object sender, TextChangedEventArgs e) { if (_ready) RefreshSources(); }
@@ -229,6 +285,21 @@ partial class TextEditorWindow : Window
             check(editor.Editor.Text == path + expected[5..], "история заменяет выделение и сохраняет остальной текст");
             editor.Editor.Undo();
             check(editor.Editor.Text == expected, "подстановку можно отменить через Undo");
+            const string documentNumbers = "ЯС42-000839-2\nЯС42-000840\nДР-123";
+            editor.Editor.Text = documentNumbers;
+            editor.ToggleFindReplace_Click(editor, new RoutedEventArgs());
+            editor.ReplaceFrom.Text = "ЯС42-";
+            editor.ReplaceTo.Text = "ЯС42вн";
+            editor.ReplaceAllButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+            check(editor.Editor.Text == "ЯС42вн000839-2\nЯС42вн000840\nДР-123" && item.Text == expected,
+                "редактор заменяет все совпадения в черновике, сохраняя другие дефисы");
+            editor.Editor.Undo();
+            check(editor.Editor.Text == documentNumbers, "замена всех совпадений отменяется одним Undo");
+            editor.ReplaceFrom.Text = "missing";
+            editor.ReplaceAll_Click(editor, new RoutedEventArgs());
+            check(editor.Editor.Text == documentNumbers && editor.FindReplaceStatus.Visibility == Visibility.Visible,
+                "при отсутствии совпадений редактор сообщает об этом без изменения черновика");
+            editor.Editor.Text = expected;
             editor.HistorySearch.Text = "не найдено";
             check(editor.Sources.Items.Count == 0, "поиск в боковой истории фильтрует записи");
             editor.HistorySearch.Text = "deadlock";

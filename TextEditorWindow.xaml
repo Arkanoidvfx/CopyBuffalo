@@ -17,6 +17,7 @@
     <Grid x:Name="Sheet" Background="{DynamicResource WindowSurface}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
@@ -24,7 +25,7 @@
         <Grid Margin="28,24,28,20">
             <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
             <StackPanel>
-                <TextBlock Text="{local:Loc Key=S5C51EDD2D64E5120}" FontSize="24" FontWeight="SemiBold"/>
+                <TextBlock Text="{local:Loc Key=S5C51EDD2D64E5120}" FontSize="24" FontWeight="SemiBold" TextWrapping="Wrap"/>
                 <TextBlock x:Name="Origin" Margin="0,6,0,0" Foreground="{DynamicResource TextSecondary}"
                            TextTrimming="CharacterEllipsis"/>
             </StackPanel>
@@ -33,9 +34,50 @@
                         ToolTip="{local:Loc Key=S90443F0455695A6A}" AutomationProperties.Name="{local:Loc Key=SDFC4A6452FC1E6BB}" Click="Undo_Click"/>
                 <Button x:Name="RedoButton" Content="&#xE7A6;" Style="{StaticResource EditorButton}"
                         ToolTip="{local:Loc Key=S65D43381EA84041D}" AutomationProperties.Name="{local:Loc Key=S12D5AB1441BA29CB}" Click="Redo_Click"/>
+                <Button Content="{local:Loc Key=S5F08BADFBF2FFBCF}" Style="{StaticResource StandardButton}"
+                        Margin="8,0,0,0" ToolTip="{local:Loc Key=S33993EE16CA361BD}" AutomationProperties.AcceleratorKey="Ctrl+H"
+                        Click="ToggleFindReplace_Click"/>
             </StackPanel>
         </Grid>
-        <Border Grid.Row="1" Margin="28,0,28,20" CornerRadius="8" BorderThickness="1"
+        <Border x:Name="FindReplacePanel" Grid.Row="1" Margin="28,0,28,12" CornerRadius="8" BorderThickness="1"
+                Background="{DynamicResource DialogSurface}" BorderBrush="{DynamicResource ControlStroke}" Padding="12" Visibility="Collapsed">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+                <StackPanel Margin="0,0,8,0">
+                    <TextBlock x:Name="FindLabel" Text="{local:Loc Key=SBE6156B8E4DE367A}" Margin="0,0,0,4" FontSize="12"
+                               TextWrapping="Wrap" Foreground="{DynamicResource TextSecondary}"/>
+                    <TextBox x:Name="ReplaceFrom" Style="{StaticResource FieldBox}" AutomationProperties.LabeledBy="{Binding ElementName=FindLabel}"/>
+                </StackPanel>
+                <StackPanel Grid.Column="1" Margin="0,0,8,0">
+                    <TextBlock x:Name="ReplaceLabel" Text="{local:Loc Key=S6E4964D15BAC8365}" Margin="0,0,0,4" FontSize="12"
+                               TextWrapping="Wrap" Foreground="{DynamicResource TextSecondary}"/>
+                    <TextBox x:Name="ReplaceTo" Style="{StaticResource FieldBox}" AutomationProperties.LabeledBy="{Binding ElementName=ReplaceLabel}"/>
+                </StackPanel>
+                <Button x:Name="ReplaceAllButton" Grid.Column="2" Content="{local:Loc Key=S6A5B5A135EDB4BAA}"
+                        VerticalAlignment="Bottom" Click="ReplaceAll_Click">
+                    <Button.Style>
+                        <Style TargetType="Button" BasedOn="{StaticResource StandardButton}">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Text, ElementName=ReplaceFrom}" Value="">
+                                    <Setter Property="IsEnabled" Value="False"/>
+                                    <Setter Property="Foreground" Value="{DynamicResource TextDisabled}"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+                </Button>
+                <Button Grid.Column="3" Content="&#xE711;" Style="{StaticResource EditorButton}" Margin="4,0,0,0"
+                        VerticalAlignment="Bottom" ToolTip="{local:Loc Key=SA7A4033657E89FC9}"
+                        AutomationProperties.Name="{local:Loc Key=SA7A4033657E89FC9}" Click="ToggleFindReplace_Click"/>
+                <TextBlock x:Name="FindReplaceStatus" Grid.Row="1" Grid.ColumnSpan="4" Margin="0,8,0,0"
+                           FontSize="12" TextWrapping="Wrap" Foreground="{DynamicResource TextSecondary}"
+                           Visibility="Collapsed" AutomationProperties.LiveSetting="Polite"/>
+            </Grid>
+        </Border>
+        <Border Grid.Row="2" Margin="28,0,28,20" CornerRadius="8" BorderThickness="1"
                 Background="{DynamicResource DialogSurface}" BorderBrush="{DynamicResource ControlStroke}">
             <Grid>
                 <TextBox x:Name="Editor" Background="Transparent" BorderThickness="0" Padding="20,16"
@@ -65,7 +107,7 @@
                 </Border>
             </Grid>
         </Border>
-        <Border Grid.Row="2" Background="{DynamicResource DialogSurface}" BorderBrush="{DynamicResource CardStroke}"
+        <Border Grid.Row="3" Background="{DynamicResource DialogSurface}" BorderBrush="{DynamicResource CardStroke}"
                 BorderThickness="0,1,0,0" Padding="28,16">
             <Grid>
                 <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
@@ -81,7 +123,7 @@
                            FontSize="12" Foreground="{DynamicResource TextSecondary}"/>
             </Grid>
         </Border>
-        <Border Grid.Column="1" Grid.RowSpan="3" BorderThickness="1,0,0,0"
+        <Border Grid.Column="1" Grid.RowSpan="4" BorderThickness="1,0,0,0"
                 BorderBrush="{DynamicResource CardStroke}" Background="{DynamicResource DialogSurface}">
             <Grid Margin="16,24,16,16">
                 <Grid.RowDefinitions>

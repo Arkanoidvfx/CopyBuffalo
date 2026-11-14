@@ -276,7 +276,7 @@
         <Style x:Key="ClipItemContainer" TargetType="ListBoxItem">
             <Setter Property="Focusable" Value="False"/>
             <!-- Без этого ListBoxItem берёт системный ControlText (чёрный) — на тёмной карточке текст не виден -->
-            <Setter Property="Foreground" Value="{DynamicResource TextPrimary}"/>
+            <Setter Property="Foreground" Value="{DynamicResource PanelEntryText}"/>
             <Setter Property="Margin" Value="0,0,0,4"/>
             <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
             <Setter Property="AutomationProperties.Name" Value="{Binding Preview}"/>
@@ -284,7 +284,7 @@
                 <Setter.Value>
                     <ControlTemplate TargetType="ListBoxItem">
                         <Grid>
-                            <Border x:Name="Bd" CornerRadius="4" Background="{DynamicResource CardFill}"
+                            <Border x:Name="Bd" CornerRadius="4" Background="{DynamicResource PanelCardFill}"
                                     BorderBrush="{DynamicResource CardStroke}" BorderThickness="1" Padding="12,6,6,6">
                                 <ContentPresenter/>
                             </Border>
@@ -348,11 +348,11 @@
                                 <DataTrigger.ExitActions><RemoveStoryboard BeginStoryboardName="BusySweep"/></DataTrigger.ExitActions>
                             </DataTrigger>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource CardHover}"/>
+                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource PanelCardHover}"/>
                             </Trigger>
                             <!-- Выбранная отличается от наведённой обводкой, как выбранные плитки и символы -->
                             <Trigger Property="IsSelected" Value="True">
-                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource CardHover}"/>
+                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource PanelCardHover}"/>
                                 <Setter TargetName="Bd" Property="BorderBrush" Value="{DynamicResource AccentRing}"/>
                                 <Setter TargetName="Pill" Property="Visibility" Value="Visible"/>
                             </Trigger>
@@ -361,7 +361,7 @@
                             </Trigger>
                             <Trigger Property="Tag" Value="Merge">
                                 <Setter TargetName="Bd" Property="BorderBrush" Value="{DynamicResource Accent}"/>
-                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource CardHover}"/>
+                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource PanelCardHover}"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -400,7 +400,7 @@
         <Style x:Key="PinTileContainer" TargetType="ListBoxItem">
             <Setter Property="Focusable" Value="False"/>
             <!-- Без этого ListBoxItem берёт системный ControlText (чёрный) — на тёмной карточке текст не виден -->
-            <Setter Property="Foreground" Value="{DynamicResource TextPrimary}"/>
+            <Setter Property="Foreground" Value="{DynamicResource PanelEntryText}"/>
             <Setter Property="Margin" Value="3"/>
             <Setter Property="Width" Value="104"/>
             <Setter Property="Height" Value="104"/>
@@ -411,7 +411,7 @@
                 <Setter.Value>
                     <ControlTemplate TargetType="ListBoxItem">
                         <Grid>
-                            <Border x:Name="Bd" CornerRadius="4" Background="{DynamicResource CardFill}"
+                            <Border x:Name="Bd" CornerRadius="4" Background="{DynamicResource PanelCardFill}"
                                     BorderBrush="{DynamicResource CardStroke}" BorderThickness="1">
                                 <Grid>
                                     <Border CornerRadius="3" Background="{Binding TileTint}" IsHitTestVisible="False"/>
@@ -476,10 +476,10 @@
                                 <DataTrigger.ExitActions><RemoveStoryboard BeginStoryboardName="BusySweep"/></DataTrigger.ExitActions>
                             </DataTrigger>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource CardHover}"/>
+                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource PanelCardHover}"/>
                             </Trigger>
                             <Trigger Property="IsSelected" Value="True">
-                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource CardHover}"/>
+                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource PanelCardHover}"/>
                                 <Setter TargetName="Ring" Property="Visibility" Value="Visible"/>
                             </Trigger>
                             <DataTrigger Binding="{Binding IsGroupHeader}" Value="True">
@@ -498,13 +498,13 @@
                             </Trigger>
                             <Trigger Property="Tag" Value="Merge">
                                 <Setter TargetName="Bd" Property="BorderBrush" Value="{DynamicResource Accent}"/>
-                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource CardHover}"/>
+                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource PanelCardHover}"/>
                             </Trigger>
                             <Trigger Property="Tag" Value="After">
                                 <Setter TargetName="AfterMark" Property="Visibility" Value="Visible"/>
                             </Trigger>
                             <Trigger Property="Tag" Value="Group">
-                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource SubtleHover}"/>
+                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource PanelCardSubtleHover}"/>
                                 <Setter TargetName="Bd" Property="BorderThickness" Value="1"/>
                                 <Setter TargetName="Bd" Property="BorderBrush" Value="{DynamicResource Accent}"/>
                             </Trigger>
@@ -517,7 +517,7 @@
         <!-- Строка закреплённого в виде «список»: значок типа, заголовок и подробности; выбранная — как в «Буфере» -->
         <Style x:Key="PinRowContainer" TargetType="ListBoxItem">
             <Setter Property="Focusable" Value="False"/>
-            <Setter Property="Foreground" Value="{DynamicResource TextPrimary}"/>
+            <Setter Property="Foreground" Value="{DynamicResource PanelEntryText}"/>
             <Setter Property="Margin" Value="0,0,0,2"/>
             <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
             <Setter Property="AutomationProperties.Name" Value="{Binding Preview}"/>
@@ -585,10 +585,10 @@
                                 <DataTrigger.ExitActions><RemoveStoryboard BeginStoryboardName="BusySweep"/></DataTrigger.ExitActions>
                             </DataTrigger>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource SubtleHover}"/>
+                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource PanelCardSubtleHover}"/>
                             </Trigger>
                             <Trigger Property="IsSelected" Value="True">
-                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource CardHover}"/>
+                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource PanelCardHover}"/>
                                 <Setter TargetName="Bd" Property="BorderBrush" Value="{DynamicResource AccentRing}"/>
                                 <Setter TargetName="Pill" Property="Visibility" Value="Visible"/>
                             </Trigger>
@@ -606,7 +606,7 @@
                                 <Setter TargetName="AfterMark" Property="Visibility" Value="Visible"/>
                             </Trigger>
                             <Trigger Property="Tag" Value="Group">
-                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource SubtleHover}"/>
+                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource PanelCardSubtleHover}"/>
                                 <Setter TargetName="Bd" Property="BorderBrush" Value="{DynamicResource Accent}"/>
                             </Trigger>
                             <Trigger Property="Tag" Value="Replace">
@@ -614,7 +614,7 @@
                             </Trigger>
                             <Trigger Property="Tag" Value="Merge">
                                 <Setter TargetName="Bd" Property="BorderBrush" Value="{DynamicResource Accent}"/>
-                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource CardHover}"/>
+                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource PanelCardHover}"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -628,7 +628,7 @@
             <Setter Property="Width" Value="38"/>
             <Setter Property="Height" Value="38"/>
             <Setter Property="Margin" Value="1"/>
-            <Setter Property="Foreground" Value="{DynamicResource TextPrimary}"/>
+            <Setter Property="Foreground" Value="{DynamicResource PanelEntryText}"/>
             <Setter Property="ToolTip" Value="{Binding Code}"/>
             <Setter Property="AutomationProperties.Name" Value="{Binding Char}"/>
             <Setter Property="Template">
@@ -649,10 +649,10 @@
                         </Grid>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource SubtleHover}"/>
+                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource PanelCardSubtleHover}"/>
                             </Trigger>
                             <Trigger Property="IsSelected" Value="True">
-                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource SubtleHover}"/>
+                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource PanelCardSubtleHover}"/>
                                 <Setter TargetName="Ring" Property="Visibility" Value="Visible"/>
                             </Trigger>
                         </ControlTemplate.Triggers>

@@ -1,7 +1,6 @@
 using System.ComponentModel;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using System.IO;
 using System.Windows.Automation;
 using System.Windows;
 using System.Windows.Controls;
@@ -184,8 +183,10 @@ partial class PanelWindow : Window
     public PanelWindow(HistoryStore store, SymbolCatalog symbols)
     {
         InitializeComponent();
+        InitializePanelTransparency();
         InitializeLanguage();
         InitializeDragVisual();
+        InitializeInlineEdit();
         _infoTimer.Tick += (_, _) =>
         {
             _infoTimer.Stop();
@@ -201,7 +202,8 @@ partial class PanelWindow : Window
         {
             if (ValueDrop.IsOpen) CloseValueDrop();
             if (SettingsFlyout.Visibility != Visibility.Visible || (e.OriginalSource as DependencyObject).IsWithin(SettingsFlyout)) return;
-            CloseSettings();
+            if (PickingSettingsHistory) CloseSettingsHistory();
+            else CloseSettings();
             e.Handled = true;
         };
         Root.MouseLeave += (_, _) => StartOutsideTimer();
@@ -248,7 +250,7 @@ partial class PanelWindow : Window
         Search.ApplyTemplate();
         if (Search.Template.FindName("PART_Clear", Search) is Button clearSearch)
             clearSearch.Click += (_, _) => { Search.Text = ""; Search.Focus(); };
-        foreach (var toggle in new[] { AnimationsToggle, OutsideHideToggle, KeyHintsToggle, TextPeekToggle, AutoUpdateToggle })
+        foreach (var toggle in new[] { AnimationsToggle, OutsideHideToggle, KeyHintsToggle, TextPeekToggle, InlineEditHoldToggle, AutoUpdateToggle })
         {
             toggle.Checked += AnimateSwitch;
             toggle.Unchecked += AnimateSwitch;
@@ -441,8 +443,10 @@ partial class PanelWindow : Window
         HideShortcuts();
         CancelZoom();
         StopGif();
+        CloseSettingsHistory(restoreFocus: false);
         SettingsFlyout.Visibility = Visibility.Collapsed;
         _hiding = true;
+        _imageViewer?.Close();
         Animate(null, EnterScale, null, 0, null, 0, HideDurationMs, Motion.Out, () =>
         {
             if (!_hiding || version != _visibilityVersion) return;
@@ -513,6 +517,7 @@ partial class PanelWindow : Window
         _outsideTimer.Stop();
         _deactivateTimer.Stop();
         HideShortcuts();
+        CloseSettingsHistory(restoreFocus: false);
         SettingsFlyout.Visibility = Visibility.Collapsed;
         _transient = null; // вчерашний итог или неподтверждённая очистка не должны встречать при следующем открытии
         RefreshInfo();
@@ -561,7 +566,7 @@ partial class PanelWindow : Window
     }
 
     /// <summary>Своё модальное окно, меню или перетаскивание: уход фокуса/мыши тут не значит «ушли из панели».</summary>
-    bool Busy => _editingGroup || _inlineItem != null || _textEditor != null || _mergeWindow != null || _collectingMerge || _dragging || _mergingDrag || _valueSaving || ValueDrop.IsOpen || _menuOpen || _archiveInfo != null || _stackOpen;
+    bool Busy => PickingSettingsHistory || _editingGroup || _inlineItem != null || _textEditor != null || _imageViewer != null || _mergeWindow != null || _collectingMerge || _dragging || _mergingDrag || _valueSaving || ValueDrop.IsOpen || _menuOpen || _archiveInfo != null || _stackOpen;
 
     /// <summary>
     /// Передний план сейчас у нашего окна (панель, её диалог, окно графа). Спрашиваем Windows, а не IsActive:
@@ -809,6 +814,7 @@ partial class PanelWindow : Window
         // 0xE8 не назначена, WPF отдаёт её как Key.None.
         if (key is Key.LWin or Key.RWin or Key.None || KeyInterop.VirtualKeyFromKey(key) == VK_MASK) return;
         _outsideTimer.Stop(); // с панелью работают с клавиатуры — мышь снаружи не повод прятать
+        if (PickingSettingsHistory) { HandleSettingsHistoryKey(key, e); return; }
         if (HandleInlineEditKey(key, e)) return;
         if (HandleStackKey(key, e)) return;
         if (key is Key.LeftAlt or Key.RightAlt) { CancelZoom(); StopGif(); }
@@ -865,6 +871,10 @@ partial class PanelWindow : Window
                 break;
             case Key.F2 when selected != null && InlineEditable(selected):
                 BeginInlineEdit(selected);
+                break;
+            case Key.F11 when Keyboard.Modifiers == ModifierKeys.None:
+                if (!e.IsRepeat && ImageForFullScreen(Mouse.DirectlyOver as DependencyObject) is { } image)
+                    OpenImageViewer(image);
                 break;
             case Key.Escape:
                 if (_transient != null) CloseTransient();
@@ -949,7 +959,7 @@ partial class PanelWindow : Window
         }
         if (_altClick) { _altClick = false; e.Handled = true; return; }
         if (_collectingMerge) { e.Handled = true; return; }
-        if (_dragging || _suppressClick) return;
+        if (_dragging || _suppressClick || _inlineHoldOpened) return;
         switch ((e.OriginalSource as DependencyObject)?.FindAncestor<ListBoxItem>()?.DataContext)
         {
             case ClipItem item: RequestPaste(item, Keyboard.Modifiers.HasFlag(ModifierKeys.Shift), Keyboard.Modifiers == ModifierKeys.Control); break;
@@ -1032,10 +1042,19 @@ partial class PanelWindow : Window
     }
 
     /// <summary>Группы: вставка, преобразование, закрепление, удаление; справа сочетания.</summary>
-    void ShowMenu(ClipItem item, UIElement target, PlacementMode placement)
+    ContextMenu ShowMenu(ClipItem item, UIElement target, PlacementMode placement)
     {
         var menu = new ContextMenu { PlacementTarget = target, Placement = placement };
+        bool showImage = false, menuClosed = false;
+        void ShowImageAfterMenu() => Dispatcher.BeginInvoke(DispatcherPriority.Input, new Action(() => OpenImageViewer(item)));
         menu.Items.Add(Entry(UiText.T("Вставить"), "\uE77F", () => RequestPaste(item, false), "Enter"));
+        if (item.IsImage)
+            menu.Items.Add(Entry(UiText.T("На весь экран"), "\uE740", () =>
+            {
+                showImage = true;
+                if (menuClosed) ShowImageAfterMenu();
+                else menu.IsOpen = false;
+            }, "F11"));
         menu.Items.Add(Entry(UiText.T("Открыть карту истории"), "\uE8A7", () => Dispatcher.BeginInvoke(new Action(() => OpenHistoryMap(item)))));
         if (item.IsImage) menu.Items.Add(Entry(item.InSeries ? UiText.T("Снять отметку") : UiText.T("Выбрать картинку"), "\uE762", () => ToggleSeriesItem(item), UiText.T("Ctrl+клик")));
         if (item.ImageHash == null) menu.Items.Add(Entry(item.IsFolder ? UiText.T("Вставить путь") : UiText.T("Вставить как текст"), "\uE8D2", () => RequestPaste(item, true), "Shift+Enter"));
@@ -1100,8 +1119,15 @@ partial class PanelWindow : Window
         }
         menu.Items.Add(new Separator());
         menu.Items.Add(Entry(UiText.T("Удалить"), "\uE74D", () => RemoveAnimated(item), "Del"));
-        menu.Closed += (_, _) => { if (_textEditor == null) Search.Focus(); };
+        menu.Closed += (_, _) =>
+        {
+            if (_textEditor == null) Search.Focus();
+            menuClosed = true;
+            // Click can arrive before the popup restores focus to the panel.
+            if (showImage) ShowImageAfterMenu();
+        };
         OpenMenu(menu);
+        return menu;
     }
 
     internal MenuItem OcrEntry(ClipItem item)
@@ -1197,6 +1223,7 @@ partial class PanelWindow : Window
 
     void CloseSettings()
     {
+        CloseSettingsHistory(restoreFocus: false);
         Storage = _storage; // закрытие без «Применить» отменяет изменения бегунков
         SettingsFlyout.Visibility = Visibility.Collapsed;
         Width = _normalSize.Width; Height = _normalSize.Height;
@@ -1493,6 +1520,7 @@ partial class PanelWindow : Window
         {
             _dragStart = e.GetPosition(this);
             _dragItem = item;
+            StartInlineEditHold(item);
         }
     }
 
@@ -1502,6 +1530,7 @@ partial class PanelWindow : Window
         var now = e.GetPosition(this);
         if (Math.Abs(now.X - start.X) < SystemParameters.MinimumHorizontalDragDistance &&
             Math.Abs(now.Y - start.Y) < SystemParameters.MinimumVerticalDragDistance) return;
+        _inlineHoldTimer.Stop();
         _dragging = true;
         _suppressClick = true;
         CancelZoom();
@@ -1714,7 +1743,11 @@ partial class PanelWindow : Window
         _zoomTarget = target;
         _zoomTip = tip;
         _zoomProgress = progress;
-        _zoomFull = target.DataContext is ClipItem { IsImage: true, IsGif: false, ImageDir: not null } item ? LoadZoomImage(item) : null;
+        if (target.DataContext is ClipItem { IsImage: true, IsGif: false } item)
+        {
+            var dpi = VisualTreeHelper.GetDpi(this);
+            _zoomFull = LoadPreviewImage(item, new Size(260 * ImageZoomScale * dpi.DpiScaleX, 120 * ImageZoomScale * dpi.DpiScaleY));
+        }
         progress.Visibility = Visibility.Visible;
         var bar = new ScaleTransform(0, 1);
         progress.RenderTransform = bar;
@@ -1747,19 +1780,6 @@ partial class PanelWindow : Window
         transform.BeginAnimation(ScaleTransform.ScaleXProperty, grow);
         transform.BeginAnimation(ScaleTransform.ScaleYProperty, grow.Clone());
         if (_zoomFull != null) ShowFullZoom(_zoomFull, tip, preview);
-    }
-
-    /// <summary>
-    /// Миниатюра — 320 px, в окне увеличения до 1300 px она мылится. Полную картинку декодируем сразу
-    /// под размер окна увеличения (с учётом DPI), в фоне, пока идёт задержка наведения.
-    /// </summary>
-    Task<System.Windows.Media.Imaging.BitmapSource?> LoadZoomImage(ClipItem item)
-    {
-        int scale = ImageZoomScale;
-        double fit = Math.Min(260.0 * scale, 120.0 * scale * item.ImageWidth / Math.Max(1, item.ImageHeight));
-        int width = (int)Math.Min(item.ImageWidth, Math.Ceiling(fit * VisualTreeHelper.GetDpi(this).DpiScaleX));
-        var path = Path.Combine(item.ImageDir!, item.ImageHash + ".dat");
-        return Task.Run(() => ImageFiles.LoadBitmap(path, width));
     }
 
     async void ShowFullZoom(Task<System.Windows.Media.Imaging.BitmapSource?> load, ToolTip tip, Image preview)
@@ -1835,40 +1855,11 @@ partial class PanelWindow : Window
         _gifTarget = target;
         try
         {
-            await Task.Run(async () =>
+            await PlayPreviewGif(item, new Size(320, 160), source =>
             {
-                var bytes = ImageFiles.ReadFull(item.ImageDir, item.ImageHash);
-                using var stream = new MemoryStream(bytes);
-                using var gif = System.Drawing.Image.FromStream(stream);
-                int count = gif.GetFrameCount(System.Drawing.Imaging.FrameDimension.Time);
-                if (count < 2) return;
-                byte[]? delays = null;
-                try { delays = gif.GetPropertyItem(0x5100)?.Value; } catch (ArgumentException) { }
-                double scale = Math.Min(1, Math.Min(320.0 / gif.Width, 160.0 / gif.Height));
-                var size = new System.Drawing.Size(Math.Max(1, (int)(gif.Width * scale)), Math.Max(1, (int)(gif.Height * scale)));
-
-                while (!playback.IsCancellationRequested)
-                {
-                    for (int frame = 0; frame < count; frame++)
-                    {
-                        playback.Token.ThrowIfCancellationRequested();
-                        gif.SelectActiveFrame(System.Drawing.Imaging.FrameDimension.Time, frame);
-                        using var bitmap = new System.Drawing.Bitmap(gif, size);
-                        using var png = new MemoryStream();
-                        bitmap.Save(png, System.Drawing.Imaging.ImageFormat.Png);
-                        var source = ImageFiles.Decode(png.ToArray());
-                        await Dispatcher.InvokeAsync(() =>
-                        {
-                            if (!playback.IsCancellationRequested && ReferenceEquals(target.DataContext, item) && target.IsMouseOver)
-                                target.SetCurrentValue(Image.SourceProperty, source);
-                            else if (!playback.IsCancellationRequested)
-                                StopGif();
-                        });
-                        int delay = delays != null && (long)frame * 4 + 4 <= delays.Length
-                            ? BitConverter.ToInt32(delays, frame * 4) * 10 : 100;
-                        await Task.Delay(Math.Max(20, delay), playback.Token);
-                    }
-                }
+                if (ReferenceEquals(target.DataContext, item) && target.IsMouseOver)
+                    target.SetCurrentValue(Image.SourceProperty, source);
+                else StopGif();
             }, playback.Token);
         }
         catch (OperationCanceledException) { }
