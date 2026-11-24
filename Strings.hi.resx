@@ -336,10 +336,6 @@
     <value>तीर</value>
     <comment>Стрелки</comment>
   </data>
-  <data name="S2734E4685D892F22" xml:space="preserve">
-    <value>अधिक: रिकॉर्डिंग रोकें, सेटिंग्स, इतिहास साफ़ करें</value>
-    <comment>Ещё: пауза записи, настройки, очистка истории</comment>
-  </data>
   <data name="S27410FC78B03DDB6" xml:space="preserve">
     <value>प्रभाव की गति, प्रतिशत</value>
     <comment>Скорость эффекта, процентов</comment>
@@ -472,10 +468,6 @@
     <value>मिलते-जुलते अक्षर और पंक्तियों का क्रम जाँचें।</value>
     <comment>Проверьте похожие буквы и порядок строк.</comment>
   </data>
-  <data name="S36BA2804E029771D" xml:space="preserve">
-    <value>अधिक: रोकें, सेटिंग्स, साफ़ करें (बटन पर जाने के लिए F6)</value>
-    <comment>Ещё: пауза, настройки, очистка (F6 — фокус на кнопки)</comment>
-  </data>
   <data name="S380FA2FBAAA6699B" xml:space="preserve">
     <value>इतिहास से लें</value>
     <comment>Взять из истории</comment>
@@ -511,6 +503,14 @@
   <data name="S3B9CF4A79A869535" xml:space="preserve">
     <value>Unity Shader Graph नोड</value>
     <comment>Ноды Unity Shader Graph</comment>
+  </data>
+  <data name="S4127F4E9FCA5D849" xml:space="preserve">
+    <value>कोई गलती नहीं मिली।</value>
+    <comment>Ошибок не найдено.</comment>
+  </data>
+  <data name="S54D648114CA838CC" xml:space="preserve">
+    <value>यह इतिहास और क्लिपबोर्ड में है।</value>
+    <comment>Исправленный текст в истории и в буфере обмена.</comment>
   </data>
   <data name="S55435886F76E0E6A" xml:space="preserve">
     <value>पाठ मर्ज करें — CopyBuffalo</value>
@@ -680,9 +680,9 @@
     <value>ZIP के रूप में भेजें</value>
     <comment>Отправить архивом .zip</comment>
   </data>
-  <data name="S4E6171ACEE4847BD" xml:space="preserve">
-    <value>प्रतीक, कोड (2014) या श्रेणी (मुद्रा) से खोजें।</value>
-    <comment>Ищите по символу, коду (2014) или группе («валют»).</comment>
+  <data name="S014E31D7DE87112C" xml:space="preserve">
+    <value>प्रतीक, अक्षर (c → ć, č), कोड (2014) या श्रेणी (मुद्रा) से खोजें।</value>
+    <comment>Ищите по символу, букве (c → ć, č), коду (2014) или группе («валют»).</comment>
   </data>
   <data name="S4EBEB45A877CDD5E" xml:space="preserve">
     <value>संग्रहण सेटिंग्स</value>
@@ -820,6 +820,10 @@
     <value>जोड़ा गया पथ अब स्लॉट में नहीं बैठता।</value>
     <comment>Назначение пути больше не подходит к слоту.</comment>
   </data>
+  <data name="S604A9B47E0ED6409" xml:space="preserve">
+    <value>सुधारा गया पाठ इतिहास में है,</value>
+    <comment>Исправленный текст в истории,</comment>
+  </data>
   <data name="S6076E7DEACE54EA2" xml:space="preserve">
     <value>अगली चुनी हुई फ़ाइल पेस्ट करें</value>
     <comment>Вставить следующий выбранный файл</comment>
@@ -876,6 +880,10 @@
     <value>नीला</value>
     <comment>Синий</comment>
   </data>
+  <data name="S6779AB711DA7CD3B" xml:space="preserve">
+    <value>व्याकरण ठीक करें</value>
+    <comment>Исправить грамматику</comment>
+  </data>
   <data name="S6791BBFBFE97992A" xml:space="preserve">
     <value>कार्ड के क्रम से पथ जोड़ दिए गए। आप कोई भी जोड़ बदल सकते हैं।</value>
     <comment>Пути назначены по порядку карточек. Любое назначение можно изменить.</comment>
@@ -895,6 +903,10 @@
   <data name="S6B07FBC6C23BDADF" xml:space="preserve">
     <value>छवि स्थानीय रूप से संसाधित हो रही है; आप काम जारी रख सकते हैं।</value>
     <comment>Можно продолжать работу — изображение обрабатывается локально.</comment>
+  </data>
+  <data name="S6B0FAD9DCED3429D" xml:space="preserve">
+    <value>पाठ ठीक नहीं हो सका।</value>
+    <comment>Не удалось исправить текст.</comment>
   </data>
   <data name="S6B38B68B028F998C" xml:space="preserve">
     <value>मूल प्रविष्टियाँ इतिहास में रहेंगी · Ctrl+Enter से मर्ज · Esc से बंद</value>
@@ -2084,6 +2096,10 @@
     <value>सभी प्रविष्टियाँ अलग-अलग पंक्तियों में मर्ज होंगी।</value>
     <comment>Все записи объединяются отдельными строками.</comment>
   </data>
+  <data name="SEF6EBB28F0A025E8" xml:space="preserve">
+    <value>व्याकरण ठीक कर दिया गया।</value>
+    <comment>Грамматика исправлена.</comment>
+  </data>
   <data name="SF00C388F0EB04339" xml:space="preserve">
     <value>पूर्ववत करना विफल</value>
     <comment>Отмена не выполнена</comment>
@@ -2354,19 +2370,6 @@
 <data name="SC37EFE9530BDDE6E" xml:space="preserve"><value>अवलोकन पर वापस</value></data>
 <data name="S81DA2D58E42F3647" xml:space="preserve"><value>प्रविष्टियाँ देखने के लिए समूह चुनें</value></data>
 <data name="SCD45EC7836B5CB5E" xml:space="preserve"><value>फ़िल्टर साफ़ करें</value></data>
-<data name="S822F9FD9BA2D117E" xml:space="preserve"><value>फ़ोन</value></data>
-<data name="S53B97805C229AC7F" xml:space="preserve"><value>फ़ोन सेटिंग</value></data>
-<data name="S30145146CB667514" xml:space="preserve"><value>फ़ोन से टेक्स्ट प्राप्त करें</value></data>
-<data name="S17424EB150B417D3" xml:space="preserve"><value>प्राप्त टेक्स्ट को तुरंत क्लिपबोर्ड पर रखें</value></data>
-<data name="S6DD75BD110D44A90" xml:space="preserve"><value>CopyBuffalo Phone ऐप से QR कोड स्कैन करें, या पता, पोर्ट और कोड हाथ से दर्ज करें। फ़ोन और PC एक ही नेटवर्क में होने चाहिए।</value></data>
-<data name="SDA82E80563D75A61" xml:space="preserve"><value>पता</value></data>
-<data name="S90947197F86BFDEA" xml:space="preserve"><value>पोर्ट</value></data>
-<data name="S1A0517BFD5DCF6AA" xml:space="preserve"><value>नया कोड</value></data>
-<data name="SAACC3EFA772B86E4" xml:space="preserve"><value>प्राप्त हो रहा है · पोर्ट {0}</value></data>
-<data name="S60420FE4F5B6189C" xml:space="preserve"><value>प्राप्ति बंद है</value></data>
-<data name="SED0DB441ADE2DEC4" xml:space="preserve"><value>पोर्ट {0} व्यस्त है: {1}</value></data>
-<data name="SABB504E01C9949B0" xml:space="preserve"><value>नेटवर्क नहीं मिला: PC को लोकल नेटवर्क से जोड़ें।</value></data>
-<data name="SB489324C4EC60F8F" xml:space="preserve"><value>पहली बार चालू करने पर Windows फ़ायरवॉल की अनुमति मांगेगा — निजी नेटवर्क के लिए अनुमति दें।</value></data>
 <data name="S775FA80A5F1D8D8D" xml:space="preserve"><value>संपादित करने के लिए पंक्ति दबाकर रखें</value></data>
 <data name="S9F8AA1C788B92C6C" xml:space="preserve"><value>पैनल की पारदर्शिता</value></data>
 <data name="S7F0D916BD1254F85" xml:space="preserve"><value>पैनल की पृष्ठभूमि</value></data>
@@ -2389,4 +2392,43 @@
 <data name="S0451B76C2F7FC56E" xml:space="preserve"><value>इतिहास से पाठ</value></data>
 <data name="S9691B7FD73FF8AF9" xml:space="preserve"><value>कोई प्रविष्टि चुनें, फिर फ़ील्ड में Ctrl+V दबाएँ।</value></data>
 <data name="S420EB0375E6574F7" xml:space="preserve"><value>कोई पाठ प्रविष्टि नहीं मिली।</value></data>
+  <data name="SA69757B1DBE17B14" xml:space="preserve"><value>फ़िल्टर</value></data>
+  <data name="S1B3EF3FF33601E29" xml:space="preserve"><value>पिछली प्रविष्टि</value></data>
+  <data name="S92BD41D8D977F56B" xml:space="preserve"><value>अगली प्रविष्टि</value></data>
+  <data name="S866424C0D200A4D3" xml:space="preserve"><value>पढ़ने के लिए होवर करें · चुनने के लिए क्लिक करें</value></data>
+  <data name="S24C7474A8433D4AC" xml:space="preserve"><value>समयरेखा</value></data>
+  <data name="SE2899079DE68C35C" xml:space="preserve"><value>दोगुना बड़ा करें</value></data>
+  <data name="S3681A2658AB51B2D" xml:space="preserve"><value>पूरा दिखाएँ</value></data>
+  <data name="S6E9DD19BE792DDC0" xml:space="preserve"><value>इतिहास खाली है</value></data>
+  <data name="S8D9C5427DC229656" xml:space="preserve"><value>यहाँ देखने के लिए कोई टेक्स्ट या चित्र कॉपी करें।</value></data>
+  <data name="SDA5129778D7D62D2" xml:space="preserve"><value>सूची की चौड़ाई</value></data>
+  <data name="S6AA5256DEDBB2D15" xml:space="preserve"><value>अक्सर वाले पहले</value><comment>Частые первыми</comment></data>
+  <data name="S490438AC414A6602" xml:space="preserve"><value>अक्सर इस्तेमाल होने वाले प्रतीक अपने समूह में पहले आते हैं</value><comment>Часто используемые символы идут первыми в своей группе</comment></data>
+  <data name="S3987D5E97F4C5EEF" xml:space="preserve"><value>पेस्ट की गई प्रविष्टियाँ अपनी जगह रखें</value><comment>Не поднимать вставленные записи</comment></data>
+  <data name="SF9A3736336415A63" xml:space="preserve"><value>पेस्ट की गई प्रविष्टियाँ अपनी जगह रहती हैं। उन्हें ऊपर लाने के लिए क्लिक करें।</value><comment>Вставленные записи остаются на своих местах. Нажмите, чтобы они поднимались наверх.</comment></data>
+  <data name="S65191CC0F4A1116B" xml:space="preserve"><value>पेस्ट की गई प्रविष्टियाँ ऊपर चली जाती हैं। उन्हें अपनी जगह रखने के लिए क्लिक करें।</value><comment>Вставленные записи поднимаются наверх. Нажмите, чтобы они оставались на своих местах.</comment></data>
+  <data name="S960A985E24EDBF4E" xml:space="preserve"><value>क्रम बना रहेगा।</value><comment>Порядок сохраняется.</comment></data>
+  <data name="S61781E34446BE478" xml:space="preserve"><value>पेस्ट की गई प्रविष्टियाँ अपनी जगह रहती हैं।</value><comment>Вставленные записи остаются на своих местах.</comment></data>
+  <data name="S6B0B89C918022181" xml:space="preserve"><value>क्रम बदलेगा।</value><comment>Порядок меняется.</comment></data>
+  <data name="SEC8B4C2A34345B9A" xml:space="preserve"><value>पेस्ट की गई प्रविष्टियाँ ऊपर चली जाती हैं।</value><comment>Вставленные записи поднимаются наверх.</comment></data>
+  <data name="SB6F33BC23530A58D" xml:space="preserve"><value>हलचल पर प्रतिक्रिया</value><comment>Реакция на движение</comment></data>
+  <data name="SD9207D64DC446EFA" xml:space="preserve"><value>पैनल हलचल की दिशा में झुकता है और पॉइंटर के पास फ़्रेम चमकता है।</value><comment>Панель наклоняется в сторону движения, у мыши светится край рамки.</comment></data>
+  <data name="SB9319DC3ABB013D5" xml:space="preserve"><value>ऑब्सीडियन स्किन</value><comment>Скин «Обсидиан»</comment></data>
+  <data name="SF7E0C0F7970E2E73" xml:space="preserve"><value>हर विंडो, मेनू और फ़ील्ड में गहरा ज्वालामुखी काँच और फ़िरोज़ी रंग। Windows थीम की जगह लेती है।</value><comment>Тёмное вулканическое стекло и бирюза во всех окнах, меню и полях. Заменяет тему Windows.</comment></data>
+  <data name="SF600EDB4DB611BC7" xml:space="preserve"><value>किनारे के टुकड़े</value><comment>Осколки по краю</comment></data>
+  <data name="SBE8B5FD6FFD8BBCA" xml:space="preserve"><value>पैनल के चारों ओर पत्थर की पतली किनारी। हिलाने पर थोड़ी खुलती है।</value><comment>Тонкая каменная кромка вокруг панели. При движении она слегка раскрывается.</comment></data>
+  <data name="S72E67FB326D967A8" xml:space="preserve"><value>सामान्य</value><comment>Общие</comment></data>
+  <data name="S9521194DF6637753" xml:space="preserve"><value>विंडो</value><comment>Окно</comment></data>
+  <data name="S4A767F2AA26A9A0D" xml:space="preserve"><value>प्रभाव</value><comment>Эффекты</comment></data>
+  <data name="S9903B13E9593C5CA" xml:space="preserve"><value>सेटिंग बंद करें (Esc)</value><comment>Закрыть настройки (Esc)</comment></data>
+  <data name="S20BCB2527595C5E1" xml:space="preserve"><value>पूरा टेक्स्ट देखने के लिए प्रविष्टि पर पॉइंटर रोकें।</value><comment>Наведите мышь на запись, и текст откроется целиком.</comment></data>
+  <data name="S9F318A3518378441" xml:space="preserve"><value>चित्र बड़ा करने के लिए उस पर पॉइंटर रोकें।</value><comment>Наведите мышь на картинку, и она увеличится.</comment></data>
+  <data name="SA898B3F151B652B9" xml:space="preserve"><value>पेंसिल बटन की जगह।</value><comment>Вместо кнопки с карандашом.</comment></data>
+  <data name="S9A40A2D431C7627E" xml:space="preserve"><value>पॉइंटर हटने पर पैनल अपने आप बंद हो जाता है।</value><comment>Панель закроется сама, когда мышь уйдёт с неё.</comment></data>
+  <data name="SF4E985D39510C047" xml:space="preserve"><value>पैनल के नीचे शॉर्टकट की पंक्ति।</value><comment>Строка с сочетаниями клавиш внизу панели.</comment></data>
+  <data name="SDC13524FAC38464E" xml:space="preserve"><value>पैनल खुलते और बंद होते समय सहज चलता है।</value><comment>Плавное появление и исчезновение панели.</comment></data>
+  <data name="S98A59F474450F99C" xml:space="preserve"><value>पेस्ट और कॉपी करते समय टेक्स्ट बदलता है। सहेजी गई प्रविष्टि वैसी ही रहती है।</value><comment>Меняет текст при вставке и копировании. Сама запись остаётся прежней.</comment></data>
+  <data name="S731F34E25885ECCC" xml:space="preserve"><value>हलचल</value><comment>Движение</comment></data>
+  <data name="S3F70F0AD6764EF96" xml:space="preserve"><value>इतिहास साफ़ करें</value><comment>Очистить историю</comment></data>
+  <data name="S4EDE614E24611507" xml:space="preserve"><value>पिन किए गए आइटम सूची में दिखाएँ</value><comment>Закреплённые списком</comment></data>
 </root>

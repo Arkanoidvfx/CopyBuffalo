@@ -167,12 +167,119 @@ static class Motion
         To(element, FrameworkElement.HeightProperty, 0, ms, Out, from: element.ActualHeight, done: Finish);
     }
 
-    /// <summary>Открытие меню: прозрачность и сдвиг 8 px от якоря. fromY &lt; 0 — меню под якорем, &gt; 0 — над ним.</summary>
+    static readonly IEasingFunction Unfold = Frozen(new CubicBezierEase(0.16, 1, 0.3, 1));
+    const int MenuOpenMs = 230, MenuItemMs = 190, MenuStaggerMs = 16, MenuCloseMs = 130;
+
+    /// <summary>
+    /// Меню разворачивается от своего якоря, строки догоняют друг друга; закрытие — снимок меню тает и подтягивается к якорю:
+    /// само меню WPF прячет сразу, и пункт срабатывает без ожидания анимации. fromY &lt; 0 — меню под якорем, &gt; 0 — над ним.
+    /// Снимок снят с того, что на экране в этот миг: закрыть можно и посреди открытия, без скачка.
+    /// </summary>
     public static void AnimateOpen(ContextMenu menu, double fromY)
     {
+        System.Windows.Interop.HwndSource? popup = null;
+        bool above = fromY > 0;
+        IntPtr Hook(IntPtr hwnd, int msg, IntPtr w, IntPtr l, ref bool handled)
+        {
+            // WM_WINDOWPOSCHANGING с SWP_HIDEWINDOW: окно меню ещё на экране. Closed приходит, когда его уже нет, и меню мигало бы на кадр.
+            if (msg == 0x46 && (System.Runtime.InteropServices.Marshal.ReadInt32(l, IntPtr.Size * 2 + 16) & 0x80) != 0 && Enabled
+                && Native.GetWindowRect(hwnd, out var place) && Picture(menu) is { } last) FadeAway(hwnd, last, place, above ? 5 : -5);
+            return IntPtr.Zero;
+        }
+        void Hide() => menu.Opacity = Enabled ? 0 : 1; // до начала анимации меню успевает показать кадр целиком
+        Hide();
+        menu.Closed += (_, _) => { popup?.RemoveHook(Hook); popup = null; Hide(); };
         menu.Opened += (_, _) =>
         {
-            if (menu.Template?.FindName("MenuRoot", menu) is FrameworkElement root) Enter(root, 0, fromY);
+            menu.Opacity = 1;
+            popup = PresentationSource.FromVisual(menu) as System.Windows.Interop.HwndSource;
+            popup?.AddHook(Hook);
+            if (menu.Template?.FindName("MenuRoot", menu) is not FrameworkElement root) return;
+            var place = Place(menu);
+            if (fromY == 0 && Native.GetCursorPos(out var cursor)) above = cursor.Y > (place.Top + place.Bottom) / 2; // по месту мыши: меню могло открыться вверх
+            if (!Enabled) return;
+            double seen = ReplaceGhost(place); // прежнее меню ещё тает на этом месте: продолжаем с его яркости, а не с нуля
+            // База каждого свойства — начало движения: до первого такта анимации видно её, и снимок меню, закрытого сразу, был бы готовым меню.
+            To(root, UIElement.OpacityProperty, 1, 120, from: seen);
+            root.Opacity = seen;
+            if (seen > 0) return;
+            var scale = new ScaleTransform(0.965, 0.82);
+            var shift = new TranslateTransform(0, above ? 8 : -8);
+            root.RenderTransformOrigin = new Point(0.5, above ? 1 : 0);
+            root.RenderTransform = new TransformGroup { Children = { scale, shift } };
+            To(scale, ScaleTransform.ScaleYProperty, 1, MenuOpenMs, Unfold, from: 0.82);
+            To(scale, ScaleTransform.ScaleXProperty, 1, MenuOpenMs, Unfold, from: 0.965);
+            To(shift, TranslateTransform.YProperty, 0, MenuOpenMs, Unfold, from: above ? 8 : -8);
+            var rows = menu.Items.OfType<FrameworkElement>().ToList();
+            for (int i = 0; i < rows.Count; i++)
+            {
+                int order = Math.Min(above ? rows.Count - 1 - i : i, 9);
+                var row = Shift(rows[i]);
+                To(rows[i], UIElement.OpacityProperty, rows[i].IsEnabled ? 1 : 0.6, MenuItemMs, from: 0, delayMs: order * MenuStaggerMs);
+                rows[i].Opacity = 0; // до своей очереди строки не видно
+                To(row, TranslateTransform.YProperty, 0, MenuItemMs + 40, Unfold, from: above ? 10 : -10, delayMs: order * MenuStaggerMs);
+                row.Y = above ? 10 : -10;
+            }
         };
+    }
+
+    static Native.RECT Place(FrameworkElement element)
+    {
+        var corner = element.PointToScreen(default);
+        var dpi = VisualTreeHelper.GetDpi(element);
+        return new Native.RECT { Left = (int)corner.X, Top = (int)corner.Y, Right = (int)(corner.X + element.ActualWidth * dpi.DpiScaleX), Bottom = (int)(corner.Y + element.ActualHeight * dpi.DpiScaleY) };
+    }
+
+    static System.Windows.Media.Imaging.BitmapSource? Picture(FrameworkElement element)
+    {
+        if (element.ActualWidth < 1 || element.ActualHeight < 1) return null;
+        var dpi = VisualTreeHelper.GetDpi(element);
+        var picture = new System.Windows.Media.Imaging.RenderTargetBitmap((int)(element.ActualWidth * dpi.DpiScaleX), (int)(element.ActualHeight * dpi.DpiScaleY), 96 * dpi.DpiScaleX, 96 * dpi.DpiScaleY, PixelFormats.Pbgra32);
+        picture.Render(element);
+        picture.Freeze();
+        return picture;
+    }
+
+    /// <summary>Тающий снимок закрытого меню; одновременно он один.</summary>
+    sealed class Ghost
+    {
+        public required IntPtr Hwnd;
+        public required Native.RECT Place;
+        public double Alpha = 1;
+        public int FramesLeft = int.MaxValue;
+    }
+    static Ghost? _ghost;
+
+    /// <summary>Яркость снимка, который тает на том же месте, или 0. Снимок уходит, когда новое меню уже нарисовано.</summary>
+    static double ReplaceGhost(Native.RECT place)
+    {
+        if (_ghost is not { } ghost) return 0;
+        ghost.FramesLeft = 2;
+        return Math.Abs(ghost.Place.Left - place.Left) < 4 && Math.Abs(ghost.Place.Top - place.Top) < 4 ? ghost.Alpha : 0;
+    }
+
+    /// <summary>Снимок picture встаёт под окно under (оно прячется следом) и тает.</summary>
+    static void FadeAway(IntPtr under, System.Windows.Media.Imaging.BitmapSource picture, Native.RECT place, double drift)
+    {
+        place.Right = place.Left + picture.PixelWidth;
+        place.Bottom = place.Top + picture.PixelHeight;
+        var hwnd = Native.ShowPicture(place, picture, under);
+        if (hwnd == IntPtr.Zero) return;
+        Native.DwmFlush(); // снимок уже на экране, прежде чем окно спрячется: иначе между ними бывал пустой кадр
+        if (_ghost != null) _ghost.FramesLeft = 0;
+        var ghost = _ghost = new Ghost { Hwnd = hwnd, Place = place };
+        var clock = System.Diagnostics.Stopwatch.StartNew();
+        void Frame(object? sender, EventArgs e)
+        {
+            double t = Math.Min(1, clock.Elapsed.TotalMilliseconds / MenuCloseMs), gone = t * t * (3 - 2 * t);
+            int dy = (int)Math.Round(drift * gone);
+            var at = new Native.RECT { Left = place.Left, Right = place.Right, Top = place.Top + dy, Bottom = place.Bottom + dy };
+            ghost.Alpha = 1 - gone;
+            if (t < 1 && ghost.FramesLeft-- > 0) { Native.UpdateLayered(hwnd, at, picture, 0, 0, (byte)(255 * ghost.Alpha)); return; }
+            CompositionTarget.Rendering -= Frame;
+            Native.DestroyWindow(hwnd);
+            if (_ghost == ghost) _ghost = null;
+        }
+        CompositionTarget.Rendering += Frame;
     }
 }

@@ -12,11 +12,15 @@ internal sealed partial class HistoryMapWindow
     double XScaleAt(double value) => value * (1 - .35 * Math.Clamp((.55 - value) / .1, 0, 1));
     double XScale => XScaleAt(scale);
     Point Screen(Point p) => new(p.X * XScale + offset.X, p.Y * scale + offset.Y);
-    int CompactRows(double height) => Math.Clamp((int)((canvas.ActualHeight - 80) / (height + 14)), 4, 6);
+    int CompactRows(double height) => Math.Clamp((int)((canvas.ActualHeight - 16) / (height + 14)), 2, 6);
     Rect ScreenRect(MapNode n)
     {
-        if (scale >= .55) return new Rect(Screen(n.Position), new Size(280 * scale, 140 * scale));
         var center = Screen(new Point(n.Position.X + 140, n.Position.Y + 70));
+        if (scale >= .55)
+        {
+            double w = Math.Min(340 * scale - 12, Math.Max(228, 280 * scale)), h = Math.Max(116, 140 * scale);
+            return new Rect(center.X - w / 2, center.Y - h / 2, w, h);
+        }
         double blend = Math.Clamp((.55 - scale) / .1, 0, 1);
         double width = 280 * scale + (200 - 280 * scale) * blend, height = 140 * scale + (90 - 140 * scale) * blend;
         int rows = CompactRows(height);
@@ -31,7 +35,7 @@ internal sealed partial class HistoryMapWindow
         var n = nodes.FirstOrDefault(n => n.Entry.Id == id); if (n == null) { Draw(); return; }
         scale = 1;
         offset = new Point(Center.X - (n.Position.X + 140) * scale, Center.Y - (n.Position.Y + 70) * scale); Draw();
-        Motion.To(canvas, OpacityProperty, 1, Motion.Normal, from: .75);
+        if (!timelineMode) Motion.To(canvas, OpacityProperty, 1, Motion.Normal, from: .75);
     }
     void Fit()
     {
@@ -44,7 +48,7 @@ internal sealed partial class HistoryMapWindow
             foreach (var node in nodes) bounds.Union(ScreenRect(node));
             return bounds;
         }
-        bool Fits(Rect bounds) => bounds.Width <= Math.Max(1, canvas.ActualWidth - 64) && bounds.Height <= Math.Max(1, canvas.ActualHeight - 64);
+        bool Fits(Rect bounds) => bounds.Width <= Math.Max(1, canvas.ActualWidth - 32) && bounds.Height <= Math.Max(1, canvas.ActualHeight - 32);
         double low = .25, high = 1;
         if (!Fits(Measure(low)))
         {
@@ -103,6 +107,23 @@ internal sealed partial class HistoryMapWindow
         int thumbnailFrame = BeginMapFrame();
         summaryCards.Clear();
         canvas.Children.Clear();
+        selectedIndex = Array.FindIndex(nodes, n => n.Entry.Id == selected);
+        pinnedEntry = selectedIndex < 0 ? null : nodes[selectedIndex].Entry;
+        TimelineLayout();
+        if (timelineMode) SyncTimeline();
+        reader.Visibility = !overview && nodes.Length > 0 ? Visibility.Visible : Visibility.Collapsed;
+        Panel actions = reader.Visibility == Visibility.Visible ? readerActions : header;
+        copy.Visibility = nodes.Length == 0 ? Visibility.Collapsed : Visibility.Visible;
+        if (!ReferenceEquals(copy.Parent, actions))
+        {
+            ((Panel)copy.Parent).Children.Remove(copy);
+            actions.Children.Add(copy);
+        }
+        ShowReading(overview ? null : pinnedEntry);
+        int position = selectedIndex < 0 ? 0 : timelineMode ? nodes.Length - selectedIndex : selectedIndex + 1;
+        previousEntry.IsEnabled = !overview && position > 1;
+        nextEntry.IsEnabled = !overview && position > 0 && position < nodes.Length;
+        positionLabel.Text = overview || position == 0 ? UiText.F($"Записей: {nodes.Length}") : $"{position} / {nodes.Length}";
         zoomLabel.Text = overview ? T("Обзор") : (scale * 100).ToString("0'%'", Culture);
         canvas.Cursor = overview ? Cursors.Arrow : Cursors.SizeAll;
         zoomOut.IsEnabled = !groupPending && nodes.Length > 0 && (overview ? groupHistory.Count > 0 : scale > .25);
@@ -113,10 +134,27 @@ internal sealed partial class HistoryMapWindow
         dayOverview.BorderBrush = Brush(overview ? "Accent" : "ControlStroke");
         if (nodes.Length == 0)
         {
-            var empty = Label("Нет совпадений. Измените даты или очистите поиск.", 16); empty.Width = Math.Max(120, canvas.ActualWidth - 48); empty.TextWrapping = TextWrapping.Wrap;
-            Canvas.SetLeft(empty, 24); Canvas.SetTop(empty, 32); canvas.Children.Add(empty); return;
+            var stack = new StackPanel { VerticalAlignment = VerticalAlignment.Center, HorizontalAlignment = HorizontalAlignment.Center };
+            bool filtered = clearFilters.Visibility == Visibility.Visible;
+            stack.Children.Add(new TextBlock { Text = filtered ? "\uE721" : "\uE77F", FontFamily = (FontFamily)FindResource("IconFont"), FontSize = 28, TextAlignment = TextAlignment.Center, Foreground = Brush("TextSecondary") });
+            var title = Label(filtered ? "Ничего не найдено" : invalid.Count > 0 ? "Обновите карту для просмотра изменений" : "История пуста", 22);
+            title.FontWeight = FontWeights.SemiBold; title.TextAlignment = TextAlignment.Center; title.Margin = new Thickness(0, 10, 0, 6); stack.Children.Add(title);
+            if (filtered)
+            {
+                if (clearFilters.Parent is Panel parent) parent.Children.Remove(clearFilters);
+                stack.Children.Add(clearFilters);
+            }
+            else if (invalid.Count == 0) stack.Children.Add(Label("Скопируйте текст или изображение, чтобы увидеть его здесь.", 14));
+            var empty = new Grid(); empty.Children.Add(stack);
+            Place(empty, new Point(), Math.Max(1, canvas.ActualWidth), Math.Max(1, canvas.ActualHeight)); return;
+        }
+        if (clearFilters.Parent != header)
+        {
+            if (clearFilters.Parent is Panel parent) parent.Children.Remove(clearFilters);
+            header.Children.Insert(header.Children.IndexOf(filtersToggle) + 1, clearFilters);
         }
         var visible = new Rect(0, 0, Math.Max(1, canvas.ActualWidth), Math.Max(1, canvas.ActualHeight));
+        if (timelineMode) return;
         if (overview) { DrawGroups(visible); return; }
 
         // Lines indicate time order, not inferred relationships.
@@ -137,26 +175,33 @@ internal sealed partial class HistoryMapWindow
         {
             var rect = ScreenRect(node); if (!visible.IntersectsWith(rect)) continue;
             bool compact = scale < .55;
-            double padding = compact ? 4 : Math.Max(8, 16 * scale), font = compact ? 12 : Math.Clamp(16 * scale, 12, 20), line = Math.Ceiling(font * 1.3);
+            double padding = compact ? 4 : Math.Max(7, 12 * scale), font = compact ? 13 : Math.Clamp(17 * scale, 14, 20), line = Math.Ceiling(font * 1.3);
             bool showImage = node.Entry.Kind == "image" && node.Entry.Hash != null && !node.Entry.Sensitive && rect.Width >= 150 && rect.Height >= 70;
-            double imageSize = showImage ? Math.Min(82, rect.Height - padding * 2 - 2) : 0;
-            var stack = new StackPanel { Width = Math.Max(1, rect.Width - padding * 2 - 2 - (showImage ? imageSize + 10 : 0)), Height = Math.Max(1, rect.Height - padding * 2 - 2) };
-            stack.Children.Add(new TextBlock { Text = node.Entry.Date(First).ToString(compact ? "d MMM" : "d MMM · HH:mm", Culture), FontSize = Math.Clamp(12 * scale, 10, 15), Opacity = .78, Margin = new Thickness(0, 0, 0, compact ? 0 : Math.Max(6, 10 * scale)), TextTrimming = TextTrimming.CharacterEllipsis });
+            var stack = new StackPanel { Width = Math.Max(1, rect.Width - padding * 2 - 2), Height = Math.Max(1, rect.Height - padding * 2 - 2) };
+            var stamp = node.Entry.Date(First).ToString(compact ? "d MMM" : "d MMM · HH:mm", Culture);
+            stack.Children.Add(new TextBlock { Text = stamp, FontSize = Math.Clamp(12 * scale, 10, 15), Foreground = Brush("TextSecondary"), Margin = new Thickness(0, 0, 0, compact ? 0 : Math.Max(6, 10 * scale)), TextTrimming = TextTrimming.CharacterEllipsis });
             stack.Children.Add(new TextBlock { Text = node.Entry.Preview, FontFamily = (FontFamily)FindResource(node.Entry.Mono ? "MonoFont" : "TextFont"), FontSize = font, FontWeight = node.Entry.Id == selected ? FontWeights.SemiBold : FontWeights.Normal, TextWrapping = TextWrapping.Wrap, TextTrimming = TextTrimming.CharacterEllipsis, LineHeight = line, LineStackingStrategy = LineStackingStrategy.BlockLineHeight, MaxHeight = line * (compact ? (rect.Height >= 80 ? 3 : 1) : scale >= .9 ? 3 : 2) });
             Image? thumbnail = null;
             object content = stack;
             if (showImage)
             {
-                thumbnail = new Image { Width = imageSize, Height = imageSize, Stretch = Stretch.Uniform, ClipToBounds = true, Margin = new Thickness(0, 0, 10, 0) };
-                var card = new DockPanel(); DockPanel.SetDock(thumbnail, Dock.Left); card.Children.Add(thumbnail); card.Children.Add(stack); content = card;
+                var card = new DockPanel { Width = stack.Width, Height = stack.Height };
+                var caption = new TextBlock { Text = stamp + "  ·  " + (string.IsNullOrWhiteSpace(node.Entry.Source) ? T("Изображение") : node.Entry.Source), FontSize = 12, Foreground = Brush("TextSecondary"), TextTrimming = TextTrimming.CharacterEllipsis };
+                DockPanel.SetDock(caption, Dock.Top); card.Children.Add(caption);
+                thumbnail = new Image { Stretch = Stretch.Uniform, Margin = new Thickness(0, 4, 0, 0) };
+                card.Children.Add(thumbnail); content = card;
             }
             var button = new Button { Tag = node.Entry.Id, Content = content, Style = (Style)FindResource("StandardButton"), Padding = new Thickness(padding), HorizontalContentAlignment = HorizontalAlignment.Stretch, Background = Brush("WindowSurface"), Foreground = Brush("TextPrimary"), BorderBrush = Brush(node.Entry.Id == selected ? "Accent" : "ControlStroke"), BorderThickness = new Thickness(node.Entry.Id == selected ? 2 : 1), Focusable = true };
-            button.ToolTip = new TextBlock { Text = SourceLabel(node.Entry.Source) + "\n" + node.Entry.Preview, MaxWidth = 340, TextWrapping = TextWrapping.Wrap };
+            if (!compact && scale >= .9 && !string.IsNullOrWhiteSpace(node.Entry.Source))
+                stack.Children.Add(new TextBlock { Text = node.Entry.Source, FontSize = 12, Foreground = Brush("TextSecondary"), TextTrimming = TextTrimming.CharacterEllipsis, Margin = new Thickness(0, 4, 0, 0) });
+            button.MouseEnter += (_, _) => ShowReading(node.Entry);
+            button.GotKeyboardFocus += (_, _) => ShowReading(node.Entry);
+            button.LostKeyboardFocus += (_, _) => ShowReading(pinnedEntry);
             button.Cursor = Cursors.Hand;
             AutomationProperties.SetName(button, node.Entry.Date(First).ToString("g", Culture) + " · " + SourceLabel(node.Entry.Source) + " · " + node.Entry.Preview);
             button.Click += (_, _) => Select(node.Entry.Id); button.MouseDoubleClick += (_, _) => CenterOn(node.Entry.Id);
             Place(button, rect.TopLeft, rect.Width, rect.Height);
-            if (thumbnail != null) RequestMapThumbnail(thumbnail, node.Entry, thumbnailFrame);
+            if (thumbnail != null) _ = RequestMapThumbnail(thumbnail, node.Entry, thumbnailFrame);
         }
     }
     void Place(FrameworkElement element, Point at, double width, double height) { element.Width = Math.Max(0, width); element.Height = Math.Max(0, height); Canvas.SetLeft(element, at.X); Canvas.SetTop(element, at.Y); canvas.Children.Add(element); }

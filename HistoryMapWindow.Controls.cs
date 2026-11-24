@@ -71,6 +71,7 @@ internal sealed partial class HistoryMapWindow
             var day = start.AddDays(i); counts.TryGetValue(day, out int total);
             var cell = new Button { Content = day.Day.ToString(), Style = (Style)FindResource("StandardButton"), Focusable = true, Padding = new Thickness(0), MinWidth = 24, Height = 28, Margin = new Thickness(1), Opacity = day.Month == month.Month ? 1 : .45, FontWeight = total > 0 ? FontWeights.Bold : FontWeights.Normal };
             cell.ToolTip = day.ToString("D", culture) + " · " + UiText.F($"Записей: {total}"); AutomationProperties.SetName(cell, (string)cell.ToolTip);
+            ToolTipService.SetInitialShowDelay(cell, 0);
             if (calendar.SelectedDates.Contains(day)) { cell.Background = Brush("Accent"); cell.Foreground = Brush("TextOnAccent"); }
             else if (total > 0) { cell.BorderBrush = Brush("Accent"); cell.BorderThickness = new Thickness(0, 0, 0, 2); }
             cell.Click += (_, _) => { var anchor = Keyboard.Modifiers.HasFlag(ModifierKeys.Shift) && calendar.SelectedDates.Count > 0 ? calendar.SelectedDates[0] : day; calendar.SelectedDates.Clear(); calendar.SelectedDates.AddRange(anchor < day ? anchor : day, anchor > day ? anchor : day); };

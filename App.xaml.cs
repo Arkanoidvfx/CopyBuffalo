@@ -145,6 +145,7 @@ public partial class App : Application
             Shutdown(1);
         };
 
+        using (var skinKey = Registry.CurrentUser.OpenSubKey(SettingsKey)) Skin.On = skinKey?.GetValue("Skin") is int skin && skin != 0;
         ApplyTheme();
         SystemEvents.UserPreferenceChanged += (_, _) => Dispatcher.BeginInvoke(() =>
         {
@@ -163,6 +164,7 @@ public partial class App : Application
 
         Paster.CleanGifTemp(_storage.TempDays);
         _watcher = new ClipboardWatcher(_store);
+        AppIcons.Folder = Path.Combine(DataDir, "icons");
         _panel = new PanelWindow(_store, new SymbolCatalog(Path.Combine(DataDir, "symbols.json")));
         _panel.Storage = _storage;
         _panel.LanguageChanged += language =>
@@ -207,6 +209,7 @@ public partial class App : Application
         _panel.SeriesPasteAllRequested += items => { if (items.Count > 0) OnPasteRequested(items[0], false, items); };
         _panel.TypeRequested += OnTypeRequested;
         _panel.CompressRequested += OnCompressRequested;
+        _panel.GrammarRequested += OnGrammarRequested;
         _panel.TranslateTextRequested += OnTranslateTextRequested;
         _panel.ArchiveRequested += OnArchiveRequested;
         _panel.ExtractAudioRequested += OnExtractAudioRequested;
@@ -216,6 +219,8 @@ public partial class App : Application
         {
             // Своя настройка, а не системные «Эффекты анимации»: у многих они выключены ради скорости, а анимацию панели просили отдельно.
             _panel.Animations = key?.GetValue("Animations") is not int a || a != 0;
+            _store.KeepOrder = _panel.KeepOrder = key?.GetValue("KeepOrder") is not int keepOrder || keepOrder != 0;
+            _panel.SymbolsByUse = key?.GetValue("SymbolsByUse") is not int byUse || byUse != 0;
             _panel.ShowKeyHints = key?.GetValue("KeyHints") is not int hints || hints != 0;
             _panel.SetPanelTransparency(key?.GetValue("PanelBackgroundTransparency") is int background ? background : 0,
                 key?.GetValue("PanelTextTransparency") is int text ? text : 0,
@@ -223,8 +228,11 @@ public partial class App : Application
             _panel.InlineEditOnHold = key?.GetValue("InlineEditOnHold") is int hold && hold != 0;
             _panel.PinnedAsList = key?.GetValue("PinnedView") is int view && view == 1;
             _panel.VfxEnabled = key?.GetValue("VfxEnabled") is not int vfx || vfx != 0;
+            _panel.FrameReaction = key?.GetValue("FrameReaction") is not int reaction || reaction != 0;
+            _panel.SkinEnabled = Skin.On;
+            _panel.ShardsEnabled = key?.GetValue("VfxShards") is int shards && shards != 0;
             _panel.VfxOpacity = key?.GetValue("VfxOpacity") is int vfxOpacity ? vfxOpacity : 20;
-            _panel.VfxSpeed = key?.GetValue("VfxSpeed") is int vfxSpeed ? vfxSpeed : 100;
+            _panel.VfxSpeed = key?.GetValue("VfxSpeed") is int vfxSpeed ? vfxSpeed : 70;
             _panel.TextPeekEnabled = key?.GetValue("TextPeek") is not int peek || peek != 0;
             _panel.TextPeekDelayMs = key?.GetValue("TextPeekDelayMs") is int peekDelay ? peekDelay : 600;
             _panel.TextPeekWidth = key?.GetValue("TextPeekWidth") is int peekWidth ? peekWidth : 380;
@@ -273,6 +281,17 @@ public partial class App : Application
             using var key = Registry.CurrentUser.CreateSubKey(SettingsKey);
             key.SetValue("Animations", on ? 1 : 0, RegistryValueKind.DWord);
         };
+        _panel.KeepOrderChanged += on =>
+        {
+            _store.KeepOrder = on;
+            using var key = Registry.CurrentUser.CreateSubKey(SettingsKey);
+            key.SetValue("KeepOrder", on ? 1 : 0, RegistryValueKind.DWord);
+        };
+        _panel.SymbolsByUseChanged += on =>
+        {
+            using var key = Registry.CurrentUser.CreateSubKey(SettingsKey);
+            key.SetValue("SymbolsByUse", on ? 1 : 0, RegistryValueKind.DWord);
+        };
         _panel.KeyHintsChanged += on =>
         {
             using var key = Registry.CurrentUser.CreateSubKey(SettingsKey);
@@ -289,6 +308,19 @@ public partial class App : Application
         {
             using var key = Registry.CurrentUser.CreateSubKey(SettingsKey);
             key.SetValue("InlineEditOnHold", on ? 1 : 0, RegistryValueKind.DWord);
+        };
+        _panel.SkinChanged += on =>
+        {
+            Skin.On = on;
+            ApplyTheme();
+            using var key = Registry.CurrentUser.CreateSubKey(SettingsKey);
+            key.SetValue("Skin", on ? 1 : 0, RegistryValueKind.DWord);
+        };
+        _panel.VfxExtrasChanged += (reaction, shards) =>
+        {
+            using var key = Registry.CurrentUser.CreateSubKey(SettingsKey);
+            key.SetValue("FrameReaction", reaction ? 1 : 0, RegistryValueKind.DWord);
+            key.SetValue("VfxShards", shards ? 1 : 0, RegistryValueKind.DWord);
         };
         _panel.VfxChanged += (on, opacity, speed) =>
         {
@@ -756,7 +788,8 @@ public partial class App : Application
         item.Compressing = true;
         try
         {
-            var compressed = await _compressor.CompressAsync(item.Text);
+            string text = item.Text;
+            var compressed = await Task.Run(() => _compressor.CompressAsync(text)); // запуск llama-server — не в потоке панели
             if (compressed.Length == 0 || compressed.Length >= item.Text.Length)
             {
                 Notify(InfoKind.Info, UiText.T("Промпт уже компактный."), UiText.T("Короче не получилось."));
@@ -781,6 +814,42 @@ public partial class App : Application
         {
             Log(ex);
             Notify(InfoKind.Critical, UiText.T("Не удалось сжать промпт."), UiText.F($"Подробности: {Path.Combine(DataDir, "error.log")}"), 5000);
+        }
+        finally { item.Compressing = false; }
+    }
+
+    async void OnGrammarRequested(ClipItem item)
+    {
+        if (item.IsFolder || item.Compressing) return;
+        item.Compressing = true; // одна операция модели на запись: бегущая полоса на карточке
+        try
+        {
+            string text = item.Text;
+            var fixedText = await Task.Run(() => _compressor.FixGrammarAsync(text, CancellationToken.None));
+            if (fixedText == text.Trim().ReplaceLineEndings("\r\n"))
+            {
+                Notify(InfoKind.Info, UiText.T("Ошибок не найдено."), UiText.T("Текст не изменился."));
+                return;
+            }
+            _store.Add(fixedText, null, null, DateTime.UtcNow, sensitive: item.IsSensitive);
+            try { Paster.CopyText(fixedText, sensitive: item.IsSensitive); }
+            catch (System.Runtime.InteropServices.ExternalException ex)
+            {
+                Log(ex);
+                Notify(InfoKind.Caution, UiText.T("Исправленный текст в истории,"), UiText.T("но буфер обмена занят."));
+                return;
+            }
+            Notify(InfoKind.Success, UiText.T("Грамматика исправлена."), UiText.T("Исправленный текст в истории и в буфере обмена."));
+        }
+        catch (PromptCompressor.Failure ex)
+        {
+            Log(ex);
+            Notify(InfoKind.Critical, UiText.T("Не удалось исправить текст."), ex.Message, 5000);
+        }
+        catch (Exception ex)
+        {
+            Log(ex);
+            Notify(InfoKind.Critical, UiText.T("Не удалось исправить текст."), UiText.F($"Подробности: {Path.Combine(DataDir, "error.log")}"), 5000);
         }
         finally { item.Compressing = false; }
     }
@@ -871,7 +940,7 @@ public partial class App : Application
         menu.Items.Add(_autostartItem);
         menu.Items.Add(PanelWindow.Entry(UiText.T("Настройки"), "\uE713", () => { OpenFromTray(); _panel.OpenSettings(); }));
         menu.Items.Add(new Separator());
-        menu.Items.Add(PanelWindow.Entry(UiText.T("Очистить историю…"), "\uE74D", () => { OpenFromTray(); _panel.AskClear(); }));
+        menu.Items.Add(PanelWindow.Entry(UiText.T("Очистить историю…"), "\uE74D", () => { OpenFromTray(); Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Input, _panel.AskClear); }));
         menu.Items.Add(PanelWindow.Entry(UiText.T("Перезапустить"), "\uE72C", Restart));
         menu.Items.Add(PanelWindow.Entry(UiText.T("Выход"), "\uE7E8", Shutdown));
         Motion.AnimateOpen(menu, 8); // меню трея открывается над значком — выезжает вверх
@@ -979,7 +1048,7 @@ public partial class App : Application
     internal void ApplyTheme(bool? dark = null)
     {
         using var key = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Themes\Personalize");
-        IsDarkTheme = dark ?? (key?.GetValue("AppsUseLightTheme") is not int v || v == 0);
+        IsDarkTheme = Skin.On || (dark ?? (key?.GetValue("AppsUseLightTheme") is not int v || v == 0));
 
         var accent = ReadAccent();
         // Как в Win11: в тёмной теме акцент светлее, в светлой — темнее.
@@ -1021,11 +1090,17 @@ public partial class App : Application
             Resources[name] = Frozen(Color.FromArgb((byte)(argb >> 24), (byte)(argb >> 16), (byte)(argb >> 8), (byte)argb));
         Resources["Accent"] = Frozen(accent);
         Resources["AccentRing"] = Frozen(Color.FromArgb(0x99, accent.R, accent.G, accent.B)); // обводка выбранной записи
+        Resources["FieldFill"] = Resources["ControlFill"];
+        Resources["FieldFillHover"] = Resources["ControlFillHover"];
+        if (Skin.On) Skin.Obsidian(Resources);
+        else Skin.Plain(Resources);
+        Resources["KeyCapBase"] = Frozen(Skin.ColorOf(Resources["WindowSurface"]));
         Resources["PanelEntryText"] = Resources["TextPrimary"];
         Resources["PanelCardFill"] = Resources["CardFill"];
         Resources["PanelCardHover"] = Resources["CardHover"];
         Resources["PanelCardSubtleHover"] = Resources["SubtleHover"];
         _panel?.RefreshPanelTransparency();
+        _panel?.RefreshSkin();
     }
 
     static Color ReadAccent()

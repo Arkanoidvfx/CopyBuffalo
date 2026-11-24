@@ -336,10 +336,6 @@
     <value>箭頭</value>
     <comment>Стрелки</comment>
   </data>
-  <data name="S2734E4685D892F22" xml:space="preserve">
-    <value>更多：暫停記錄、設定、清除歷史記錄</value>
-    <comment>Ещё: пауза записи, настройки, очистка истории</comment>
-  </data>
   <data name="S27410FC78B03DDB6" xml:space="preserve">
     <value>效果速度，百分比</value>
     <comment>Скорость эффекта, процентов</comment>
@@ -472,10 +468,6 @@
     <value>請檢查相似字元同行序。</value>
     <comment>Проверьте похожие буквы и порядок строк.</comment>
   </data>
-  <data name="S36BA2804E029771D" xml:space="preserve">
-    <value>更多：暫停、設定、清除（按 F6 聚焦按鈕）</value>
-    <comment>Ещё: пауза, настройки, очистка (F6 — фокус на кнопки)</comment>
-  </data>
   <data name="S380FA2FBAAA6699B" xml:space="preserve">
     <value>由歷史記錄攞</value>
     <comment>Взять из истории</comment>
@@ -511,6 +503,14 @@
   <data name="S3B9CF4A79A869535" xml:space="preserve">
     <value>Unity Shader Graph 節點</value>
     <comment>Ноды Unity Shader Graph</comment>
+  </data>
+  <data name="S4127F4E9FCA5D849" xml:space="preserve">
+    <value>搵唔到錯誤。</value>
+    <comment>Ошибок не найдено.</comment>
+  </data>
+  <data name="S54D648114CA838CC" xml:space="preserve">
+    <value>儲存咗到歷史記錄，亦複製咗到剪貼簿。</value>
+    <comment>Исправленный текст в истории и в буфере обмена.</comment>
   </data>
   <data name="S55435886F76E0E6A" xml:space="preserve">
     <value>合併文字 — CopyBuffalo</value>
@@ -680,9 +680,9 @@
     <value>用 ZIP 傳送</value>
     <comment>Отправить архивом .zip</comment>
   </data>
-  <data name="S4E6171ACEE4847BD" xml:space="preserve">
-    <value>按符號、代碼（2014）或者類別（貨幣）搜尋。</value>
-    <comment>Ищите по символу, коду (2014) или группе («валют»).</comment>
+  <data name="S014E31D7DE87112C" xml:space="preserve">
+    <value>按符號、字母（c → ć, č）、代碼（2014）或者類別（貨幣）搜尋。</value>
+    <comment>Ищите по символу, букве (c → ć, č), коду (2014) или группе («валют»).</comment>
   </data>
   <data name="S4EBEB45A877CDD5E" xml:space="preserve">
     <value>儲存設定</value>
@@ -820,6 +820,10 @@
     <value>分配嘅路徑已經唔啱呢個欄位。</value>
     <comment>Назначение пути больше не подходит к слоту.</comment>
   </data>
+  <data name="S604A9B47E0ED6409" xml:space="preserve">
+    <value>改好嘅文字已經喺歷史記錄度，</value>
+    <comment>Исправленный текст в истории,</comment>
+  </data>
   <data name="S6076E7DEACE54EA2" xml:space="preserve">
     <value>貼上下一個揀咗嘅檔案</value>
     <comment>Вставить следующий выбранный файл</comment>
@@ -876,6 +880,10 @@
     <value>藍色</value>
     <comment>Синий</comment>
   </data>
+  <data name="S6779AB711DA7CD3B" xml:space="preserve">
+    <value>改正文法</value>
+    <comment>Исправить грамматику</comment>
+  </data>
   <data name="S6791BBFBFE97992A" xml:space="preserve">
     <value>已經按卡片順序分配路徑。你可以改任何分配。</value>
     <comment>Пути назначены по порядку карточек. Любое назначение можно изменить.</comment>
@@ -895,6 +903,10 @@
   <data name="S6B07FBC6C23BDADF" xml:space="preserve">
     <value>圖片喺本機處理緊，你可以繼續做其他嘢。</value>
     <comment>Можно продолжать работу — изображение обрабатывается локально.</comment>
+  </data>
+  <data name="S6B0FAD9DCED3429D" xml:space="preserve">
+    <value>改正唔到文字。</value>
+    <comment>Не удалось исправить текст.</comment>
   </data>
   <data name="S6B38B68B028F998C" xml:space="preserve">
     <value>原始記錄會保留 · Ctrl+Enter 合併 · Esc 關閉</value>
@@ -2084,6 +2096,10 @@
     <value>所有記錄會分開按行合併。</value>
     <comment>Все записи объединяются отдельными строками.</comment>
   </data>
+  <data name="SEF6EBB28F0A025E8" xml:space="preserve">
+    <value>文法改好咗。</value>
+    <comment>Грамматика исправлена.</comment>
+  </data>
   <data name="SF00C388F0EB04339" xml:space="preserve">
     <value>復原失敗</value>
     <comment>Отмена не выполнена</comment>
@@ -2354,19 +2370,6 @@
 <data name="SC37EFE9530BDDE6E" xml:space="preserve"><value>返回總覽</value></data>
 <data name="S81DA2D58E42F3647" xml:space="preserve"><value>選擇群組查看項目</value></data>
 <data name="SCD45EC7836B5CB5E" xml:space="preserve"><value>清除篩選</value></data>
-<data name="S822F9FD9BA2D117E" xml:space="preserve"><value>手機</value></data>
-<data name="S53B97805C229AC7F" xml:space="preserve"><value>手機設定</value></data>
-<data name="S30145146CB667514" xml:space="preserve"><value>接收來自手機嘅文字</value></data>
-<data name="S17424EB150B417D3" xml:space="preserve"><value>即刻將收到嘅文字放入剪貼簿</value></data>
-<data name="S6DD75BD110D44A90" xml:space="preserve"><value>用 CopyBuffalo Phone 應用程式掃描 QR 碼，或者手動輸入地址、連接埠同代碼。手機同電腦要喺同一個網絡。</value></data>
-<data name="SDA82E80563D75A61" xml:space="preserve"><value>地址</value></data>
-<data name="S90947197F86BFDEA" xml:space="preserve"><value>連接埠</value></data>
-<data name="S1A0517BFD5DCF6AA" xml:space="preserve"><value>新代碼</value></data>
-<data name="SAACC3EFA772B86E4" xml:space="preserve"><value>接收緊 · 連接埠 {0}</value></data>
-<data name="S60420FE4F5B6189C" xml:space="preserve"><value>接收已關閉</value></data>
-<data name="SED0DB441ADE2DEC4" xml:space="preserve"><value>連接埠 {0} 俾人佔用咗：{1}</value></data>
-<data name="SABB504E01C9949B0" xml:space="preserve"><value>搵唔到網絡：請將電腦連接到區域網絡。</value></data>
-<data name="SB489324C4EC60F8F" xml:space="preserve"><value>第一次開啟時，Windows 會問防火牆權限，請為私人網絡允許。</value></data>
 <data name="S775FA80A5F1D8D8D" xml:space="preserve"><value>撳住項目嚟編輯</value></data>
 <data name="S9F8AA1C788B92C6C" xml:space="preserve"><value>面板透明度</value></data>
 <data name="S7F0D916BD1254F85" xml:space="preserve"><value>面板背景</value></data>
@@ -2389,4 +2392,43 @@
 <data name="S0451B76C2F7FC56E" xml:space="preserve"><value>歷史文字</value></data>
 <data name="S9691B7FD73FF8AF9" xml:space="preserve"><value>揀一條記錄，然後喺欄位撳 Ctrl+V。</value></data>
 <data name="S420EB0375E6574F7" xml:space="preserve"><value>搵唔到文字記錄。</value></data>
+  <data name="SA69757B1DBE17B14" xml:space="preserve"><value>篩選</value></data>
+  <data name="S1B3EF3FF33601E29" xml:space="preserve"><value>上一項記錄</value></data>
+  <data name="S92BD41D8D977F56B" xml:space="preserve"><value>下一項記錄</value></data>
+  <data name="S866424C0D200A4D3" xml:space="preserve"><value>移至項目即可閱讀 · 按一下以選取</value></data>
+  <data name="S24C7474A8433D4AC" xml:space="preserve"><value>時間軸</value></data>
+  <data name="SE2899079DE68C35C" xml:space="preserve"><value>放大至符合視窗大小的兩倍</value></data>
+  <data name="S3681A2658AB51B2D" xml:space="preserve"><value>符合視窗大小</value></data>
+  <data name="S6E9DD19BE792DDC0" xml:space="preserve"><value>歷史記錄是空的</value></data>
+  <data name="S8D9C5427DC229656" xml:space="preserve"><value>複製文字或圖片後，即可在此查看。</value></data>
+  <data name="SDA5129778D7D62D2" xml:space="preserve"><value>清單闊度</value></data>
+  <data name="S6AA5256DEDBB2D15" xml:space="preserve"><value>常用優先</value><comment>Частые первыми</comment></data>
+  <data name="S490438AC414A6602" xml:space="preserve"><value>成日用嘅符號會排喺自己組別最前</value><comment>Часто используемые символы идут первыми в своей группе</comment></data>
+  <data name="S3987D5E97F4C5EEF" xml:space="preserve"><value>貼上嘅項目保持原位</value><comment>Не поднимать вставленные записи</comment></data>
+  <data name="SF9A3736336415A63" xml:space="preserve"><value>貼上嘅項目會留喺原位。撳一下就會移到最前。</value><comment>Вставленные записи остаются на своих местах. Нажмите, чтобы они поднимались наверх.</comment></data>
+  <data name="S65191CC0F4A1116B" xml:space="preserve"><value>貼上嘅項目會移到最前。撳一下就會留喺原位。</value><comment>Вставленные записи поднимаются наверх. Нажмите, чтобы они оставались на своих местах.</comment></data>
+  <data name="S960A985E24EDBF4E" xml:space="preserve"><value>次序唔變。</value><comment>Порядок сохраняется.</comment></data>
+  <data name="S61781E34446BE478" xml:space="preserve"><value>貼上嘅項目會留喺原位。</value><comment>Вставленные записи остаются на своих местах.</comment></data>
+  <data name="S6B0B89C918022181" xml:space="preserve"><value>次序會變。</value><comment>Порядок меняется.</comment></data>
+  <data name="SEC8B4C2A34345B9A" xml:space="preserve"><value>貼上嘅項目會移到最前。</value><comment>Вставленные записи поднимаются наверх.</comment></data>
+  <data name="SB6F33BC23530A58D" xml:space="preserve"><value>跟住郁動反應</value><comment>Реакция на движение</comment></data>
+  <data name="SD9207D64DC446EFA" xml:space="preserve"><value>面板會向郁動方向傾斜，指標附近嘅邊框會發光。</value><comment>Панель наклоняется в сторону движения, у мыши светится край рамки.</comment></data>
+  <data name="SB9319DC3ABB013D5" xml:space="preserve"><value>黑曜石外觀</value><comment>Скин «Обсидиан»</comment></data>
+  <data name="SF7E0C0F7970E2E73" xml:space="preserve"><value>所有視窗、選單同欄位都用深色火山玻璃同青綠色，代替 Windows 佈景主題。</value><comment>Тёмное вулканическое стекло и бирюза во всех окнах, меню и полях. Заменяет тему Windows.</comment></data>
+  <data name="SF600EDB4DB611BC7" xml:space="preserve"><value>邊緣碎片</value><comment>Осколки по краю</comment></data>
+  <data name="SBE8B5FD6FFD8BBCA" xml:space="preserve"><value>面板周圍嘅幼石邊。郁嗰陣會微微張開。</value><comment>Тонкая каменная кромка вокруг панели. При движении она слегка раскрывается.</comment></data>
+  <data name="S72E67FB326D967A8" xml:space="preserve"><value>一般</value><comment>Общие</comment></data>
+  <data name="S9521194DF6637753" xml:space="preserve"><value>視窗</value><comment>Окно</comment></data>
+  <data name="S4A767F2AA26A9A0D" xml:space="preserve"><value>效果</value><comment>Эффекты</comment></data>
+  <data name="S9903B13E9593C5CA" xml:space="preserve"><value>閂設定 (Esc)</value><comment>Закрыть настройки (Esc)</comment></data>
+  <data name="S20BCB2527595C5E1" xml:space="preserve"><value>將指標停喺項目上面就睇到全文。</value><comment>Наведите мышь на запись, и текст откроется целиком.</comment></data>
+  <data name="S9F318A3518378441" xml:space="preserve"><value>將指標停喺圖片上面就會放大。</value><comment>Наведите мышь на картинку, и она увеличится.</comment></data>
+  <data name="SA898B3F151B652B9" xml:space="preserve"><value>代替鉛筆掣。</value><comment>Вместо кнопки с карандашом.</comment></data>
+  <data name="S9A40A2D431C7627E" xml:space="preserve"><value>指標離開之後面板會自動閂。</value><comment>Панель закроется сама, когда мышь уйдёт с неё.</comment></data>
+  <data name="SF4E985D39510C047" xml:space="preserve"><value>面板底部嘅快速鍵提示。</value><comment>Строка с сочетаниями клавиш внизу панели.</comment></data>
+  <data name="SDC13524FAC38464E" xml:space="preserve"><value>面板開同閂嗰陣會順滑過渡。</value><comment>Плавное появление и исчезновение панели.</comment></data>
+  <data name="S98A59F474450F99C" xml:space="preserve"><value>貼上同複製嗰陣取代文字，儲存咗嘅項目唔變。</value><comment>Меняет текст при вставке и копировании. Сама запись остаётся прежней.</comment></data>
+  <data name="S731F34E25885ECCC" xml:space="preserve"><value>郁動</value><comment>Движение</comment></data>
+  <data name="S3F70F0AD6764EF96" xml:space="preserve"><value>清除歷史記錄</value><comment>Очистить историю</comment></data>
+  <data name="S4EDE614E24611507" xml:space="preserve"><value>以清單顯示釘選項目</value><comment>Закреплённые списком</comment></data>
 </root>

@@ -26,8 +26,8 @@ partial class PanelWindow
         _vfxReady = true;
         _vfxTimer.Tick += (_, _) => DrawVfxFrame();
         IsVisibleChanged += (_, _) => RefreshVfx();
-        LocationChanged += (_, _) => { if (_vfxWindow?.IsVisible == true) _vfxWindow.Align(this); };
-        SizeChanged += (_, _) => { if (_vfxWindow?.IsVisible == true) _vfxWindow.Align(this); };
+        LocationChanged += (_, _) => { if (_vfxWindow?.IsVisible == true) AlignVfx(); };
+        SizeChanged += (_, _) => { if (_vfxWindow?.IsVisible == true) AlignVfx(); };
         Closed += (_, _) =>
         {
             _vfxReady = false;
@@ -39,7 +39,66 @@ partial class PanelWindow
         };
         VfxToggle.Checked += AnimateSwitch;
         VfxToggle.Unchecked += AnimateSwitch;
+        foreach (var toggle in new[] { ReactionToggle, ShardsToggle, SkinToggle })
+        {
+            toggle.Checked += AnimateSwitch;
+            toggle.Unchecked += AnimateSwitch;
+        }
         RefreshVfx();
+    }
+
+    public bool ShardsEnabled { get => ShardsToggle.IsChecked == true; set => ShardsToggle.IsChecked = value; }
+    bool ShardsShown => ShardsEnabled && IsVisible && _vfxWindow != null;
+    /// <summary>Реакция на движение и скин «Осколки».</summary>
+    public event Action<bool, bool>? VfxExtrasChanged;
+
+    public bool SkinEnabled { get => SkinToggle.IsChecked == true; set => SkinToggle.IsChecked = value; }
+    public event Action<bool>? SkinChanged;
+
+    void Skin_Changed(object sender, RoutedEventArgs e)
+    {
+        if (_vfxReady && SkinEnabled != Skin.On) SkinChanged?.Invoke(SkinEnabled);
+    }
+
+    /// <summary>Тема или скин сменились: осколки перекрашиваются.</summary>
+    internal void RefreshSkin() => RefreshShards();
+
+    void VfxExtras_Changed(object sender, RoutedEventArgs e)
+    {
+        if (!_vfxReady) return;
+        if (!FrameReaction) SettlePlate();
+        RefreshVfx();
+        VfxExtrasChanged?.Invoke(FrameReaction, ShardsEnabled);
+    }
+
+    VfxWindow VfxOverlay()
+    {
+        _vfxWindow ??= new VfxWindow(Root) { Owner = this };
+        new System.Windows.Interop.WindowInteropHelper(_vfxWindow).EnsureHandle();
+        return _vfxWindow;
+    }
+
+    /// <summary>Осколки стоят в окне пламени сами по себе: пламя выключено или панель закреплена — они остаются.</summary>
+    void RefreshShards()
+    {
+        bool on = ShardsEnabled && IsVisible;
+        if (_vfxWindow != null) _vfxWindow.Shards.Visibility = on ? Visibility.Visible : Visibility.Collapsed;
+        if (!on) return;
+        var overlay = VfxOverlay();
+        overlay.Shards.Visibility = Visibility.Visible;
+        overlay.Shards.Paint(Skin.ColorOf(FindResource("WindowSurface")), Skin.ColorOf(FindResource("PinGlow")));
+        AlignVfx();
+        if (overlay.IsVisible) return;
+        overlay.Flame.Visibility = Visibility.Collapsed;
+        overlay.Show();
+        AlignVfx();
+    }
+
+    void HideFlame()
+    {
+        if (_vfxWindow == null) return;
+        _vfxWindow.Flame.Visibility = Visibility.Collapsed;
+        if (!ShardsShown) _vfxWindow.Hide();
     }
 
     void Vfx_Changed(object sender, RoutedEventArgs e) => ApplyVfxSettings();
@@ -60,10 +119,11 @@ partial class PanelWindow
         VfxOpacityValue.Text = $"{VfxOpacity}%";
         VfxSpeedValue.Text = $"{VfxSpeed}%";
         VfxPreview.Opacity = VfxOpacity / 100.0;
+        RefreshShards();
         VfxStatus.SetResourceReference(ForegroundProperty, "TextSecondary");
         if (!VfxEnabled || !IsVisible)
         {
-            _vfxWindow?.Hide();
+            HideFlame();
             if (!VfxEnabled) VfxPreview.Frame = null;
             VfxStatus.Text = VfxEnabled ? UiText.T("Готов к показу") : UiText.T("Выключен");
             return;
@@ -80,20 +140,19 @@ partial class PanelWindow
             if (KeepOpen)
             {
                 // A pinned panel can stay on screen for hours, and its lit edge takes over from the flame.
-                _vfxWindow?.Hide();
+                HideFlame();
                 VfxPreview.Frame ??= _vfxFrames[0];
                 VfxStatus.Text = UiText.T("Панель закреплена: эффект остановлен");
                 return;
             }
-            _vfxWindow ??= new VfxWindow(Root) { Owner = this };
-            new System.Windows.Interop.WindowInteropHelper(_vfxWindow).EnsureHandle();
-            _vfxWindow.Flame.Opacity = VfxOpacity / 100.0;
-            _vfxWindow.Align(this);
+            VfxOverlay().Flame.Visibility = Visibility.Visible;
+            _vfxWindow!.Flame.Opacity = VfxOpacity / 100.0;
+            AlignVfx();
             _vfxFrame = -1;
             _vfxClock.Restart();
             DrawVfxFrame();
             if (!_vfxWindow.IsVisible) _vfxWindow.Show();
-            _vfxWindow.Align(this);
+            AlignVfx();
             if (Animations) _vfxTimer.Start();
             else _vfxClock.Stop();
             VfxStatus.Text = Animations ? UiText.T("Включён · 64 кадра · только по краям") : UiText.T("Статичная рамка · анимация окна выключена");
@@ -102,10 +161,15 @@ partial class PanelWindow
         {
             App.Log(ex);
             if (version != _vfxVersion || !_vfxReady) return;
-            _vfxWindow?.Hide();
+            HideFlame();
             VfxStatus.Text = UiText.T("Не удалось загрузить эффект. Попробуйте перезапустить приложение.");
             VfxStatus.SetResourceReference(ForegroundProperty, "CriticalText");
         }
+    }
+
+    void AlignVfx()
+    {
+        if (_resize == null && !_jumping && PanelPixels() is { } panel) _vfxWindow?.Align(panel, System.Windows.Media.VisualTreeHelper.GetDpi(this).DpiScaleX);
     }
 
     void DrawVfxFrame()
@@ -255,9 +319,9 @@ partial class PanelWindow
         bool motion = Motion.Enabled;
         try
         {
-            check(panel.VfxOpacity == 20, "VFX: default intensity is 20%");
+            check(panel is { VfxEnabled: true, VfxOpacity: 20, VfxSpeed: 70, FrameReaction: true, ShardsEnabled: false }, "VFX: defaults are 20% intensity, 70% speed, reaction on, shards off");
             panel.ShowSettingsPage(2);
-            check(panel.VfxSettingsView.Visibility == Visibility.Visible && panel.VisualSettingsView.Visibility == Visibility.Collapsed
+            check(panel.VfxSettingsView.Visibility == Visibility.Visible && panel.GeneralSettingsView.Visibility == Visibility.Collapsed
                 && panel.StorageSettingsView.Visibility == Visibility.Collapsed, "VFX: settings tab selects its own page and hides the other two");
             int changed = 0;
             panel.VfxChanged += (_, _, _) => changed++;
@@ -335,7 +399,7 @@ partial class PanelWindow
             panel.VfxPreview.Frame = frames[16];
             panel.SettingsFlyout.Visibility = Visibility.Visible;
             panel.Root.Measure(new Size(392, 492)); panel.Root.Arrange(new Rect(0, 0, 392, 492)); panel.Root.UpdateLayout();
-            check(panel.VfxSettingsTab.ActualWidth > 60 && panel.StorageSettingsTab.ActualWidth > 60 && panel.VisualSettingsTab.ActualWidth > 60,
+            check(panel.VfxSettingsTab.ActualWidth > 60 && panel.StorageSettingsTab.ActualWidth > 60 && panel.GeneralSettingsTab.ActualWidth > 60,
                 "VFX: all three settings tabs fit the existing flyout");
             panel.SettingsFlyout.Visibility = Visibility.Visible;
             panel.Root.UpdateLayout();

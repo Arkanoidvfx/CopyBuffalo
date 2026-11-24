@@ -20,7 +20,6 @@ enum InfoKind { Neutral, Info, Caution, Success, Critical }
 
 partial class PanelWindow : Window
 {
-    const int GridColumns = 3;
     const double ShadowMargin = 16; // поле под тень вокруг панели (Root.Margin в XAML)
     const double EnterScale = 0.96, EnterShift = 6; // появление: небольшой рост и сдвиг от каретки, без «прыжка» с 80%
     bool _hiding;
@@ -57,6 +56,7 @@ partial class PanelWindow : Window
     WinEventProc? _onForeground; // держим ссылку: хук вызывает делегат, GC не должен его собрать
     RECT _anchor;            // каретка последнего показа: от неё же ставим окно, выросшее под настройки
     RECT? _draggedTo;        // окно, куда панель перетащили за шапку: до перезапуска показываем там, а не у каретки
+    bool _closeSettingsOnUp; // нажали на шапку при открытых настройках
     Point? _headerPress;     // нажатие на шапке: перетаскивание начинается после порога, клик по вкладке остаётся кликом
     Size _normalSize;        // размер панели без настроек
     readonly List<ListBoxItem> _shortcutContainers = [];
@@ -83,6 +83,9 @@ partial class PanelWindow : Window
         get => Motion.Enabled;
         set { Motion.Enabled = value; AnimationsToggle.IsChecked = value; RefreshVfx(); RestartPinEnergy(); }
     }
+    /// <summary>Вставленная запись остаётся на своём месте, а не поднимается наверх.</summary>
+    public bool KeepOrder { get => KeepOrderButton.IsChecked == true; set => KeepOrderButton.IsChecked = value; }
+    public bool SymbolsByUse { get => SymbolSortToggle.IsChecked == true; set => SymbolSortToggle.IsChecked = value; }
     public bool ShowKeyHints { get => KeyHintsToggle.IsChecked == true; set => KeyHintsToggle.IsChecked = value; }
     bool _pinnedAsList;
     /// <summary>Закреплённые списком вместо плиток: переключатель в шапке, запоминается.</summary>
@@ -120,6 +123,8 @@ partial class PanelWindow : Window
     public event Action<bool, int, int>? TextPeekChanged;
     public event Action<bool>? AnimationsChanged;
     public event Action<bool>? KeyHintsChanged;
+    public event Action<bool>? SymbolsByUseChanged;
+    public event Action<bool>? KeepOrderChanged;
     StorageSettings _storage = new();
     bool _loadingStorage;
     public event Action<StorageSettings>? StorageChanged;
@@ -143,7 +148,7 @@ partial class PanelWindow : Window
             UpdateStorageLabels();
         }
     }
-    /// <summary>Пауза записи из меню «⋯» или InfoBar; App переключает её везде (трей, значок, панель).</summary>
+    /// <summary>Пауза записи из настроек или InfoBar; App переключает её везде (трей, значок, панель).</summary>
     public event Action<bool>? PauseToggleRequested;
 
     readonly HistoryStore _store;
@@ -166,6 +171,8 @@ partial class PanelWindow : Window
     public event Action<string>? TypeRequested;
     /// <summary>«Сжать промпт»: текст записи переписать короче локальной моделью.</summary>
     public event Action<ClipItem>? CompressRequested;
+    /// <summary>«Исправить грамматику»: орфография и пунктуация локальной моделью, без переписывания.</summary>
+    public event Action<ClipItem>? GrammarRequested;
     internal event Action<ClipItem>? OcrRequested;
     internal event Action<ClipItem>? TranslateImageRequested;
     public event Action<ClipItem>? ArchiveRequested;
@@ -178,7 +185,8 @@ partial class PanelWindow : Window
     RadioButton[] Tabs => [TabAll, TabPinned, TabSymbols];
 
     /// <summary>Столбцов в текущей сетке: у плиток — 3, у символов — сколько клеток влезло по ширине.</summary>
-    int Columns => SymbolsTab ? Math.Max(1, (int)(SymbolList.ActualWidth / 40)) : GridColumns;
+    int Columns => ColumnsFor(0);
+    int ColumnsFor(double wider) => Math.Max(1, (int)(((Active.FindDescendant<ScrollViewer>()?.ViewportWidth ?? 0) + wider) / (SymbolsTab ? 40 : 110))); // клетка или плитка с полями
 
     public PanelWindow(HistoryStore store, SymbolCatalog symbols)
     {
@@ -202,10 +210,26 @@ partial class PanelWindow : Window
         {
             if (ValueDrop.IsOpen) CloseValueDrop();
             if (SettingsFlyout.Visibility != Visibility.Visible || (e.OriginalSource as DependencyObject).IsWithin(SettingsFlyout)) return;
+            // За шапку панель несут и с открытыми настройками: закрывает только щелчок без переноса.
+            if (!PickingSettingsHistory && (e.OriginalSource as DependencyObject).IsWithin(PanelHeader))
+            {
+                _closeSettingsOnUp = e.ChangedButton == MouseButton.Left;
+                return;
+            }
             if (PickingSettingsHistory) CloseSettingsHistory();
             else CloseSettings();
             e.Handled = true;
         };
+        Root.PreviewMouseLeftButtonUp += (_, e) =>
+        {
+            if (!_closeSettingsOnUp) return;
+            _closeSettingsOnUp = false;
+            _headerPress = null;
+            Mouse.Capture(null); // нажатая вкладка или кнопка не сработает: щелчок только закрывает настройки
+            CloseSettings();
+            e.Handled = true;
+        };
+        Root.AddHandler(PreviewMouseLeftButtonUpEvent, new MouseButtonEventHandler((_, _) => Dispatcher.BeginInvoke(DispatcherPriority.Background, () => _listClosedByPress = null)), handledEventsToo: true);
         Root.MouseLeave += (_, _) => StartOutsideTimer();
         _deactivateTimer.Tick += (_, _) =>
         {
@@ -216,6 +240,9 @@ partial class PanelWindow : Window
         };
         _store = store;
         _symbols = symbols;
+        TypeRequested += symbols.Use;
+        IsVisibleChanged += (_, _) => { if (!IsVisible) { symbols.Reorder(); EndResize(); } };
+        LostMouseCapture += (_, _) => EndResize();
 
         _symbolView = new ListCollectionView(symbols.Items) { Filter = o => SymbolCatalog.Matches((SymbolItem)o, Search.Text) };
         _symbolView.GroupDescriptions.Add(new PropertyGroupDescription(nameof(SymbolItem.Group)));
@@ -250,11 +277,15 @@ partial class PanelWindow : Window
         Search.ApplyTemplate();
         if (Search.Template.FindName("PART_Clear", Search) is Button clearSearch)
             clearSearch.Click += (_, _) => { Search.Text = ""; Search.Focus(); };
-        foreach (var toggle in new[] { AnimationsToggle, OutsideHideToggle, KeyHintsToggle, TextPeekToggle, InlineEditHoldToggle, AutoUpdateToggle })
+        foreach (var toggle in new[] { AnimationsToggle, OutsideHideToggle, KeyHintsToggle, TextPeekToggle, InlineEditHoldToggle, AutoUpdateToggle, SymbolSortToggle })
         {
             toggle.Checked += AnimateSwitch;
             toggle.Unchecked += AnimateSwitch;
         }
+        AppIcons.Found += IconFound;
+        Closed += (_, _) => AppIcons.Found -= IconFound;
+        void IconFound(string app) => Dispatcher.BeginInvoke(() => { if (string.Equals(app, _sourceFilter, StringComparison.OrdinalIgnoreCase)) RefreshSourceMark(); });
+        InitializeKeyCaps();
         TabsHost.SizeChanged += (_, _) => MoveTabIndicator(false);
 
         InitializeMergeSelection();
@@ -262,9 +293,11 @@ partial class PanelWindow : Window
         InitializeVfx();
         InitializeClipStack();
         InitializePinEnergy();
+        InitializePlate();
         PreviewKeyUp += (_, e) => { if (e.Key is Key.LeftCtrl or Key.RightCtrl) { HideShortcuts(); RefreshMergeMarks(); } };
         PreviewKeyUp += (_, _) => RefreshHintFocus(Keyboard.Modifiers);
         PreviewKeyDown += (_, _) => RefreshHintFocus(Keyboard.Modifiers); // раньше OnKey: он может пометить событие обработанным
+        PreviewKeyDown += (_, e) => { if (_resize != null && e.Key == Key.Escape) { EndResize(cancel: true); e.Handled = true; } };
         PreviewKeyDown += OnKey;
         Activated += (_, _) => RefreshHintFocus(Keyboard.Modifiers);
         ValueDropCard.PreviewKeyDown += (_, e) =>
@@ -330,6 +363,7 @@ partial class PanelWindow : Window
     void ApplyPinnedView()
     {
         PinnedList.ItemContainerStyle = (Style)FindResource(_pinnedAsList ? "PinRowContainer" : "PinTileContainer");
+        PinnedAsListToggle.IsChecked = _pinnedAsList;
         PinnedList.ItemTemplate = (DataTemplate)FindResource(_pinnedAsList ? "PinRowTemplate" : "PinTileTemplate");
         PinnedList.ItemsPanel = (ItemsPanelTemplate)FindResource(_pinnedAsList ? "PinRowPanel" : "PinTilePanel");
         PinnedList.Margin = _pinnedAsList ? new Thickness(0, -3, 0, 0) : new Thickness(-3, -3, 0, 0);
@@ -340,6 +374,7 @@ partial class PanelWindow : Window
         HideShortcuts();
         PinnedAsList = !_pinnedAsList;
         PinnedViewChanged?.Invoke(_pinnedAsList);
+        if (SettingsFlyout.Visibility == Visibility.Visible) return;
         Motion.Enter(PinnedList, 0, 8);
         Search.Focus();
     }
@@ -364,7 +399,8 @@ partial class PanelWindow : Window
     void InitNative()
     {
         _hwnd = new WindowInteropHelper(this).Handle;
-        _normalSize = new Size(Width, Height);
+        _defaultSize = _normalSize = new Size(Width, Height);
+        HwndSource.FromHwnd(_hwnd).AddHook(ResizeHook);
         _onForeground = (_, _, hwnd, _, _, _, _) =>
         {
             OnFocusMaybeLost();
@@ -539,7 +575,7 @@ partial class PanelWindow : Window
 
         new WindowInteropHelper(this).EnsureHandle();
         _anchor = anchor;
-        Width = _normalSize.Width; Height = _normalSize.Height; // настройки могли остаться открытыми при скрытии
+        ResetSize(); // окно могли растянуть или скрыть с открытыми настройками
         Place(anchor);
         // Ставим стартовое состояние напрямую до Show: нулевая анимация может примениться
         // лишь на следующем кадре и показать старое содержимое после долгого простоя.
@@ -566,7 +602,7 @@ partial class PanelWindow : Window
     }
 
     /// <summary>Своё модальное окно, меню или перетаскивание: уход фокуса/мыши тут не значит «ушли из панели».</summary>
-    bool Busy => PickingSettingsHistory || _editingGroup || _inlineItem != null || _textEditor != null || _imageViewer != null || _mergeWindow != null || _collectingMerge || _dragging || _mergingDrag || _valueSaving || ValueDrop.IsOpen || _menuOpen || _archiveInfo != null || _stackOpen;
+    bool Busy => PickingSettingsHistory || _editingGroup || _inlineItem != null || _textEditor != null || _imageViewer != null || _mergeWindow != null || _collectingMerge || _dragging || _mergingDrag || _valueSaving || ValueDrop.IsOpen || _menuOpen || _archiveInfo != null || _stackOpen || _sizing;
 
     /// <summary>
     /// Передний план сейчас у нашего окна (панель, её диалог, окно графа). Спрашиваем Windows, а не IsActive:
@@ -626,6 +662,7 @@ partial class PanelWindow : Window
         _seriesView?.Refresh();
         _mergeView?.Refresh();
         UpdatePinnedLayout();
+        _symbols.Reorder();
         _symbolView.Refresh();
         ResetSelection();
     }
@@ -669,14 +706,26 @@ partial class PanelWindow : Window
         if (Math.Abs(now.X - start.X) < SystemParameters.MinimumHorizontalDragDistance &&
             Math.Abs(now.Y - start.Y) < SystemParameters.MinimumVerticalDragDistance) return;
         _headerPress = null;
-        try { DragMove(); } catch (InvalidOperationException) { return; } // кнопку уже отпустили
-        if (GetWindowRect(_hwnd, out var rect)) _draggedTo = rect;
+        _closeSettingsOnUp = false;
+        Mouse.Capture(null); // нажатая вкладка держит мышь, и панель с неё не двигалась; отпущенная вкладка уже не переключится
+        if (Reacts) PadWindow(PlatePad);
+        try { DragMove(); } catch (InvalidOperationException) { SettlePlate(); return; } // кнопку уже отпустили
+        if (ShellPixels() is { } rect) _draggedTo = rect;
+        if (!_plateRunning) SettlePlate();
         StartOutsideTimer();
     }
 
     void Place(RECT a)
     {
-        var at = _draggedTo;
+        var (r, origin) = Placement(a, Width, Height);
+        Root.RenderTransformOrigin = origin;
+        SetWindowPos(_hwnd, HWND_TOPMOST, r.Left, r.Top, r.Right - r.Left, r.Bottom - r.Top, SWP_NOACTIVATE);
+    }
+
+    /// <summary>Где встанет окно такого размера (DIP, вместе с тенью) и откуда ему расти.</summary>
+    (RECT Window, Point Origin) Placement(RECT a, double width, double height)
+    {
+        var at = _sizedTo ?? _draggedTo;
         var mon = MonitorFromPoint(at is { } d ? new POINT { X = (d.Left + d.Right) / 2, Y = (d.Top + d.Bottom) / 2 }
             : new POINT { X = a.Left, Y = a.Bottom }, MONITOR_DEFAULTTONEAREST);
         var mi = new MONITORINFO { cbSize = System.Runtime.InteropServices.Marshal.SizeOf<MONITORINFO>() };
@@ -686,7 +735,7 @@ partial class PanelWindow : Window
         // ponytail: при разном DPI мониторов содержимое скрытого окна масштабируется по DPI прошлого монитора до первого перерисовывания; хватит, пока нет жалоб.
         // Считаем видимую панель (без поля под тень), окно — она плюс поле.
         int m = (int)(ShadowMargin * scale);
-        int w = (int)(Width * scale) - 2 * m, h = (int)(Height * scale) - 2 * m, gap = (int)(6 * scale);
+        int w = (int)(width * scale) - 2 * m, h = (int)(height * scale) - 2 * m, gap = (int)(6 * scale);
         var work = mi.rcWork;
         w = Math.Min(w, work.Right - work.Left); h = Math.Min(h, work.Bottom - work.Top); // окно настроек не выше экрана
 
@@ -698,9 +747,38 @@ partial class PanelWindow : Window
         x = Math.Clamp(x, work.Left, Math.Max(work.Left, work.Right - w));
         y = Math.Clamp(y, work.Top, Math.Max(work.Top, work.Bottom - h));
         // Растёт и сжимается от каретки: по горизонтали — её место на панели, по вертикали — край, ближний к ней.
-        Root.RenderTransformOrigin = at != null ? new Point(0.5, 0) : new Point(Math.Clamp((a.Left - x) / (double)w, 0, 1), above ? 1 : 0);
-        SetWindowPos(_hwnd, HWND_TOPMOST, x - m, y - m, w + 2 * m, h + 2 * m, SWP_NOACTIVATE);
+        var origin = at != null ? new Point(0.5, 0) : new Point(Math.Clamp((a.Left - x) / (double)w, 0, 1), above ? 1 : 0);
+        return (new RECT { Left = x - m, Top = y - m, Right = x + w + m, Bottom = y + h + m }, origin);
     }
+
+    /// <summary>
+    /// Новый размер панели на экране: сначала новый вид рисуется в стороне, потом место, размер и картинка окна меняются одним вызовом.
+    /// По частям (ширина, высота, место) на экран попадали промежуточные кадры: растянутый список, панель не на месте.
+    /// </summary>
+    void SizePanel(double width, double height)
+    {
+        var (r, origin) = Placement(_anchor, width, height);
+        if (!IsVisible)
+        {
+            (Width, Height) = (width, height);
+            Place(_anchor);
+            return;
+        }
+        if (GetWindowRect(_hwnd, out var now) && now.Equals(r)) return;
+        Root.RenderTransformOrigin = origin;
+        double scale = VisualTreeHelper.GetDpi(this).DpiScaleX;
+        var size = new Size((r.Right - r.Left) / scale, (r.Bottom - r.Top) / scale);
+        UpdateLayout(); // потом нельзя: окно ещё прежнее и вернуло бы панели прежний размер
+        Root.Measure(size);
+        Root.Arrange(new Rect(size));
+        var panel = Inflate(r, -ShadowMargin * scale);
+        _vfxWindow?.Blank();
+        _jumping = true; // пламя встаёт следом: его окно перерисовало бы и панель, а она ещё не узнала своего размера
+        MoveWithPicture(r, panel, PanelPicture(panel, scale, ShadowMargin), (int)Math.Round(ShadowMargin * scale));
+        _jumping = false;
+        AlignVfx();
+    }
+    bool _jumping;
 
     /// <summary>
     /// Хук — не «последний ввод» для нашего процесса, поэтому SetForegroundWindow может отказать.
@@ -728,8 +806,11 @@ partial class PanelWindow : Window
             list.Visibility = list == Active ? Visibility.Visible : Visibility.Collapsed;
         PinnedBackground.Visibility = PinnedTab ? Visibility.Visible : Visibility.Collapsed;
         GroupButton.Visibility = PinnedTab ? Visibility.Visible : Visibility.Collapsed;
+        KeepOrderButton.Visibility = PinnedTab || SymbolsTab ? Visibility.Collapsed : Visibility.Visible;
+        RefreshSourceMark();
         SourceButton.Visibility = SymbolsTab ? Visibility.Collapsed : Visibility.Visible;
         KindButton.Visibility = SourceButton.Visibility;
+        SymbolSortToggle.Visibility = SymbolsTab ? Visibility.Visible : Visibility.Collapsed;
         HideShortcuts();
         if (Active.SelectedIndex < 0 && Active.Items.Count > 0) Active.SelectedIndex = 0;
         // Полоска едет к новой вкладке, содержимое въезжает с той стороны, куда переключились.
@@ -763,7 +844,7 @@ partial class PanelWindow : Window
         bool searching = Search.Text.Length > 0 || _sourceFilter != null || _kindFilter != null;
         (EmptyTitle.Text, EmptyHint.Text) = (searching, PinnedTab) switch
         {
-            (true, _) when SymbolsTab => (UiText.T("Ничего не найдено"), UiText.T("Ищите по символу, коду (2014) или группе («валют»).")),
+            (true, _) when SymbolsTab => (UiText.T("Ничего не найдено"), UiText.T("Ищите по символу, букве (c → ć, č), коду (2014) или группе («валют»).")),
             (true, _) => (UiText.T("Ничего не найдено"), UiText.T("Измените поиск, приложение или вид записей.")),
             (false, true) => (UiText.T("Закреплённых пока нет"), UiText.T("Нажмите Ctrl+P на записи или выберите «Закрепить» в её меню, и она появится здесь.")),
             _ => (UiText.T("Здесь пока пусто"), UiText.T("Скопируйте текст или картинку, и они появятся в этом списке.")),
@@ -778,29 +859,66 @@ partial class PanelWindow : Window
 
     void Source_Click(object sender, RoutedEventArgs e)
     {
-        var menu = new ContextMenu { PlacementTarget = SourceButton, Placement = PlacementMode.MousePoint };
-        var all = Entry(UiText.T("Все приложения"), "\uE71D", () => SetSourceFilter(null));
+        if (_listClosedByPress == SourceButton) return;
+        var menu = DropDown(SourceButton);
+        var all = Entry(UiText.T("Все приложения"), "\uE71D", () => SetSourceFilter(null), _store.Items.Count.ToString());
         all.IsChecked = _sourceFilter == null;
         menu.Items.Add(all);
         var groups = _store.Items.Where(i => !string.IsNullOrWhiteSpace(i.SourceApp))
             .GroupBy(i => i.SourceApp!, StringComparer.OrdinalIgnoreCase)
-            .OrderBy(g => g.Key, StringComparer.CurrentCultureIgnoreCase).ToList();
+            .OrderByDescending(g => g.Count()).ThenBy(g => g.Key, StringComparer.CurrentCultureIgnoreCase).ToList();
         if (groups.Count == 0) menu.Items.Add(new MenuItem { Header = UiText.T("Новые записи покажут приложение"), IsEnabled = false });
         foreach (var group in groups)
         {
             string app = group.Key;
-            var option = Entry($"{app}  ({group.Count()})", "\uE80F", () => SetSourceFilter(app));
+            var icon = new Image { Stretch = Stretch.Uniform, Source = AppIcons.Get(app) };
+            RenderOptions.SetBitmapScalingMode(icon, BitmapScalingMode.HighQuality);
+            var option = Entry(AppIcons.Title(app), icon.Source == null ? "\uECAA" : "", () => SetSourceFilter(app), group.Count().ToString());
+            option.Icon = icon;
+            void Arrived(string name)
+            {
+                if (!string.Equals(name, app, StringComparison.OrdinalIgnoreCase)) return;
+                Dispatcher.BeginInvoke(() => { icon.Source = AppIcons.Get(app); option.Tag = ""; Motion.Pop(icon, 1.08, 0.6); });
+            }
+            AppIcons.Found += Arrived;
+            menu.Closed += (_, _) => AppIcons.Found -= Arrived;
             option.IsChecked = string.Equals(_sourceFilter, app, StringComparison.OrdinalIgnoreCase);
             menu.Items.Add(option);
         }
         menu.Closed += (_, _) => Search.Focus();
-        OpenMenu(menu);
+        OpenMenu(menu, dropDown: true);
+    }
+
+    /// <summary>Список кнопки: под ней, край к краю (у меню поле под тень).</summary>
+    static ContextMenu DropDown(UIElement button) => new() { PlacementTarget = button, Placement = PlacementMode.Bottom, HorizontalOffset = -12, VerticalOffset = 0 };
+
+    /// <summary>Видна история одной программы: её значок большим прозрачным знаком за записями.</summary>
+    void RefreshSourceMark()
+    {
+        if (SourceMark == null) return;
+        bool on = _sourceFilter != null && !SymbolsTab && !PinnedTab;
+        var icon = on ? AppIcons.Get(_sourceFilter!) : null;
+        if (icon == null)
+        {
+            if (SourceMark.Visibility != Visibility.Visible) return;
+            Motion.To(SourceMark, OpacityProperty, 0, Motion.Normal, done: () => { if (SourceMark.Opacity == 0) SourceMark.Visibility = Visibility.Collapsed; });
+            return;
+        }
+        bool same = ReferenceEquals(SourceMark.Tag, icon) && SourceMark.Visibility == Visibility.Visible;
+        if (!same) (SourceMark.Tag, SourceMark.Source) = (icon, AppIcons.Soft(icon));
+        SourceMark.Visibility = Visibility.Visible;
+        Motion.To(SourceMark, OpacityProperty, 0.07, Motion.Slow, from: same ? null : 0);
+        if (same || !Motion.Enabled) return;
+        var scale = Motion.Scale(SourceMark);
+        Motion.To(scale, ScaleTransform.ScaleXProperty, 1, 420, from: 0.9);
+        Motion.To(scale, ScaleTransform.ScaleYProperty, 1, 420, from: 0.9);
     }
 
     internal void SetSourceFilter(string? source)
     {
         _sourceFilter = source;
-        SourceButton.Content = (source is { Length: > 8 } ? source[..7] + "…" : source ?? UiText.T("Все")) + " ▾";
+        RefreshSourceMark();
+        SourceButton.Content = (source == null ? UiText.T("Все") : AppIcons.Title(source) is { Length: > 8 } title ? title[..7] + "…" : AppIcons.Title(source)) + " ▾";
         SourceButton.ToolTip = source == null ? UiText.T("Фильтр по приложению") : UiText.F($"Приложение: {source}");
         AutomationProperties.SetName(SourceButton, UiText.F($"Приложение: {source ?? UiText.T("все")}"));
         RefreshViews();
@@ -1034,7 +1152,7 @@ partial class PanelWindow : Window
     {
         var menu = new ContextMenu { PlacementTarget = target, Placement = placement };
         menu.Items.Add(Entry(UiText.T("Вставить"), "\uE77F", () => TypeRequested?.Invoke(s.Char), "Enter"));
-        menu.Items.Add(Entry(UiText.T("Копировать"), "\uE8C8", () => Clipboard.SetText(s.Char)));
+        menu.Items.Add(Entry(UiText.T("Копировать"), "\uE8C8", () => { Clipboard.SetText(s.Char); _symbols.Use(s.Char); }));
         menu.Items.Add(new Separator());
         menu.Items.Add(Entry(s.Pinned ? UiText.T("Открепить") : UiText.T("Закрепить"), s.Pinned ? "\uE77A" : "\uE718", () => _symbols.TogglePin(s.Char), "Ctrl+P"));
         menu.Closed += (_, _) => Search.Focus();
@@ -1087,6 +1205,9 @@ partial class PanelWindow : Window
             var compress = Entry(item.Compressing ? UiText.T("Сжимается…") : UiText.T("Сжать промпт"), "\uE73F", () => CompressRequested?.Invoke(item));
             compress.IsEnabled = !item.Compressing;
             menu.Items.Add(compress);
+            var grammar = Entry(UiText.T("Исправить грамматику"), "\uE8FD", () => GrammarRequested?.Invoke(item));
+            grammar.IsEnabled = !item.Compressing;
+            menu.Items.Add(grammar);
         }
         menu.Items.Add(new Separator());
         menu.Items.Add(Entry(item.Pinned ? UiText.T("Открепить") : UiText.T("Закрепить"), item.Pinned ? "\uE77A" : "\uE718", () =>
@@ -1201,70 +1322,72 @@ partial class PanelWindow : Window
         editor.Show();
     }
 
-    /// <summary>«⋯» в шапке: настройки, пауза записи и очистка истории — опасное действие не лежит в одном клике.</summary>
-    void More_HeaderClick(object sender, RoutedEventArgs e)
+    void SettingsButton_Click(object sender, RoutedEventArgs e) => OpenSettings();
+
+    void Pause_Changed(object sender, RoutedEventArgs e)
     {
-        var menu = new ContextMenu { PlacementTarget = MoreButton };
-        menu.Items.Add(Entry(UiText.T("Настройки"), "\uE713", OpenSettings));
-        var pause = Entry(UiText.T("Пауза записи"), "", () => PauseToggleRequested?.Invoke(!_paused));
-        pause.IsChecked = _paused;
-        menu.Items.Add(pause);
-        if (PinnedTab) menu.Items.Add(_pinnedAsList ? Entry(UiText.T("Показать плитками"), "\uF0E2", TogglePinnedView) : Entry(UiText.T("Показать списком"), "\uE8FD", TogglePinnedView));
-        menu.Items.Add(new Separator());
-        var clear = Entry(UiText.T("Очистить историю…"), "\uE74D", AskClear);
-        clear.IsEnabled = _store.Items.Any(i => !i.Pinned);
-        menu.Items.Add(clear);
-        menu.Closed += (_, _) =>
-        {
-            if (SettingsFlyout.Visibility != Visibility.Visible && !InfoSecondary.IsKeyboardFocused) Search.Focus();
-        };
-        OpenMenu(menu);
+        if (PauseToggle.IsChecked != _paused) PauseToggleRequested?.Invoke(!_paused);
+    }
+
+    void ClearHistory_Click(object sender, RoutedEventArgs e) => AskClear();
+    void RefreshClearButton() => ClearHistoryButton.IsEnabled = _store.Items.Any(i => !i.Pinned);
+
+    void PinnedAsList_Changed(object sender, RoutedEventArgs e)
+    {
+        if (PinnedAsListToggle.IsChecked != _pinnedAsList) TogglePinnedView();
     }
 
     void CloseSettings()
     {
         CloseSettingsHistory(restoreFocus: false);
+        SettlePlate();
         Storage = _storage; // закрытие без «Применить» отменяет изменения бегунков
         SettingsFlyout.Visibility = Visibility.Collapsed;
-        Width = _normalSize.Width; Height = _normalSize.Height;
-        Place(_anchor);
+        SizePanel(_normalSize.Width, _normalSize.Height);
         Search.Focus();
     }
 
-    /// <summary>Настройки без прокрутки: окно шире и растёт на скрытую часть страницы; Place держит его в пределах экрана.</summary>
+    /// <summary>Настройки шире и выше панели и одного размера на всех страницах: окно не прыгает при переходе. Place держит его в пределах экрана.</summary>
     void FitSettings()
     {
         if (SettingsFlyout.Visibility != Visibility.Visible) return;
-        Width = _normalSize.Width + SettingsExtraWidth;
-        UpdateLayout();
-        var view = new[] { VisualSettingsView, StorageSettingsView, VfxSettingsView }.First(v => v.Visibility == Visibility.Visible);
-        Height = Math.Max(_normalSize.Height, Height + view.ExtentHeight - view.ViewportHeight);
-        Place(_anchor);
+        SettlePlate();
+        SizePanel(_normalSize.Width + SettingsExtraWidth, Math.Max(_normalSize.Height, SettingsHeight));
     }
-    const double SettingsExtraWidth = 400;
+    const double SettingsExtraWidth = 400, SettingsHeight = 700;
 
-    /// <summary>Настройки: выезжают из-под «⋯» (из меню панели или трея).</summary>
+    /// <summary>Настройки: выезжают из-под шестерёнки в шапке (с неё же или из трея).</summary>
     public void OpenSettings()
     {
         Storage = _storage;
-        ShowVisualSettings_Click(VisualSettingsTab, new RoutedEventArgs());
+        RefreshClearButton();
+        ShowGeneralSettings_Click(GeneralSettingsTab, new RoutedEventArgs());
+        // Настройки сразу непрозрачны, проявляется только страница: под тающими настройками был бы виден список.
+        GeneralSettingsView.BeginAnimation(OpacityProperty, null);
+        GeneralSettingsView.Opacity = Motion.Enabled ? 0 : 1;
         SettingsFlyout.Visibility = Visibility.Visible;
         FitSettings();
-        Motion.Enter(SettingsFlyout, 0, -8);
-        Dispatcher.BeginInvoke(DispatcherPriority.Input, () => VisualSettingsTab.Focus());
+        Motion.Enter(GeneralSettingsView, 0, -8);
+        Dispatcher.BeginInvoke(DispatcherPriority.Input, () => GeneralSettingsTab.Focus());
     }
 
-    void ShowVisualSettings_Click(object sender, RoutedEventArgs e) => ShowSettingsPage(0);
+    void CloseSettings_Click(object sender, RoutedEventArgs e) => CloseSettings();
+    void ShowGeneralSettings_Click(object sender, RoutedEventArgs e) => ShowSettingsPage(0);
     void ShowStorageSettings_Click(object sender, RoutedEventArgs e) => ShowSettingsPage(1);
     void ShowVfxSettings_Click(object sender, RoutedEventArgs e) => ShowSettingsPage(2);
+    void ShowLookSettings_Click(object sender, RoutedEventArgs e) => ShowSettingsPage(3);
+    void ShowWindowSettings_Click(object sender, RoutedEventArgs e) => ShowSettingsPage(4);
+    void ShowEntriesSettings_Click(object sender, RoutedEventArgs e) => ShowSettingsPage(5);
     void ShowSettingsPage(int page)
     {
-        VisualSettingsView.Visibility = page == 0 ? Visibility.Visible : Visibility.Collapsed;
-        StorageSettingsView.Visibility = page == 1 ? Visibility.Visible : Visibility.Collapsed;
-        VfxSettingsView.Visibility = page == 2 ? Visibility.Visible : Visibility.Collapsed;
-        VisualSettingsTab.Style = (Style)FindResource(page == 0 ? "AccentButton" : "StandardButton");
-        StorageSettingsTab.Style = (Style)FindResource(page == 1 ? "AccentButton" : "StandardButton");
-        VfxSettingsTab.Style = (Style)FindResource(page == 2 ? "AccentButton" : "StandardButton");
+        ScrollViewer[] views = [GeneralSettingsView, StorageSettingsView, VfxSettingsView, LookSettingsView, WindowSettingsView, EntriesSettingsView];
+        RadioButton[] tabs = [GeneralSettingsTab, StorageSettingsTab, VfxSettingsTab, LookSettingsTab, WindowSettingsTab, EntriesSettingsTab];
+        bool changed = views[page].Visibility != Visibility.Visible;
+        for (int i = 0; i < views.Length; i++) views[i].Visibility = i == page ? Visibility.Visible : Visibility.Collapsed;
+        tabs[page].IsChecked = true;
+        if (changed) Motion.Enter(views[page], 0, 10);
+        double step = tabs[page].Height + tabs[page].Margin.Bottom; // разделы одной высоты, полоска переезжает к выбранному
+        Motion.To(Motion.Shift(SettingsNavMark), TranslateTransform.YProperty, SettingsNavList.Children.IndexOf(tabs[page]) * step, SettingsFlyout.IsVisible ? Motion.Slow : 0);
         FitSettings();
     }
 
@@ -1333,6 +1456,7 @@ partial class PanelWindow : Window
     {
         var menu = new ContextMenu { PlacementTarget = target, Placement = PlacementMode.MousePoint };
         menu.Items.Add(Entry(UiText.T("Создать группу"), "\uE710", CreateGroup));
+        menu.Items.Add(_pinnedAsList ? Entry(UiText.T("Показать плитками"), "\uF0E2", TogglePinnedView) : Entry(UiText.T("Показать списком"), "\uE8FD", TogglePinnedView));
         menu.Closed += (_, _) => { if (!_editingGroup) Search.Focus(); };
         OpenMenu(menu);
     }
@@ -1371,15 +1495,23 @@ partial class PanelWindow : Window
             SidePlacements(popup, target, (top - 4) * target.Width / Root.ActualWidth);
     }
 
-    void OpenMenu(ContextMenu menu)
+    Button? _listClosedByPress; // до отпускания кнопки мыши
+
+    void OpenMenu(ContextMenu menu, bool dropDown = false)
     {
         CancelZoom();
         StopGif();
         ClosePeek();
-        PrepareMenu(menu);
+        if (!dropDown) PrepareMenu(menu); // список кнопки стоит под ней, меню записи — сбоку от панели или у мыши
         _menuOpen = true;
         _outsideTimer.Stop();
         menu.Closed += (_, _) => { _menuOpen = false; StartOutsideTimer(); };
+        // Нажатие на кнопку закрывает её список; отпускание не должно тут же открыть его снова. Closed для этого поздно: приходит после щелчка.
+        Mouse.AddPreviewMouseDownOutsideCapturedElementHandler(menu, (_, e) =>
+        {
+            if (dropDown && e.ChangedButton == MouseButton.Left && menu.PlacementTarget is Button button
+                && new Rect(button.RenderSize).Contains(e.GetPosition(button))) _listClosedByPress = button;
+        });
         Motion.AnimateOpen(menu, menu.Placement == PlacementMode.MousePoint ? 0 : -8);
         menu.IsOpen = true;
     }
@@ -1644,6 +1776,61 @@ partial class PanelWindow : Window
         foreach (var (hint, key) in new (UIElement, ModifierKeys)[] { (HintPaste, ModifierKeys.None), (HintQuick, ModifierKeys.Control), (HintSelect, ModifierKeys.Alt), (HintStack, ModifierKeys.Shift) })
             Motion.To(hint, OpacityProperty, held == ModifierKeys.None || held == key ? 1 : 0.35, Motion.Fast);
     }
+
+    /// <summary>Клавиши внизу панели нажимаются вместе с настоящими.</summary>
+    void InitializeKeyCaps()
+    {
+        PreviewKeyDown += (_, e) => PressKeyCaps(e.Key == Key.System ? e.SystemKey : e.Key, true);
+        PreviewKeyUp += (_, e) => PressKeyCaps(e.Key == Key.System ? e.SystemKey : e.Key, false);
+        Deactivated += (_, _) => ReleaseKeyCaps();
+        IsVisibleChanged += (_, _) => ReleaseKeyCaps();
+        PreviewMouseLeftButtonDown += (_, _) => { if (Keyboard.Modifiers == ModifierKeys.Alt) Last(SelectKeys)?.Press(true); };
+        PreviewMouseLeftButtonUp += (_, _) => Last(SelectKeys)?.Press(false);
+        PreviewMouseWheel += (_, _) => { if (Keyboard.Modifiers == ModifierKeys.Shift) Last(StackKeys)?.Tap(); };
+    }
+
+    static KeyCap? Last(KeyCaps keys) => keys.Caps.Count > 1 ? keys.Caps[^1] : null;
+
+    internal void PressKeyCaps(Key key, bool down)
+    {
+        switch (key)
+        {
+            case Key.Enter: PasteKeys.Caps[0].Press(down); break;
+            case Key.LeftCtrl or Key.RightCtrl:
+                QuickKeys.Caps[0].Press(down);
+                if (!down) Last(QuickKeys)?.Press(false);
+                break;
+            case Key.LeftAlt or Key.RightAlt: SelectKeys.Caps[0].Press(down); break;
+            case Key.LeftShift or Key.RightShift: StackKeys.Caps[0].Press(down); break;
+            case (>= Key.D1 and <= Key.D9) or (>= Key.NumPad1 and <= Key.NumPad9): Last(QuickKeys)?.Press(down && Keyboard.Modifiers == ModifierKeys.Control); break;
+        }
+    }
+
+    void ReleaseKeyCaps()
+    {
+        foreach (var keys in new[] { PasteKeys, QuickKeys, SelectKeys, StackKeys })
+            foreach (var cap in keys.Caps) cap.Press(false);
+    }
+
+    void KeepOrder_Changed(object sender, RoutedEventArgs e) => KeepOrderChanged?.Invoke(KeepOrder);
+
+    void KeepOrder_Click(object sender, RoutedEventArgs e)
+    {
+        if (KeepOrder) ShowInfo(InfoKind.Info, UiText.T("Порядок сохраняется."), UiText.T("Вставленные записи остаются на своих местах."));
+        else ShowInfo(InfoKind.Info, UiText.T("Порядок меняется."), UiText.T("Вставленные записи поднимаются наверх."));
+        Search.Focus();
+    }
+
+    void SymbolSort_Changed(object sender, RoutedEventArgs e)
+    {
+        if (_symbols == null) return; // IsChecked из XAML срабатывает раньше конструктора
+        _symbols.ByUse = SymbolsByUse;
+        _symbols.Reorder();
+        if (SymbolsTab) ResetSelection();
+        SymbolsByUseChanged?.Invoke(SymbolsByUse);
+    }
+
+    void SymbolSort_Click(object sender, RoutedEventArgs e) => Search.Focus(); // печатать поиск можно сразу
 
     void KeyHintsToggle_Changed(object sender, RoutedEventArgs e)
     {
@@ -1958,6 +2145,7 @@ partial class PanelWindow : Window
     public void SetPaused(bool paused)
     {
         _paused = paused;
+        PauseToggle.IsChecked = paused;
         RefreshInfo();
     }
 
@@ -2047,16 +2235,11 @@ partial class PanelWindow : Window
         _ => UiText.T("записей"),
     };
 
-    /// <summary>Очистка истории: подтверждение строкой в панели, а не системным окном. Фокус на «Отмена», как раньше «Нет».</summary>
+    /// <summary>Очистка истории: отдельное окно-вопрос, фокус на «Отмена».</summary>
     public void AskClear()
     {
         int count = _store.Items.Count(i => !i.Pinned);
-        if (count == 0) return;
-        TabAll.IsChecked = true;
-        _transient = new Info(InfoKind.Neutral, UiText.F($"Удалить {count} {Records(count)}?"), UiText.T("Закреплённые останутся."),
-            (UiText.T("Очистить"), new Action(ClearAnimated)), (UiText.T("Отмена"), null));
-        RefreshInfo();
-        Dispatcher.BeginInvoke(DispatcherPriority.Input, () => InfoSecondary.Focus());
+        if (count > 0 && ConfirmClear(count)) ClearAnimated();
     }
 
     /// <summary>Видимые записи уезжают вправо по очереди (шаг 30 мс), затем история очищается и выплывает пустое состояние.</summary>
@@ -2126,6 +2309,7 @@ partial class PanelWindow : Window
     /// <summary>Пока панель открыта, новая запись раскрывается сверху (остальные съезжают) и вспыхивает акцентом.</summary>
     void OnItemsChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
+        RefreshClearButton();
         if (SeriesActive || _mergeTextFilter || !IsShown || !Motion.Enabled || e.NewStartingIndex != 0
             || e.Action is not (NotifyCollectionChangedAction.Add or NotifyCollectionChangedAction.Move)
             || e.NewItems?[0] is not ClipItem item) return;
@@ -2380,12 +2564,13 @@ partial class PanelWindow : Window
 
     // ---------- Клавиатура ----------
 
-    /// <summary>F6 / Shift+F6: поиск → источник → «⋯» → «+ группа» → кнопки InfoBar. Tab занят переключением вкладок.</summary>
+    /// <summary>F6 / Shift+F6: поиск → источник → настройки → «+ группа» → кнопки InfoBar. Tab занят переключением вкладок.</summary>
     void CycleFocus(bool back)
     {
         var stops = new List<Control> { Search };
         if (SourceButton.IsVisible) stops.Add(SourceButton);
         if (KindButton.IsVisible) stops.Add(KindButton);
+        if (SymbolSortToggle.IsVisible) stops.Add(SymbolSortToggle);
         if (!SymbolsTab && !SeriesActive && !_mergeTextFilter) stops.Add(Active);
         if (SeriesActive || _mergeTextFilter)
         {
@@ -2395,9 +2580,10 @@ partial class PanelWindow : Window
             if (SeriesAll.IsEnabled) stops.Add(SeriesAll);
             stops.Add(SeriesClear);
         }
-        stops.Add(MoreButton);
+        stops.Add(SettingsButton);
         stops.Add(KeepOpenButton);
         if (GroupButton.IsVisible) stops.Add(GroupButton);
+        if (KeepOrderButton.IsVisible) stops.Add(KeepOrderButton);
         if (InfoBar.IsVisible)
             foreach (var b in new[] { InfoPrimary, InfoSecondary, InfoClose }) if (b.IsVisible) stops.Add(b);
         stops.RemoveAll(c => !c.IsEnabled);

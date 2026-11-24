@@ -34,6 +34,13 @@ public sealed class ClipItem : INotifyPropertyChanged
         get => _lastUsedAt;
         set { _lastUsedAt = value; PropertyChanged?.Invoke(this, new(nameof(TimeLabel))); }
     }
+    /// <summary>
+    /// Место в списке, если вставка через панель его не меняет: срок хранения продлевается (LastUsedAt), а запись стоит где стояла.
+    /// null — запись стоит по LastUsedAt.
+    /// </summary>
+    public DateTime? ListedAt { get; set; }
+    [JsonIgnore]
+    public DateTime OrderAt => ListedAt ?? LastUsedAt;
 
     /// <summary>Сегодня — «15:32», вчера — «вчера», раньше — «22.09».</summary>
     [JsonIgnore]
@@ -41,7 +48,7 @@ public sealed class ClipItem : INotifyPropertyChanged
     {
         get
         {
-            var t = LastUsedAt.ToLocalTime();
+            var t = OrderAt.ToLocalTime();
             return (DateTime.Today - t.Date).Days switch { 0 => t.ToString("HH:mm"), 1 => UiText.T("вчера"), _ => t.ToString("dd.MM") };
         }
     }
@@ -420,7 +427,7 @@ static class ImageFiles
 }
 
 /// <summary>
-/// История буфера. Только UI-поток. Порядок в Items — по LastUsedAt, свежие сверху.
+/// История буфера. Только UI-поток. Порядок в Items — по OrderAt, свежие сверху.
 /// Незакреплённые живут 7 дней и не больше 100 штук; закреплённые — всегда.
 /// На диске — JSON, зашифрованный DPAPI (CurrentUser): в истории бывают пароли и токены.
 /// Картинки — отдельными файлами в images/, чтобы не переписывать их при каждом сохранении.
@@ -547,14 +554,23 @@ public sealed class HistoryStore
         Insert(fresh, nowUtc);
     }
 
+    /// <summary>Вставка через панель не поднимает запись; обычное копирование того же в другом приложении поднимает.</summary>
+    internal bool KeepOrder { get; set; }
+
     /// <summary>Наша же вставка вернулась в буфер — только поднимаем запись, без повторного разбора данных.</summary>
     public void Touch(Guid id, DateTime nowUtc)
     {
-        if (Items.FirstOrDefault(i => i.Id == id) is { } item) Bump(item, nowUtc);
+        if (Items.FirstOrDefault(i => i.Id == id) is not { } item) return;
+        if (!KeepOrder) { Bump(item, nowUtc); return; }
+        item.ListedAt = item.OrderAt;
+        item.LastUsedAt = nowUtc;
+        Prune(nowUtc);
+        Changed?.Invoke();
     }
 
     void Bump(ClipItem item, DateTime nowUtc)
     {
+        item.ListedAt = null;
         item.LastUsedAt = nowUtc;
         Place(item);
         Prune(nowUtc);
@@ -569,14 +585,14 @@ public sealed class HistoryStore
     }
 
     /// <summary>
-    /// Ставит запись по LastUsedAt, а не просто наверх: большая картинка дописывается в фоне
+    /// Ставит запись по OrderAt, а не просто наверх: большая картинка дописывается в фоне
     /// и может прийти позже текста, скопированного уже после неё.
     /// </summary>
     void Place(ClipItem item)
     {
         int from = Items.IndexOf(item);
         int to = 0;
-        while (to < Items.Count && (Items[to] == item || Items[to].LastUsedAt > item.LastUsedAt)) to++;
+        while (to < Items.Count && (Items[to] == item || Items[to].OrderAt > item.OrderAt)) to++;
         if (from < 0) Items.Insert(to, item);
         else Items.Move(from, to > from ? to - 1 : to); // to считан вместе с самой записью
     }
@@ -613,7 +629,7 @@ public sealed class HistoryStore
 
     public IReadOnlyList<ClipItem> PinnedIn(Guid? groupId) => Items
         .Where(i => i.Pinned && i.PinnedGroupId == groupId)
-        .OrderBy(i => i.PinnedOrder).ThenByDescending(i => i.LastUsedAt).ToList();
+        .OrderBy(i => i.PinnedOrder).ThenByDescending(i => i.OrderAt).ToList();
 
     public void SetTileColor(ClipItem item, int color)
     {
@@ -756,7 +772,7 @@ public sealed class HistoryStore
                     : JsonSerializer.Deserialize<HistoryFile>(json) ?? new HistoryFile();
                 Groups.AddRange((file.Groups ?? []).Where(g => g.Id != Guid.Empty && !string.IsNullOrWhiteSpace(g.Name)));
                 var list = file.Items ?? [];
-                foreach (var i in list.OrderByDescending(i => i.LastUsedAt)) { i.ImageDir = ImagesDir; Items.Add(i); }
+                foreach (var i in list.OrderByDescending(i => i.OrderAt)) { i.ImageDir = ImagesDir; Items.Add(i); }
                 foreach (var i in Items.Where(i => i.PinnedGroupId != null && Groups.All(g => g.Id != i.PinnedGroupId))) i.PinnedGroupId = null;
                 if (legacy)
                 {
@@ -813,7 +829,11 @@ public sealed class HistoryStore
             keep.Rtf = keep.IsSensitive ? null : keep.Rtf ?? drop.Rtf;
             keep.Html = keep.IsSensitive ? null : keep.Html ?? drop.Html;
             keep.SourceApp ??= drop.SourceApp;
-            if (keep.LastUsedAt < drop.LastUsedAt) { keep.LastUsedAt = drop.LastUsedAt; Place(keep); }
+            var order = keep.OrderAt > drop.OrderAt ? keep.OrderAt : drop.OrderAt;
+            bool moved = order != keep.OrderAt;
+            if (keep.LastUsedAt < drop.LastUsedAt) keep.LastUsedAt = drop.LastUsedAt;
+            keep.ListedAt = order == keep.LastUsedAt ? null : order;
+            if (moved) Place(keep);
             Items.Remove(drop);
         }
         return true;
@@ -890,6 +910,12 @@ public sealed class HistoryStore
             PanelWindow.SelfTestMergeSelection(dir, Check);
             PanelWindow.SelfTestSubstitution(dir, Check);
             PanelWindow.SelfTestInlineEdit(dir, Check);
+            PanelWindow.SelfTestResize(dir, Check);
+            PanelWindow.SelfTestPlate(Check);
+            ShardFrame.SelfTest(Check);
+            Skin.SelfTest(Check);
+            AppIcons.SelfTest(dir, Check);
+            KeyCap.SelfTest(Check);
             PanelWindow.SelfTestPanelTransparency(dir, Check);
             PanelWindow.SelfTestImageSeries(dir, Check);
             PanelWindow.SelfTestImageViewer(dir, Check);
@@ -1004,6 +1030,11 @@ public sealed class HistoryStore
                 "сжатый промпт: метка посреди фразы → блок отдельными строками после неё");
             Check(PromptCompressor.Clean("Исправь функцию.", code).EndsWith("\r\n```py\r\nx = 1\r\n```"),
                 "сжатый промпт: потерянный моделью блок кода дописывается в конец");
+            (string, string)[] ru = [("ru", "")], en = [("en", "")];
+            Check(PromptCompressor.Examples("падает сборка:\nSystem.IO.FileNotFoundException: Could not load file or assembly 'Microsoft.Extensions.Logging'\nможет обновить Logging?", ru, en) == ru
+                && PromptCompressor.Examples("Fix lastPage() in src/pager.ts", ru, en) == en
+                && PromptCompressor.Examples("请帮我看一下 src/server/auth.go 里的 RefreshToken 函数，有时候会返回 500", ru, en).Length == 0,
+                "сжатый промпт: русский со стектрейсом — русские примеры, английский — английские, китайский — без примеров");
 
             // Картинки: одна и та же картинка в разных форматах пикселей → один хэш, одна запись.
             var px = new byte[] { 255, 0, 0, 255, 0, 255, 0, 255, 0, 0, 255, 255, 10, 20, 30, 255 };
@@ -1303,6 +1334,23 @@ public sealed class HistoryStore
             Check(order.Items.Select(i => i.Text).SequenceEqual(["позже", "раньше"]), "запись встаёт по времени копирования, а не просто наверх");
             order.Touch(order.Items[1].Id, t0.AddMinutes(3));
             Check(order.Items[0].Text == "раньше", "своя вставка поднимает запись по Id");
+            order.KeepOrder = true;
+            order.Touch(order.Items[1].Id, t0.AddMinutes(4));
+            Check(order.Items.Select(i => i.Text).SequenceEqual(["раньше", "позже"]) && order.Items[1].LastUsedAt == t0.AddMinutes(4) && order.Items[1].OrderAt == t0.AddMinutes(2),
+                "порядок сохраняется: вставка продлевает хранение, но запись стоит где стояла");
+            order.Add("новая", null, null, t0.AddMinutes(3.5));
+            Check(order.Items[0].Text == "новая", "порядок сохраняется: новая копия встаёт выше недавно вставленной записи");
+            order.Save();
+            var order2 = new HistoryStore(order._path);
+            order2.Load(t0.AddMinutes(5));
+            Check(order2.Items.Select(i => i.Text).SequenceEqual(["новая", "раньше", "позже"]), "порядок сохраняется после перезапуска");
+            order2.Storage = order2.Storage with { HistoryDays = 1 };
+            order2.Touch(order2.Items[1].Id, t0.AddDays(1));
+            order2.KeepOrder = true;
+            order2.Touch(order2.Items[2].Id, t0.AddDays(2).AddMinutes(5));
+            Check(order2.Items.Any(i => i.Text == "позже") && order2.Items.All(i => i.Text != "новая"), "порядок сохраняется: вставляемая запись не удаляется по сроку");
+            order2.Add("позже", null, null, t0.AddDays(2).AddMinutes(6));
+            Check(order2.Items[0].Text == "позже" && order2.Items[0].ListedAt == null, "порядок сохраняется: копирование в другом приложении поднимает запись");
             Check(JsonSerializer.Serialize("Привет <b>", JsonOptions) == "\"Привет <b>\"", "кириллица и HTML в истории без \\u-экранирования");
 
             var recover = new HistoryStore(Path.Combine(dir, "recover", "history.dat"));
@@ -1360,6 +1408,34 @@ public sealed class HistoryStore
             var dash = sym2.Items.First(i => i.Char == "—");
             Check(SymbolCatalog.Matches(dash, "2014") && SymbolCatalog.Matches(dash, "U+2014") && SymbolCatalog.Matches(dash, UiText.T("Пунктуация"))
                   && !SymbolCatalog.Matches(dash, "валют"), "поиск символа по коду и группе");
+            string Found(string q) => string.Concat(sym2.Items.Where(i => !i.Pinned && SymbolCatalog.Matches(i, q)).Select(i => i.Char));
+            Check(Found("c") == "çćĉċčÇĆĈĊČ" && Found("C") == Found("c") && Found("ć") == "ć" && Found("l").Contains('ł') && Found("i").Contains('İ')
+                  && Found("ae") == "æÆ" && Found("е").Contains('ё') && sym2.Items.Where(i => !i.Pinned).GroupBy(i => (i.Group, i.Char)).All(g => g.Count() == 1),
+                "поиск буквы с диакритикой по основной букве");
+            panel.TabSymbols.IsChecked = true;
+            panel.Search.Text = "c";
+            string Shown() => string.Concat(panel.SymbolList.Items.Cast<SymbolItem>().Select(i => i.Char));
+            foreach (var ch in "ććčččČ") sym2.Use(ch.ToString());
+            Check(Shown() == "çćĉċčÇĆĈĊČ", "частые символы: порядок не меняется сразу, под мышью");
+            sym2.Reorder();
+            Check(Shown() == "čćçĉċČÇĆĈĊ", "частые символы идут первыми в своей группе");
+            Check(panel.SymbolsByUse && panel.SymbolSortToggle.Visibility == System.Windows.Visibility.Visible, "частые символы: переключатель виден и включён");
+            panel.SymbolsByUse = false;
+            Check(Shown() == "çćĉċčÇĆĈĊČ" && panel.SymbolList.SelectedIndex == 0, "частые символы: выключено, порядок обычный");
+            sym2.Use("ĉ"); sym2.Reorder();
+            Check(Shown() == "çćĉċčÇĆĈĊČ", "частые символы: выключено, вставка порядок не меняет");
+            panel.SymbolsByUse = true;
+            Check(Shown() == "čćĉçċČÇĆĈĊ" && panel.SymbolList.SelectedIndex == 0, "частые символы: включено снова, счёт не прерывался");
+            sym2.TogglePin("ĉ"); sym2.TogglePin("ĉ");
+            Check(Found("c") == "čćĉçċČÇĆĈĊ" && sym2.Items.Count == new SymbolCatalog(symPath).Items.Count, "частые символы: порядок переживает закрепление");
+            panel.Search.Text = "";
+            panel.TabAll.IsChecked = true;
+            Check(panel.SymbolSortToggle.Visibility == System.Windows.Visibility.Collapsed, "частые символы: переключатель только на вкладке символов");
+            var sym3 = new SymbolCatalog(symPath);
+            Check(sym3.Items.SequenceEqual(sym2.Items) && sym3.Items.Where(i => i.Group.StartsWith(UiText.T("Латиница"))).First().Char == "č",
+                "частые символы: порядок переживает перезапуск");
+            File.WriteAllText(Path.ChangeExtension(symPath, ".usage.json"), "мусор");
+            Check(new SymbolCatalog(symPath).Items.First(i => i.Group.StartsWith(UiText.T("Латиница"))).Char == "à", "частые символы: битый файл счётчиков даёт обычный порядок");
 
             File.WriteAllText(s._path, "мусор");
             var s3 = new HistoryStore(s._path);

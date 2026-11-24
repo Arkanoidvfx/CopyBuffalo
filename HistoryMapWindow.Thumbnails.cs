@@ -28,10 +28,10 @@ internal sealed partial class HistoryMapWindow
         finally { mapThumbnailGate.Release(); }
     }
 
-    async void RequestMapThumbnail(Image holder, MapEntry entry, int frame)
+    async Task RequestMapThumbnail(Image holder, MapEntry entry, int? frame, Func<bool>? stillVisible = null)
     {
         if (entry.Sensitive || entry.Kind != "image" || entry.Hash == null) return;
-        bool Current() => !closed && frame == mapThumbnailFrame && !invalid.Contains(entry.Id)
+        bool Current() => !closed && (frame == null || frame == mapThumbnailFrame) && (stillVisible?.Invoke() ?? true) && !invalid.Contains(entry.Id)
             && snapshot.Any(e => ReferenceEquals(e, entry))
             && store.Items.FirstOrDefault(i => i.Id == entry.Id) is { } live && !live.IsSensitive && entry.ContentMatches(live);
         if (!Current()) return;

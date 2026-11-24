@@ -20,6 +20,8 @@ internal sealed partial class HistoryMapWindow
         var store = new HistoryStore(Path.Combine(directory, "map.dat"));
         var time = DateTime.UtcNow.AddDays(-2);
         for (int i = 0; i < 28; i++) store.Items.Add(new ClipItem { Text = i % 3 == 0 ? "Research notes\nMaterials, references and next steps" : i % 3 == 1 ? "git log --oneline --max-count=12" : "https://example.test/projects/clipboard", SourceApp = i % 3 == 0 ? "Notepad" : i % 3 == 1 ? "Terminal" : "Browser", CreatedAt = time.AddMinutes(i * 120), LastUsedAt = time.AddMinutes(i * 120) });
+        var longNote = store.Items[13];
+        store.UpdateText(longNote, "Review notes\n" + string.Join("\n", Enumerable.Range(1, 60).Select(i => $"Revision {i} — verify the layout, keyboard navigation and search results.")));
         var anchor = store.Items[14]; var snap = MapEntry.Capture(anchor);
         anchor.LastUsedAt = DateTime.UtcNow;
         check(snap.Used != anchor.LastUsedAt, "snapshot keeps last-use date stable after copying");
@@ -56,6 +58,33 @@ internal sealed partial class HistoryMapWindow
         {
             window.original = window.selected = anchor.Id;
             window.Show(); window.RefreshSnapshot(); Pump(() => window.nodes.Length == 28);
+            window.UpdateLayout();
+            check(window.timeline.IsVisible && window.reader.ActualWidth > 600 && window.timeline.SelectedItem is HistoryTimelineEntry active && active.Entry.Id == anchor.Id, "timeline opens at the original entry beside a full-height reader");
+            double oldListWidth = window.timelinePane.ActualWidth;
+            window.timelineDivider.RaiseEvent(new System.Windows.Input.KeyEventArgs(System.Windows.Input.Keyboard.PrimaryDevice, PresentationSource.FromVisual(window), 0, System.Windows.Input.Key.Right) { RoutedEvent = KeyDownEvent });
+            window.UpdateLayout();
+            check(window.timelinePane.ActualWidth > oldListWidth + 10, "keyboard divider gives the list more room");
+            double resizedWidth = window.timelinePane.ActualWidth;
+            var noteRow = window.timelineRows.Single(r => r.Entry.Id == longNote.Id);
+            window.timeline.ScrollIntoView(noteRow); window.UpdateLayout();
+            var container = (System.Windows.Controls.ListBoxItem)window.timeline.ItemContainerGenerator.ContainerFromItem(noteRow);
+            container.RaiseEvent(new System.Windows.Input.MouseEventArgs(System.Windows.Input.Mouse.PrimaryDevice, 0) { RoutedEvent = MouseEnterEvent });
+            check(window.readingText.Text == longNote.Text && window.selected == anchor.Id, "timeline hover reads full content while the copy target stays pinned");
+            window.CaptureMap(Path.Combine(directory, "timeline-text.png"));
+            var copyShown = window.CopyDisplayed(); Pump(() => copyShown.IsCompleted); copyShown.GetAwaiter().GetResult();
+            check(System.Windows.Clipboard.GetText() == longNote.Text && window.selected == longNote.Id, "reader copy commits and copies the displayed entry");
+            check(Equals(window.copy.Content, window.T("Скопировано")) && Math.Abs(window.timelinePane.ActualWidth - resizedWidth) < 2, "copy confirms on the reader button and preserves pane widths");
+            window.search.Text = "revision 57"; Pump(() => window.timelineRows.Length == 1 && window.readingText.VerticalOffset > 0);
+            var hit = window.timelineRows.Single().Excerpt;
+            check(hit.Hit == "Revision 57" && window.readingText.SelectedText == hit.Hit && window.readingText.Text == longNote.Text, "search shows the matching passage in the row and scrolls the full reader to it");
+            window.CaptureMap(Path.Combine(directory, "timeline-match.png"));
+            window.search.Focus(); window.FocusSearchResult();
+            check(window.timeline.IsKeyboardFocusWithin, "down from search transfers keyboard focus to the retained match");
+            window.search.Text = "no such revision"; Pump(() => window.nodes.Length == 0);
+            check(window.clearFilters.IsVisible && window.clearFilters.Parent != window.header && !window.reader.IsVisible, "zero matches offer an inline recovery action");
+            window.clearFilters.RaiseEvent(new RoutedEventArgs(System.Windows.Controls.Button.ClickEvent)); Pump(() => window.nodes.Length == 28);
+            window.Select(anchor.Id);
+            window.SetTimeline(false);
             window.UpdateLayout(); window.CenterOn(anchor.Id);
             check(!window.rail.IsVisible && !window.inspector.IsVisible && !window.filterPanel.IsVisible && !window.clearFilters.IsVisible && window.copy.IsVisible, "wide map opens with auxiliary panes and inactive filter cue hidden and Copy available");
             window.CaptureMap(Path.Combine(directory, "map-first-wide.png"));
@@ -95,7 +124,18 @@ internal sealed partial class HistoryMapWindow
             var sampleCard = smallCards.FirstOrDefault(b => b.Content is System.Windows.Controls.StackPanel panel && panel.Children.OfType<System.Windows.Controls.TextBlock>().Count() >= 2);
             check(sampleCard?.Content is System.Windows.Controls.StackPanel content && content.Children.OfType<System.Windows.Controls.TextBlock>().Take(2).All(t => t.FontSize >= 10 && t.Text.Length > 0 && t.TranslatePoint(new Point(0, 0), content).Y + t.ActualHeight <= content.ActualHeight + 1), "zoomed-out cards retain readable date and content without vertical clipping");
             check(sampleCard?.Content is System.Windows.Controls.StackPanel multiline && multiline.Children.OfType<System.Windows.Controls.TextBlock>().Last() is { FontSize: >= 12, TextWrapping: TextWrapping.Wrap } excerpt && excerpt.MaxHeight >= excerpt.LineHeight * 2, "compact entries show readable multiline previews");
-            check(sampleCard?.ToolTip is System.Windows.Controls.TextBlock tooltip && tooltip.Text.Length > 0 && !string.IsNullOrEmpty(System.Windows.Automation.AutomationProperties.GetName(sampleCard)), "zoomed-out cards expose full preview and an accessible name");
+            var hoverCard = smallCards.Single(b => Equals(b.Tag, longNote.Id));
+            var hovered = window.nodes.Single(n => n.Entry.Id == (Guid)hoverCard.Tag).Entry;
+            hoverCard.RaiseEvent(new System.Windows.Input.MouseEventArgs(System.Windows.Input.Mouse.PrimaryDevice, 0) { RoutedEvent = MouseEnterEvent });
+            check(window.readingText.Text == hovered.Text && window.readingLabel.Text == window.T("Просмотр") && window.selected == anchor.Id && System.Windows.Clipboard.GetText() == clipboardBeforeZoom && !string.IsNullOrEmpty(System.Windows.Automation.AutomationProperties.GetName(hoverCard)), "hover reads full text synchronously without selecting or copying");
+            window.CaptureMap(Path.Combine(directory, "map-hover.png"));
+            window.readingText.ScrollToEnd(); window.UpdateLayout();
+            check(window.readingText.VerticalOffset > 0 && window.readingText.Text.EndsWith("search results.") && window.readingText.Text.Length > hovered.Preview.Length, "long hover text scrolls through the full entry");
+            ((System.Windows.Controls.Grid)window.canvas.Parent).RaiseEvent(new System.Windows.Input.MouseEventArgs(System.Windows.Input.Mouse.PrimaryDevice, 0) { RoutedEvent = MouseLeaveEvent });
+            check(window.readingText.Text == anchor.Text && window.readingLabel.Text == window.T("Выбрано"), "leaving the reading area restores the pinned entry");
+            window.StepEntry(-1); check(window.selected == window.nodes[index - 1].Entry.Id && window.readingEntry?.Id == window.selected, "previous entry selects and reads the chronological neighbor");
+            window.StepEntry(1); check(window.selected == anchor.Id, "next entry returns to the original selection");
+            window.Zoom(.25, pointer);
             var panNode = window.nodes.Single(item => item.Entry.Id == anchor.Id); var beforePan = window.ScreenRect(panNode);
             window.offset += new Vector(45, 30); window.Draw(); var afterPan = window.ScreenRect(panNode);
             check(Math.Abs(afterPan.X - beforePan.X - 45) < .01 && Math.Abs(afterPan.Y - beforePan.Y - 30) < .01 && window.selected == anchor.Id, "panning moves cards on both axes without changing selection");
@@ -208,7 +248,12 @@ internal sealed partial class HistoryMapWindow
             anchor.IsSensitive = true;
             check(!window.copy.IsEnabled && window.picture.Source == null && window.preview.Text.Length == 0, "sensitivity change revokes cached preview immediately");
             window.RefreshSnapshot(); Pump(() => window.nodes.Length == 28);
+            window.Select(anchor.Id); window.CenterOn(anchor.Id);
+            var protectedCard = window.canvas.Children.OfType<System.Windows.Controls.Button>().Single(b => Equals(b.Tag, anchor.Id));
+            protectedCard.RaiseEvent(new System.Windows.Input.MouseEventArgs(System.Windows.Input.Mouse.PrimaryDevice, 0) { RoutedEvent = MouseEnterEvent });
+            check(window.readingText.Text == "********" && window.readingMedia.Content == null, "instant reading never reveals protected contents");
             store.Prune(DateTime.UtcNow.AddYears(1));
+            check(window.readingText.Text == "" && window.readingEntry == null, "expiry clears the reading surface synchronously");
             check(window.nodes.Length == 0 && !window.copy.IsEnabled && !window.home.IsEnabled, "expiry without Changed removes nodes and actions");
             var large = Enumerable.Range(0, 6000).Select(i => new MapEntry(Guid.NewGuid(), "item", null, null, "item", "", "text", null, null, false, time, time.AddSeconds(i))).ToArray();
             check(HistoryMap.Layout(large, false).Length == large.Length, "large history preserves every entry");
@@ -239,6 +284,10 @@ internal sealed partial class HistoryMapWindow
             try
             {
                 compact.original = compact.selected = store.Items[40].Id; compact.Show(); compact.RefreshSnapshot(); Pump(() => compact.nodes.Length == 104); compact.UpdateLayout(); compact.ResizePanes(); compact.UpdateLayout(); compact.CenterOn(compact.selected);
+                compact.Width = 640; compact.Height = 480; compact.UpdateLayout();
+                check(System.Windows.Controls.Grid.GetRow(compact.reader) == 1 && compact.timeline.ActualHeight > 80 && compact.reader.ActualHeight > 80, "narrow timeline stacks the list and reading area");
+                compact.CaptureMap(Path.Combine(directory, "timeline-compact.png"));
+                compact.SetTimeline(false); compact.Width = 800; compact.Height = 820; compact.UpdateLayout();
                 check(!compact.rail.IsVisible && !compact.inspector.IsVisible, "first compact opening keeps auxiliary panes hidden");
                 compact.CaptureMap(Path.Combine(directory, "map-first-compact.png"));
                 compact.previewToggle.RaiseEvent(new RoutedEventArgs(System.Windows.Controls.Button.ClickEvent)); compact.UpdateLayout();
@@ -272,12 +321,23 @@ internal sealed partial class HistoryMapWindow
 
             var imageDir = Path.Combine(directory, "thumbnail-fixture"); Directory.CreateDirectory(imageDir);
             var imageStore = new HistoryStore(Path.Combine(imageDir, "map.dat"));
-            var pixels = Enumerable.Range(0, 64).SelectMany(_ => new byte[] { 24, 135, 220, 255 }).ToArray();
-            var bitmapFixture = BitmapSource.Create(8, 8, 96, 96, PixelFormats.Bgra32, null, pixels, 32); bitmapFixture.Freeze();
+            var strip = new DrawingVisual();
+            using (var dc = strip.RenderOpen())
+            {
+                dc.DrawRectangle(new SolidColorBrush(Color.FromRgb(23, 38, 49)), null, new Rect(0, 0, 932, 126));
+                void TerminalLine(string text, Brush ink, double y) => dc.DrawText(new FormattedText(text,
+                    System.Globalization.CultureInfo.InvariantCulture, FlowDirection.LeftToRight, new Typeface("Consolas"), 22, ink, 1), new Point(22, y));
+                TerminalLine("D:\\Projects\\CopyBuffalo> dotnet build -c Release", Brushes.White, 12);
+                TerminalLine("Build succeeded.", Brushes.LightGreen, 50);
+                TerminalLine("0 warnings    0 errors", Brushes.LightSteelBlue, 85);
+            }
+            var bitmapFixture = new RenderTargetBitmap(932, 126, 96, 96, PixelFormats.Pbgra32); bitmapFixture.Render(strip); bitmapFixture.Freeze();
             ImageFiles.Write(imageStore.ImagesDir, "synthetic-map-image", bitmapFixture);
-            var imageItem = new ClipItem { ImageHash = "synthetic-map-image", ImageWidth = 8, ImageHeight = 8, ImageDir = imageStore.ImagesDir, CreatedAt = time, LastUsedAt = time };
+            var imageItem = new ClipItem { ImageHash = "synthetic-map-image", ImageWidth = 932, ImageHeight = 126, SourceApp = "ShareX", ImageDir = imageStore.ImagesDir, CreatedAt = time, LastUsedAt = time };
             var protectedImage = new ClipItem { ImageHash = "synthetic-map-image", ImageWidth = 8, ImageHeight = 8, ImageDir = imageStore.ImagesDir, CreatedAt = time, LastUsedAt = time, IsSensitive = true };
             imageStore.Items.Add(imageItem); imageStore.Items.Add(protectedImage);
+            foreach (var (source, text, hoursAgo) in new[] { ("Notepad", "Карта истории\nПроверить чтение длинного снимка на масштабе 69%.", 1), ("Terminal", "dotnet build -c Release", 2), ("Explorer", @"D:\Projects\CopyBuffalo\Assets", 23) })
+                imageStore.Items.Add(new ClipItem { Text = text, SourceApp = source, CreatedAt = time.AddHours(-hoursAgo), LastUsedAt = time.AddHours(-hoursAgo) });
             var fixtureColors = new[] { Colors.CornflowerBlue, Colors.SeaGreen, Colors.Coral, Colors.MediumPurple };
             for (int i = 0; i < fixtureColors.Length; i++)
             {
@@ -296,9 +356,26 @@ internal sealed partial class HistoryMapWindow
             var imageWindow = new HistoryMapWindow(imageStore);
             try
             {
-                imageWindow.original = imageWindow.selected = imageItem.Id; imageWindow.Show(); imageWindow.RefreshSnapshot(); Pump(() => imageWindow.nodes.Length == 6);
+                imageWindow.original = imageWindow.selected = imageItem.Id; imageWindow.Show(); imageWindow.RefreshSnapshot(); Pump(() => imageWindow.nodes.Length == imageStore.Items.Count);
+                imageWindow.UpdateLayout();
+                Pump(() => imageWindow.readingMedia.Content is System.Windows.Controls.Image { Source: BitmapSource { PixelWidth: 932 } });
+                var stripImage = (System.Windows.Controls.Image)imageWindow.readingMedia.Content;
+                check(stripImage.ActualWidth > 580 && stripImage.ActualWidth / stripImage.ActualHeight > 7, "932 by 126 strip renders at reading width with original aspect and detail");
+                ((App)Application.Current).ApplyTheme(true);
+                imageWindow.CaptureMap(Path.Combine(directory, "timeline-strip.png"));
+                double fittedWidth = stripImage.ActualWidth;
+                imageWindow.imageZoom.RaiseEvent(new RoutedEventArgs(System.Windows.Controls.Button.ClickEvent)); imageWindow.UpdateLayout();
+                check(imageWindow.enlarged && stripImage.ActualWidth >= fittedWidth * 1.95 && imageWindow.imageViewport.ScrollableWidth > 0, "image zoom doubles the fitted size and exposes scrolling");
+                imageWindow.imageViewport.ScrollToRightEnd(); imageWindow.UpdateLayout();
+                check(imageWindow.imageViewport.HorizontalOffset > 0, "zoomed strip can be read to its far edge");
+                imageWindow.CaptureMap(Path.Combine(directory, "timeline-zoom.png"));
+                imageWindow.imageZoom.RaiseEvent(new RoutedEventArgs(System.Windows.Controls.Button.ClickEvent)); imageWindow.UpdateLayout();
+                check(!imageWindow.enlarged && Math.Abs(stripImage.ActualWidth - fittedWidth) < 2, "fit restores the complete strip without changing selection");
+                imageWindow.SetTimeline(false); imageWindow.UpdateLayout(); imageWindow.Zoom(.69, imageWindow.Center);
+                imageWindow.CaptureMap(Path.Combine(directory, "map-strip-69.png"));
                 imageWindow.UpdateLayout(); imageWindow.CenterOn(imageItem.Id); imageWindow.Zoom(.25, imageWindow.Center); imageWindow.UpdateLayout();
                 Pump(() => imageWindow.mapThumbnailLoads.Count == 0 && imageWindow.mapThumbnails.Count >= 4);
+                check(imageWindow.readingMedia.Content is System.Windows.Controls.Image { Source: not null }, "reading area renders the selected image from the thumbnail cache");
                 imageWindow.CaptureMap(Path.Combine(directory, "zoom-images-wide.png"));
                 imageWindow.Width = 800; imageWindow.UpdateLayout(); imageWindow.CaptureMap(Path.Combine(directory, "zoom-images-compact.png"));
                 var thumbnails = imageWindow.canvas.Children.OfType<System.Windows.Controls.Button>().Select(b => b.Content).OfType<System.Windows.Controls.DockPanel>().SelectMany(p => p.Children.OfType<System.Windows.Controls.Image>()).ToArray();
@@ -306,27 +383,27 @@ internal sealed partial class HistoryMapWindow
                 check(thumbnails.All(i => i.Stretch == Stretch.Uniform), "image previews preserve their full aspect ratio without cropping");
                 var entry = imageWindow.snapshot.Single(e => e.Id == imageItem.Id);
                 var holder = new System.Windows.Controls.Image(); int frame = imageWindow.BeginMapFrame();
-                imageWindow.RequestMapThumbnail(holder, entry, frame); Pump(() => holder.Source != null);
+                _ = imageWindow.RequestMapThumbnail(holder, entry, frame); Pump(() => holder.Source != null);
                 check(holder.Source is BitmapSource, "visible non-sensitive image thumbnail loads asynchronously");
                 var secretHolder = new System.Windows.Controls.Image();
-                imageWindow.RequestMapThumbnail(secretHolder, imageWindow.snapshot.Single(e => e.Id == protectedImage.Id), frame);
+                _ = imageWindow.RequestMapThumbnail(secretHolder, imageWindow.snapshot.Single(e => e.Id == protectedImage.Id), frame);
                 check(secretHolder.Source == null, "sensitive image never receives a cached thumbnail");
                 Pump(() => imageWindow.mapThumbnailLoads.Count == 0 && imageWindow.mapThumbnailGate.CurrentCount == 3);
                 imageWindow.ClearMapThumbnails(); frame = imageWindow.BeginMapFrame();
                 var invalidHolder = new System.Windows.Controls.Image();
                 for (int i = 0; i < 3; i++) imageWindow.mapThumbnailGate.Wait();
                 Task<BitmapSource?>? invalidWork = null;
-                try { imageWindow.RequestMapThumbnail(invalidHolder, entry, frame); invalidWork = imageWindow.mapThumbnailLoads[entry.Hash!]; imageItem.IsSensitive = true; }
+                try { _ = imageWindow.RequestMapThumbnail(invalidHolder, entry, frame); invalidWork = imageWindow.mapThumbnailLoads[entry.Hash!]; imageItem.IsSensitive = true; }
                 finally { imageWindow.mapThumbnailGate.Release(3); }
                 Pump(() => invalidWork!.IsCompleted);
                 check(invalidWork!.IsCanceled && invalidHolder.Source == null && imageWindow.invalid.Contains(imageItem.Id), "sensitivity change cancels an in-flight image thumbnail");
-                imageItem.IsSensitive = false; imageWindow.RefreshSnapshot(); Pump(() => imageWindow.nodes.Length == 6);
+                imageItem.IsSensitive = false; imageWindow.RefreshSnapshot(); Pump(() => imageWindow.nodes.Length == imageStore.Items.Count);
                 Pump(() => imageWindow.mapThumbnailLoads.Count == 0 && imageWindow.mapThumbnailGate.CurrentCount == 3);
                 entry = imageWindow.snapshot.Single(e => e.Id == imageItem.Id); imageWindow.ClearMapThumbnails(); frame = imageWindow.BeginMapFrame();
                 var closedHolder = new System.Windows.Controls.Image();
                 for (int i = 0; i < 3; i++) imageWindow.mapThumbnailGate.Wait();
                 Task<BitmapSource?>? closedWork = null;
-                try { imageWindow.RequestMapThumbnail(closedHolder, entry, frame); closedWork = imageWindow.mapThumbnailLoads[entry.Hash!]; imageWindow.Close(); }
+                try { _ = imageWindow.RequestMapThumbnail(closedHolder, entry, frame); closedWork = imageWindow.mapThumbnailLoads[entry.Hash!]; imageWindow.Close(); }
                 finally { imageWindow.mapThumbnailGate.Release(3); }
                 Pump(() => closedWork!.IsCompleted);
                 check(closedWork!.IsCanceled && closedHolder.Source == null && imageWindow.mapThumbnails.Count == 0, "closing map cancels queued thumbnail work and clears cache");
@@ -364,6 +441,7 @@ partial class PanelWindow
         {
             panel.Show();
             panel.OpenSettings();
+            panel.ShowSettingsPage(5); // поля автозамены на странице «Записи»
             panel.Dispatcher.Invoke(() => { }, DispatcherPriority.Background);
             panel.PasteReplacementRule = new(true, "ЯС42-", "first-second");
             panel.PasteReplacementTo.Focus();

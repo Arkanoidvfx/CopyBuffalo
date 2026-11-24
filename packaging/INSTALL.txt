@@ -1,4 +1,4 @@
-CopyBuffalo 0.2.11
+CopyBuffalo 0.2.12
 Windows 10 (1809+) / Windows 11, Intel/AMD x64
 
 DOWNLOAD
@@ -25,9 +25,9 @@ installer filename has changed. Later updates use CopyBuffalo-Setup.exe.
 USE
 Copy normally, then press Win+V to find and paste a saved entry.
 English is the default. Choose English, Russian, Simplified Chinese,
-Traditional Chinese, Cantonese, Japanese, or Hindi in Settings > View > Language,
+Traditional Chinese, Cantonese, Japanese, or Hindi in Settings > General > Language,
 then restart to apply. Settings, pause, and exit are available
-from the tray menu and the panel's three-dot menu.
+from the tray menu and the gear button in the panel.
 Exiting restores the normal Windows Win+V shortcut.
 
 UPDATES

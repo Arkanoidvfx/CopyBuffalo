@@ -1,0 +1,79 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:local="clr-namespace:ArkCopyBuffer">
+    <Style x:Key="HistoryDivider" TargetType="GridSplitter">
+        <Setter Property="Cursor" Value="SizeWE"/>
+        <Setter Property="Template"><Setter.Value>
+            <ControlTemplate TargetType="GridSplitter">
+                <Grid Background="Transparent"><Border x:Name="Grip" Width="3" Height="36" CornerRadius="2" Background="{DynamicResource ControlStroke}"/></Grid>
+                <ControlTemplate.Triggers>
+                    <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="Grip" Property="Background" Value="{DynamicResource Accent}"/></Trigger>
+                    <Trigger Property="IsKeyboardFocused" Value="True"><Setter TargetName="Grip" Property="Background" Value="{DynamicResource Accent}"/></Trigger>
+                </ControlTemplate.Triggers>
+            </ControlTemplate>
+        </Setter.Value></Setter>
+    </Style>
+    <Style x:Key="HistoryMode" TargetType="RadioButton">
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Foreground" Value="{DynamicResource TextSecondary}"/>
+        <Setter Property="FocusVisualStyle" Value="{DynamicResource FocusRing}"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="RadioButton">
+                    <Border x:Name="Tab" Padding="12,4" Background="Transparent" CornerRadius="4">
+                        <Grid>
+                            <Grid.RowDefinitions><RowDefinition/><RowDefinition Height="2"/></Grid.RowDefinitions>
+                            <ContentPresenter Margin="0,2,0,5" VerticalAlignment="Center"/>
+                            <Border x:Name="Line" Grid.Row="1" CornerRadius="1" HorizontalAlignment="Center" Width="24"/>
+                        </Grid>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="Tab" Property="Background" Value="{DynamicResource ControlFillHover}"/></Trigger>
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter Property="Foreground" Value="{DynamicResource TextPrimary}"/><Setter Property="FontWeight" Value="SemiBold"/>
+                            <Setter TargetName="Line" Property="Background" Value="{DynamicResource Accent}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style x:Key="TimelineRow" TargetType="ListBoxItem">
+        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+        <Setter Property="AutomationProperties.Name" Value="{Binding AccessibleName}"/>
+        <Setter Property="FocusVisualStyle" Value="{DynamicResource FocusRing}"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ListBoxItem">
+                    <StackPanel>
+                        <TextBlock x:Name="Day" Text="{Binding Day}" Margin="12,16,0,7" FontSize="18" FontWeight="SemiBold"
+                                   Foreground="{DynamicResource TextPrimary}"/>
+                        <Border x:Name="Row" Background="Transparent" CornerRadius="6" Padding="12,9" BorderThickness="1" BorderBrush="Transparent">
+                            <Grid>
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="48"/><ColumnDefinition Width="27"/><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                <TextBlock Text="{Binding Time}" FontSize="12" FontFamily="{DynamicResource MonoFont}"
+                                           Foreground="{DynamicResource TextSecondary}" VerticalAlignment="Top" Margin="0,2,0,0"/>
+                                <TextBlock Grid.Column="1" Text="{Binding Glyph}" FontFamily="{DynamicResource IconFont}" FontSize="15" Margin="0,2,0,0" Foreground="{DynamicResource TextSecondary}"/>
+                                <StackPanel Grid.Column="2">
+                                    <TextBlock Text="{Binding Source}" FontSize="12" Foreground="{DynamicResource TextSecondary}" TextTrimming="CharacterEllipsis"/>
+                                    <TextBlock FontSize="15" Foreground="{DynamicResource TextPrimary}" Margin="0,3,0,0"
+                                               TextWrapping="Wrap" TextTrimming="CharacterEllipsis" LineHeight="20" LineStackingStrategy="BlockLineHeight" MaxHeight="40"><Run Text="{Binding Excerpt.Before, Mode=OneWay}"/><Run Text="{Binding Excerpt.Hit, Mode=OneWay}" Foreground="{DynamicResource Accent}" FontWeight="Bold"/><Run Text="{Binding Excerpt.After, Mode=OneWay}"/></TextBlock>
+                                </StackPanel>
+                                <local:HistoryTimelineImage x:Name="Thumbnail" Grid.Column="3" Width="68" Height="42" Margin="10,0,0,0" Stretch="Uniform" Visibility="Collapsed"/>
+                            </Grid>
+                        </Border>
+                    </StackPanel>
+                    <ControlTemplate.Triggers>
+                        <DataTrigger Binding="{Binding Day}" Value=""><Setter TargetName="Day" Property="Visibility" Value="Collapsed"/></DataTrigger>
+                        <DataTrigger Binding="{Binding HasImage}" Value="True"><Setter TargetName="Thumbnail" Property="Visibility" Value="Visible"/></DataTrigger>
+                        <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="Row" Property="Background" Value="{DynamicResource ControlFillHover}"/></Trigger>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter TargetName="Row" Property="Background" Value="{DynamicResource ControlFill}"/>
+                            <Setter TargetName="Row" Property="BorderBrush" Value="{DynamicResource Accent}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+</ResourceDictionary>

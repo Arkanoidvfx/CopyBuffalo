@@ -40,6 +40,7 @@ sealed class ClipboardWatcher : IDisposable
     readonly Dispatcher _worker;
     readonly Func<uint> _sequence;
     readonly Func<StorageSettings, (uint sequence, IntPtr owner, IDataObject? data)> _readClipboard;
+    readonly Func<IntPtr, string?> _sourceApp;
     readonly SemaphoreSlim _heavyGate = new(1, 1);
     HwndSource? _source;
     uint? _lastSequence; // только поток _worker
@@ -48,13 +49,15 @@ sealed class ClipboardWatcher : IDisposable
     internal bool Capturing => Volatile.Read(ref _pendingCaptures) != 0;
     public bool Paused { get => _paused; set => _paused = value; }
 
-    ClipboardWatcher(HistoryStore store, Func<uint> sequence, Func<StorageSettings, (uint sequence, IntPtr owner, IDataObject? data)> readClipboard)
+    ClipboardWatcher(HistoryStore store, Func<uint> sequence, Func<StorageSettings, (uint sequence, IntPtr owner, IDataObject? data)> readClipboard,
+        Func<IntPtr, string?>? sourceApp = null)
     {
         _store = store;
         _storage = store.Storage;
         _worker = Dispatcher.CurrentDispatcher;
         _sequence = sequence;
         _readClipboard = readClipboard;
+        _sourceApp = sourceApp ?? SourceApp;
     }
 
     public ClipboardWatcher(HistoryStore store)
@@ -123,17 +126,27 @@ sealed class ClipboardWatcher : IDisposable
                 var (capturedSequence, owner, d) = _readClipboard(limits);
                 _lastSequence = capturedSequence; // Associate the snapshot with its copy, never with a later clipboard change.
                 if (d == null) return;
-                if (App.TraceOn) App.Trace($"capture: seq={sequence}->{capturedSequence} attempt={attempt} app={SourceApp(owner) ?? "?"} formats={string.Join(",", d.GetFormats())}");
+                var sourceApp = _sourceApp(owner);
+                if (App.TraceOn) App.Trace($"capture: seq={sequence}->{capturedSequence} attempt={attempt} app={sourceApp ?? "?"} formats={string.Join(",", d.GetFormats())}");
                 if (OwnItem(d) is { } id)
                 {
                     if (id != Guid.Empty) await RunQueued(async () => await _ui.InvokeAsync(() => _store.Touch(id, now)));
                     return;
                 }
-                var sourceApp = SourceApp(owner);
                 if (Sensitive(d))
                 {
                     if (d.GetData(DataFormats.UnicodeText) is string secret && secret.Length > 0 && secret.Length <= limits.MaxChars)
-                        await RunQueued(async () => await _ui.InvokeAsync(() => _store.Add(secret, null, null, now, sourceApp, sensitive: true)));
+                    {
+                        // Windows clipboard history can replay an ordinary copy with only its own monitor exclusion marker.
+                        bool replay = string.Equals(sourceApp, "svchost", StringComparison.OrdinalIgnoreCase)
+                            && d.GetFormats(false).All(format => format == DataFormats.UnicodeText
+                                || format == "ExcludeClipboardContentFromMonitorProcessing");
+                        await RunQueued(async () => await _ui.InvokeAsync(() =>
+                        {
+                            if (replay && _store.Items.Any(item => !item.IsImage && !item.IsMedia && !item.IsSensitive && item.Text == secret)) return;
+                            _store.Add(secret, null, null, now, sourceApp, sensitive: true);
+                        }));
+                    }
                     return;
                 }
                 // FileDrop важнее UnicodeText: некоторые приложения отдают оба формата для одного файла.
@@ -169,7 +182,12 @@ sealed class ClipboardWatcher : IDisposable
         if (owner == IntPtr.Zero) return null;
         Native.GetWindowThreadProcessId(owner, out uint pid);
         if (pid == 0) return null;
-        try { using var process = System.Diagnostics.Process.GetProcessById((int)pid); return process.ProcessName; }
+        try
+        {
+            using var process = System.Diagnostics.Process.GetProcessById((int)pid);
+            AppIcons.Learn(process.ProcessName, Native.ProcessPath(pid));
+            return process.ProcessName;
+        }
         catch { return null; } // владелец буфера успел закрыться
     }
 
@@ -585,6 +603,38 @@ sealed class ClipboardWatcher : IDisposable
         Complete(secretWatcher.CaptureCurrent());
         check(secretStore.Items[0] is { IsSensitive: false, Preview: "https://github.com/D4Vinci/Scrapling", Kind: "url" },
             "link copied with Chrome's no-history flag is captured readable");
+
+        string ownerApp = "editor";
+        var relayStore = new HistoryStore(Path.Combine(dir, "clipboard-relay", "history.dat"));
+        var relayWatcher = new ClipboardWatcher(relayStore, () => sequence,
+            _ => (sequence, IntPtr.Zero, ClipboardSnapshot.Materialize(current, new())), _ => ownerApp);
+        const string prompt = "Review the changes and finish the project.";
+        const string promptHtml = "<b>Review the changes and finish the project.</b>";
+        current = Text(prompt, html: promptHtml);
+        sequence++;
+        Complete(relayWatcher.CaptureCurrent());
+        var original = relayStore.Items[0];
+        current = Text(prompt);
+        current.SetData("ExcludeClipboardContentFromMonitorProcessing", true);
+        ownerApp = "svchost";
+        sequence++;
+        Complete(relayWatcher.CaptureCurrent());
+        check(relayStore.Items.Count == 1 && relayStore.Items[0] == original
+            && original is { IsSensitive: false, SourceApp: "editor", Html: promptHtml, Preview: prompt },
+            "Windows clipboard replay leaves the original plain text preview, source and formatting intact");
+
+        current.SetData("org.nspasteboard.ConcealedType", true);
+        sequence++;
+        Complete(relayWatcher.CaptureCurrent());
+        check(original.IsSensitive && original.Html == null,
+            "a clipboard replay with a concealment marker still protects text already in history");
+
+        current = Text("text first seen in a Windows clipboard replay");
+        current.SetData("ExcludeClipboardContentFromMonitorProcessing", true);
+        sequence++;
+        Complete(relayWatcher.CaptureCurrent());
+        check(relayStore.Items.Count == 2 && relayStore.Items[0].IsSensitive,
+            "a clipboard replay without a matching ordinary entry stays masked");
     }
 
     internal static void SelfTestListener(string dir, Action<bool, string> check)

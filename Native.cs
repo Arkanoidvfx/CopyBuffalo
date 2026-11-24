@@ -103,6 +103,68 @@ static class Native
     public const uint SWP_NOACTIVATE = 0x10, SWP_NOSIZE = 0x1;
     [DllImport("user32.dll")] public static extern bool SetWindowPos(IntPtr hwnd, IntPtr after, int x, int y, int cx, int cy, uint flags);
     [DllImport("user32.dll")] public static extern bool DestroyIcon(IntPtr icon);
+    [DllImport("user32.dll", EntryPoint = "LoadCursorW")] public static extern IntPtr LoadCursor(IntPtr instance, IntPtr name);
+    [DllImport("user32.dll")] public static extern IntPtr SetCursor(IntPtr cursor);
+
+    [StructLayout(LayoutKind.Sequential)] struct BLENDFUNCTION { public byte Op, Flags, Alpha, Format; }
+    [StructLayout(LayoutKind.Sequential)]
+    struct BITMAPINFOHEADER { public int Size, Width, Height; public short Planes, Bits; public int Compression, Image, XPels, YPels, Used, Important; }
+    [DllImport("user32.dll")]
+    static extern bool UpdateLayeredWindow(IntPtr hwnd, IntPtr screen, ref POINT to, ref SIZE size, IntPtr source, ref POINT from, int key, ref BLENDFUNCTION blend, int flags);
+    [DllImport("gdi32.dll")] static extern IntPtr CreateCompatibleDC(IntPtr dc);
+    [DllImport("gdi32.dll")] static extern bool DeleteDC(IntPtr dc);
+    [DllImport("gdi32.dll")] static extern IntPtr SelectObject(IntPtr dc, IntPtr o);
+    [DllImport("gdi32.dll")] static extern IntPtr CreateDIBSection(IntPtr dc, ref BITMAPINFOHEADER info, int usage, out IntPtr bits, IntPtr section, int offset);
+
+    [DllImport("user32.dll", CharSet = CharSet.Unicode)]
+    static extern IntPtr CreateWindowExW(uint ex, string cls, string? name, uint style, int x, int y, int w, int h, IntPtr parent, IntPtr menu, IntPtr instance, IntPtr param);
+    [DllImport("user32.dll")] public static extern bool DestroyWindow(IntPtr hwnd);
+    [DllImport("dwmapi.dll")] public static extern int DwmFlush();
+
+    /// <summary>Картинка сразу под окном after (HWND_TOPMOST — поверх всех): мимо мыши, фокуса и панели задач. Появляется сразу, без кадра ожидания WPF.</summary>
+    public static IntPtr ShowPicture(RECT at, System.Windows.Media.Imaging.BitmapSource picture, IntPtr after)
+    {
+        const uint layered = 0x80000, transparent = 0x20, noActivate = 0x08000000, topmost = 0x8, popup = 0x80000000, show = 0x40;
+        var hwnd = CreateWindowExW(layered | transparent | noActivate | topmost | (uint)WS_EX_TOOLWINDOW, "STATIC", null, popup,
+            at.Left, at.Top, at.Right - at.Left, at.Bottom - at.Top, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero);
+        if (hwnd == IntPtr.Zero) return hwnd;
+        UpdateLayered(hwnd, at, picture, 0, 0);
+        SetWindowPos(hwnd, after, 0, 0, 0, 0, SWP_NOSIZE | 0x2 | SWP_NOACTIVATE | show); // SWP_NOMOVE
+        return hwnd;
+    }
+
+    [StructLayout(LayoutKind.Sequential)] struct WINDOWPOS { public IntPtr Hwnd, After; public int X, Y, W, H; public uint Flags; }
+    [DllImport("user32.dll", EntryPoint = "SendMessageW")] static extern IntPtr SendMessage(IntPtr hwnd, int msg, IntPtr w, ref WINDOWPOS l);
+
+    /// <summary>WM_WINDOWPOSCHANGED с новым местом и размером: по нему DefWindowProc пришлёт WM_MOVE и WM_SIZE.</summary>
+    public static void SendWindowPosChanged(IntPtr hwnd, RECT r)
+    {
+        var pos = new WINDOWPOS { Hwnd = hwnd, X = r.Left, Y = r.Top, W = r.Right - r.Left, H = r.Bottom - r.Top, Flags = 0x4 | SWP_NOACTIVATE }; // SWP_NOZORDER
+        SendMessage(hwnd, 0x47, IntPtr.Zero, ref pos);
+    }
+
+    /// <summary>Прозрачное окно одним вызовом получает место, размер и картинку: picture (Pbgra32) в точке (x, y) окна, остальное прозрачно; null — прозрачно всё.</summary>
+    public static bool UpdateLayered(IntPtr hwnd, RECT window, System.Windows.Media.Imaging.BitmapSource? picture, int x, int y, byte alpha = 255)
+    {
+        int w = window.Right - window.Left, h = window.Bottom - window.Top;
+        var info = new BITMAPINFOHEADER { Size = 40, Width = w, Height = -h, Planes = 1, Bits = 32 };
+        IntPtr dc = CreateCompatibleDC(IntPtr.Zero), bitmap = CreateDIBSection(dc, ref info, 0, out var bits, IntPtr.Zero, 0);
+        if (bitmap == IntPtr.Zero) { DeleteDC(dc); return false; }
+        var old = SelectObject(dc, bitmap);
+        try
+        {
+            int left = Math.Max(0, x), top = Math.Max(0, y), right = Math.Min(w, x + (picture?.PixelWidth ?? 0)), bottom = Math.Min(h, y + (picture?.PixelHeight ?? 0));
+            if (picture != null && right > left && bottom > top)
+                picture.CopyPixels(new System.Windows.Int32Rect(left - x, top - y, right - left, bottom - top),
+                    bits + (top * w + left) * 4, (bottom - top) * w * 4 - left * 4, w * 4);
+            var to = new POINT { X = window.Left, Y = window.Top };
+            var size = new SIZE { cx = w, cy = h };
+            var from = new POINT();
+            var blend = new BLENDFUNCTION { Alpha = alpha, Format = 1 }; // AC_SRC_ALPHA
+            return UpdateLayeredWindow(hwnd, IntPtr.Zero, ref to, ref size, dc, ref from, 0, ref blend, 2); // ULW_ALPHA
+        }
+        finally { SelectObject(dc, old); DeleteObject(bitmap); DeleteDC(dc); }
+    }
 
     /// <summary>Тёмная системная рамка окна (Windows 10 20H1+). На старых сборках вызов просто ничего не меняет.</summary>
     public static void UseDarkTitleBar(IntPtr hwnd)
@@ -172,6 +234,58 @@ static class Native
         t.IsBackground = true;
         t.Start();
         return t.Join(TimeSpan.FromSeconds(5)) ? result : null; // ponytail: зависший обработчик оставит поток висеть, но UI не ждёт
+    }
+
+    [StructLayout(LayoutKind.Sequential)] struct BITMAP { public int Type, Width, Height, WidthBytes; public ushort Planes, BitsPixel; public IntPtr Bits; }
+    [DllImport("gdi32.dll")] static extern int GetObjectW(IntPtr h, int size, out BITMAP bitmap);
+    [DllImport("gdi32.dll")] static extern int GetDIBits(IntPtr dc, IntPtr bitmap, uint start, uint lines, byte[] bits, ref BITMAPINFOHEADER info, uint usage);
+
+    /// <summary>Значок файла или ярлыка с прозрачностью, или null. Вызывать из фонового потока: оболочка может думать.</summary>
+    public static System.Windows.Media.Imaging.BitmapSource? ShellIcon(string path, int size)
+    {
+        System.Windows.Media.Imaging.BitmapSource? result = null;
+        var t = new Thread(() =>
+        {
+            try
+            {
+                SHCreateItemFromParsingName(path, IntPtr.Zero, typeof(IShellItemImageFactory).GUID, out var factory);
+                if (factory.GetImage(new SIZE { cx = size, cy = size }, 0x4 | 0x1, out var hbmp) != 0) return; // SIIGBF_ICONONLY | SIIGBF_BIGGERSIZEOK
+                IntPtr dc = CreateCompatibleDC(IntPtr.Zero);
+                try
+                {
+                    if (GetObjectW(hbmp, Marshal.SizeOf<BITMAP>(), out var bitmap) == 0 || bitmap.Width <= 0 || bitmap.Height == 0) return;
+                    int w = bitmap.Width, h = Math.Abs(bitmap.Height);
+                    var info = new BITMAPINFOHEADER { Size = 40, Width = w, Height = -h, Planes = 1, Bits = 32 };
+                    var pixels = new byte[w * h * 4];
+                    if (GetDIBits(dc, hbmp, 0, (uint)h, pixels, ref info, 0) == 0) return;
+                    result = System.Windows.Media.Imaging.BitmapSource.Create(w, h, 96, 96, System.Windows.Media.PixelFormats.Pbgra32, null, pixels, w * 4);
+                    result.Freeze();
+                }
+                finally { DeleteDC(dc); DeleteObject(hbmp); }
+            }
+            catch (Exception e) when (e is COMException or System.IO.IOException or UnauthorizedAccessException or ArgumentException) { } // файла нет или к нему не пускают: останется без значка
+        });
+        t.SetApartmentState(ApartmentState.STA);
+        t.IsBackground = true;
+        t.Start();
+        return t.Join(TimeSpan.FromSeconds(5)) ? result : null;
+    }
+
+    [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+    static extern bool QueryFullProcessImageNameW(IntPtr process, uint flags, System.Text.StringBuilder name, ref uint size);
+
+    /// <summary>Путь к EXE процесса, в том числе из магазина и с повышенными правами, или null.</summary>
+    public static string? ProcessPath(uint pid)
+    {
+        var process = OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, false, pid);
+        if (process == IntPtr.Zero) return null;
+        try
+        {
+            var name = new System.Text.StringBuilder(1024);
+            uint size = (uint)name.Capacity;
+            return QueryFullProcessImageNameW(process, 0, name, ref size) ? name.ToString() : null;
+        }
+        finally { CloseHandle(process); }
     }
 
     // --- Процессы: повышенные права цели ---

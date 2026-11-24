@@ -4,7 +4,7 @@
         xmlns:local="clr-namespace:ArkCopyBuffer"
         Title="{local:Loc Key=SEB31594AB4F133FA}"
         AutomationProperties.Name="{local:Loc Key=S24626711559EDA38}"
-        Width="392" Height="492"
+        Width="392" Height="528" MinWidth="392" MinHeight="392"
         WindowStyle="None" AllowsTransparency="True" ResizeMode="NoResize"
         ShowInTaskbar="False" Topmost="True" ShowActivated="True"
         WindowStartupLocation="Manual"
@@ -291,15 +291,49 @@
                 </DataTrigger>
             </DataTemplate.Triggers>
         </DataTemplate>
-        <Style x:Key="HintKey" TargetType="Border" BasedOn="{StaticResource KeyCap}">
-            <Setter Property="CornerRadius" Value="4"/>
-            <Setter Property="Padding" Value="7,0,7,1"/>
-            <Setter Property="Margin" Value="0"/>
-        </Style>
         <Style x:Key="HintLabel" TargetType="TextBlock">
             <Setter Property="Margin" Value="6,0,0,0"/>
             <Setter Property="VerticalAlignment" Value="Center"/>
             <Setter Property="Foreground" Value="{DynamicResource TextSecondary}"/>
+        </Style>
+
+        <!-- Переключатель в шапке: у включённого подложка и цвет акцента -->
+        <Style x:Key="HeaderToggle" TargetType="ToggleButton">
+            <Setter Property="Width" Value="32"/>
+            <Setter Property="Height" Value="32"/>
+            <Setter Property="FontFamily" Value="{StaticResource IconFont}"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextSecondary}"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="FocusVisualStyle" Value="{StaticResource FocusRing}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ToggleButton">
+                        <Border x:Name="Bd" CornerRadius="4" Background="Transparent">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource SubtleHover}"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource SubtleHover}"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource SubtlePressed}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Foreground" Value="{DynamicResource TextPrimary}"/>
+                </Trigger>
+                <Trigger Property="IsChecked" Value="True">
+                    <Setter Property="Foreground" Value="{DynamicResource Accent}"/>
+                </Trigger>
+            </Style.Triggers>
         </Style>
     </Window.Resources>
     <!--
@@ -352,55 +386,41 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
+        <!-- Материал скина поверх цвета панели: сколы, отсвет и кромка. Без скина прозрачен -->
+        <Border Grid.RowSpan="5" Margin="-11,-7,-5,-9" CornerRadius="7" Background="{DynamicResource PanelTexture}" IsHitTestVisible="False"/>
+        <Border Grid.RowSpan="5" Margin="-11,-7,-5,-9" CornerRadius="7" Background="{DynamicResource PanelSheen}" BorderBrush="{DynamicResource PanelInner}" BorderThickness="1" IsHitTestVisible="False"/>
+
         <!-- За шапку (вкладки и пустое место рядом) панель перетаскивается: Header_MouseMove -->
         <DockPanel x:Name="PanelHeader" Margin="4,0,6,6" Height="32" Background="Transparent"
                    PreviewMouseLeftButtonDown="Header_MouseDown" PreviewMouseMove="Header_MouseMove" PreviewMouseLeftButtonUp="Header_MouseUp">
-            <!-- Пауза, настройки и очистка — в меню «⋯»: опасная очистка не лежит в одном клике рядом с шестерёнкой -->
-            <Button x:Name="MoreButton" DockPanel.Dock="Right" Style="{StaticResource SubtleIconButton}" Focusable="True" Width="32" Height="32"
-                    Content="&#xE712;" Click="More_HeaderClick" FontSize="14"
-                    ToolTip="{local:Loc Key=S36BA2804E029771D}"
-                    AutomationProperties.Name="{local:Loc Key=S2734E4685D892F22}"/>
+            <!-- Пауза записи и очистка истории лежат в настройках: в один щелчок с панели их не задеть -->
+            <Button x:Name="SettingsButton" DockPanel.Dock="Right" Style="{StaticResource SubtleIconButton}" Focusable="True" Width="32" Height="32"
+                    Content="&#xE713;" Click="SettingsButton_Click" FontSize="14"
+                    ToolTip="{local:Loc Key=S985B5E0F2CCF1BA0}" AutomationProperties.Name="{local:Loc Key=S985B5E0F2CCF1BA0}"/>
             <!-- Булавка панели: наклонная и пустая, пока панель скрывается сама; выпрямляется и заливается акцентом, когда панель остаётся на экране -->
             <ToggleButton x:Name="KeepOpenButton" DockPanel.Dock="Right" Checked="KeepOpen_Changed" Unchecked="KeepOpen_Changed" AutomationProperties.Name="{local:Loc Key=S6BCCE6136CD105CA}">
                 <ToggleButton.Style>
-                    <Style TargetType="ToggleButton">
-                        <Setter Property="Width" Value="32"/>
-                        <Setter Property="Height" Value="32"/>
-                        <Setter Property="FontFamily" Value="{StaticResource IconFont}"/>
-                        <Setter Property="FontSize" Value="14"/>
-                        <Setter Property="Foreground" Value="{DynamicResource TextSecondary}"/>
-                        <Setter Property="Cursor" Value="Hand"/>
-                        <Setter Property="FocusVisualStyle" Value="{StaticResource FocusRing}"/>
+                    <Style TargetType="ToggleButton" BasedOn="{StaticResource HeaderToggle}">
                         <Setter Property="Content" Value="&#xE718;"/>
                         <Setter Property="ToolTip" Value="{local:Loc Key=S6BCCE6136CD105CA}"/>
-                        <Setter Property="Template">
-                            <Setter.Value>
-                                <ControlTemplate TargetType="ToggleButton">
-                                    <Border x:Name="Bd" CornerRadius="4" Background="Transparent">
-                                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                    </Border>
-                                    <ControlTemplate.Triggers>
-                                        <Trigger Property="IsChecked" Value="True">
-                                            <Setter TargetName="Bd" Property="Background" Value="{DynamicResource SubtleHover}"/>
-                                        </Trigger>
-                                        <Trigger Property="IsMouseOver" Value="True">
-                                            <Setter TargetName="Bd" Property="Background" Value="{DynamicResource SubtleHover}"/>
-                                        </Trigger>
-                                        <Trigger Property="IsPressed" Value="True">
-                                            <Setter TargetName="Bd" Property="Background" Value="{DynamicResource SubtlePressed}"/>
-                                        </Trigger>
-                                    </ControlTemplate.Triggers>
-                                </ControlTemplate>
-                            </Setter.Value>
-                        </Setter>
                         <Style.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Foreground" Value="{DynamicResource TextPrimary}"/>
-                            </Trigger>
                             <Trigger Property="IsChecked" Value="True">
                                 <Setter Property="Content" Value="&#xE842;"/>
-                                <Setter Property="Foreground" Value="{DynamicResource Accent}"/>
                                 <Setter Property="ToolTip" Value="{local:Loc Key=S29D614F401E3483B}"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </ToggleButton.Style>
+            </ToggleButton>
+            <!-- Вставленная запись не поднимается наверх -->
+            <ToggleButton x:Name="KeepOrderButton" DockPanel.Dock="Right" IsChecked="True" Content="&#xE8CB;" Checked="KeepOrder_Changed" Unchecked="KeepOrder_Changed" Click="KeepOrder_Click"
+                          AutomationProperties.Name="{local:Loc Key=S3987D5E97F4C5EEF}">
+                <ToggleButton.Style>
+                    <Style TargetType="ToggleButton" BasedOn="{StaticResource HeaderToggle}">
+                        <Setter Property="ToolTip" Value="{local:Loc Key=S65191CC0F4A1116B}"/>
+                        <Style.Triggers>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter Property="ToolTip" Value="{local:Loc Key=SF9A3736336415A63}"/>
                             </Trigger>
                         </Style.Triggers>
                     </Style>
@@ -441,6 +461,10 @@
             <Button x:Name="KindButton" Grid.Column="2" Width="84" Margin="6,0,0,0" Padding="5,0" Style="{StaticResource StandardButton}"
                     FontSize="12" Content="{local:Loc Key=S8593A09889BF93D1}" Click="Kind_Click" ToolTip="{local:Loc Key=S3D3419ACCC61723B}"
                     AutomationProperties.Name="{local:Loc Key=S2263DC75D8F9FABF}"/>
+            <ToggleButton x:Name="SymbolSortToggle" Grid.Column="1" Grid.ColumnSpan="2" Margin="6,0,0,0" Style="{StaticResource ToggleSwitch}" IsChecked="True"
+                          FontSize="12" Visibility="Collapsed" Checked="SymbolSort_Changed" Unchecked="SymbolSort_Changed" Click="SymbolSort_Click"
+                          Content="{local:Loc Key=S6AA5256DEDBB2D15}" ToolTip="{local:Loc Key=S490438AC414A6602}"
+                          AutomationProperties.Name="{local:Loc Key=S6AA5256DEDBB2D15}"/>
         </Grid>
 
         <!-- InfoBar: пауза записи, подтверждение очистки, итог «Сжать промпт», ошибки. Раскрывается по высоте -->
@@ -479,6 +503,10 @@
                 </Border>
             </Grid>
         </Border>
+
+        <!-- Чья история сейчас видна: большой размытый значок программы за записями (AppIcons.Soft) -->
+        <Image x:Name="SourceMark" Grid.Row="3" Width="280" Height="280" HorizontalAlignment="Center" VerticalAlignment="Center" Stretch="Uniform" Opacity="0"
+               IsHitTestVisible="False" Visibility="Collapsed" RenderOptions.BitmapScalingMode="HighQuality"/>
 
         <Border x:Name="PinnedBackground" Grid.Row="3" Background="Transparent" Visibility="Collapsed"
                 MouseRightButtonUp="Pinned_EmptyRightClick"/>
@@ -682,7 +710,7 @@
             </ListBox.ItemTemplate>
         </ListBox>
 
-        <!-- Закреплённые: плитки 3 в ряд или список (меню «⋯»); шаблоны и контейнеры меняет ApplyPinnedView -->
+        <!-- Закреплённые: плитки 3 в ряд или список (настройки «Записи»); шаблоны и контейнеры меняет ApplyPinnedView -->
         <ListBox x:Name="PinnedList" Grid.Row="3" Focusable="True" FocusVisualStyle="{StaticResource FocusRing}" Visibility="Collapsed"
                  Background="Transparent" BorderThickness="0" Padding="0" Margin="-3,-3,0,0"
                  ItemContainerStyle="{StaticResource PinTileContainer}"
@@ -704,7 +732,8 @@
                  AutomationProperties.Name="{local:Loc Key=SA9E2FC1FF43D16B4}">
             <ListBox.ItemsPanel>
                 <ItemsPanelTemplate>
-                    <WrapPanel/>
+                    <!-- Размер клетки задан: при изменении ширины панели сотни клеток не измеряются заново -->
+                    <WrapPanel ItemWidth="40" ItemHeight="40"/>
                 </ItemsPanelTemplate>
             </ListBox.ItemsPanel>
             <ListBox.GroupStyle>
@@ -842,7 +871,7 @@
         </Border>
 
         <!-- Строка клавиш: сверху вставка одной записи, снизу нескольких. Зажатый модификатор гасит чужие подсказки (RefreshHintFocus). Выключается в настройках -->
-        <Border x:Name="KeyHints" Grid.Row="4" Margin="-11,8,-5,-9" Padding="12,7,12,8" BorderThickness="0,1,0,0" CornerRadius="0,0,7,7"
+        <Border x:Name="KeyHints" Grid.Row="4" Margin="-11,8,-5,-9" Padding="12,6,12,6" BorderThickness="0,1,0,0" CornerRadius="0,0,7,7"
                 BorderBrush="{DynamicResource WindowStroke}" Background="{DynamicResource PanelFooterFill}" TextElement.FontSize="11">
             <Grid Grid.IsSharedSizeScope="True">
                 <Grid.ColumnDefinitions>
@@ -858,7 +887,7 @@
                         <ColumnDefinition Width="Auto" SharedSizeGroup="HintKeysLeft"/>
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
-                    <Border Style="{StaticResource HintKey}"><TextBlock Text="Enter" HorizontalAlignment="Center"/></Border>
+                    <local:KeyCaps x:Name="PasteKeys" Text="Enter"/>
                     <TextBlock Grid.Column="1" Style="{StaticResource HintLabel}" Text="{local:Loc Key=SADC41711D61237AC}"/>
                 </Grid>
                 <Grid x:Name="HintQuick" Grid.Column="1">
@@ -866,7 +895,7 @@
                         <ColumnDefinition Width="Auto" SharedSizeGroup="HintKeysRight"/>
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
-                    <Border Style="{StaticResource HintKey}"><TextBlock Text="Ctrl+1-9" HorizontalAlignment="Center"/></Border>
+                    <local:KeyCaps x:Name="QuickKeys" Text="Ctrl+1-9"/>
                     <TextBlock Grid.Column="1" Style="{StaticResource HintLabel}" Text="{local:Loc Key=SDCD85BADA23A9985}"/>
                 </Grid>
                 <Grid x:Name="HintSelect" Grid.Row="1" Margin="0,4,0,0" HorizontalAlignment="Left" Background="Transparent" ToolTip="{local:Loc Key=S7E3BECFF8AF12D2F}">
@@ -874,7 +903,7 @@
                         <ColumnDefinition Width="Auto" SharedSizeGroup="HintKeysLeft"/>
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
-                    <Border Style="{StaticResource HintKey}"><TextBlock Text="{local:Loc Key=SA9C61AE59CA81A48}" HorizontalAlignment="Center"/></Border>
+                    <local:KeyCaps x:Name="SelectKeys" Text="{local:Loc Key=SA9C61AE59CA81A48}"/>
                     <TextBlock Grid.Column="1" Style="{StaticResource HintLabel}" Text="{local:Loc Key=SDC348037F1B79A33}"/>
                 </Grid>
                 <Grid x:Name="HintStack" Grid.Row="1" Grid.Column="1" Margin="0,4,0,0" Background="Transparent" ToolTip="{local:Loc Key=SC741550FE8935208}">
@@ -882,7 +911,7 @@
                         <ColumnDefinition Width="Auto" SharedSizeGroup="HintKeysRight"/>
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
-                    <Border Style="{StaticResource HintKey}"><TextBlock Text="{local:Loc Key=S21F2F3E398D92E6A}" HorizontalAlignment="Center"/></Border>
+                    <local:KeyCaps x:Name="StackKeys" Text="{local:Loc Key=S21F2F3E398D92E6A}"/>
                     <TextBlock Grid.Column="1" Style="{StaticResource HintLabel}" Text="{local:Loc Key=SE2FE65015C71CA55}"/>
                 </Grid>
             </Grid>
@@ -1046,304 +1075,360 @@
 
         <Border x:Name="SettingsFlyout" Grid.RowSpan="5" Panel.ZIndex="10" Visibility="Collapsed"
                 Margin="4,34,4,4"
-                CornerRadius="8" Background="{DynamicResource MenuSurface}"
+                CornerRadius="8" Background="{DynamicResource MenuSurface}" TextElement.FontSize="14"
                 BorderBrush="{DynamicResource WindowStroke}" BorderThickness="1">
             <Border.Effect>
                 <DropShadowEffect BlurRadius="18" ShadowDepth="4" Direction="270" Opacity="0.3"/>
             </Border.Effect>
             <Grid>
             <Grid x:Name="SettingsPages">
-                <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
+                <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition/></Grid.ColumnDefinitions>
                 <Grid.Resources>
-                    <Style x:Key="SettingsCard" TargetType="Border">
-                        <Setter Property="Background" Value="{DynamicResource WindowSurface}"/>
-                        <Setter Property="BorderBrush" Value="{DynamicResource WindowStroke}"/>
-                        <Setter Property="BorderThickness" Value="1"/>
-                        <Setter Property="CornerRadius" Value="8"/>
-                        <Setter Property="Padding" Value="12,10,12,12"/>
-                        <Setter Property="Margin" Value="0,0,0,12"/>
+                    <Style x:Key="SettingsTitle" TargetType="TextBlock">
+                        <Setter Property="FontSize" Value="20"/>
+                        <Setter Property="FontWeight" Value="SemiBold"/>
+                        <Setter Property="Margin" Value="0,0,40,0"/>
+                    </Style>
+                    <Style x:Key="SettingsHeading" TargetType="TextBlock">
+                        <Setter Property="FontWeight" Value="SemiBold"/>
+                        <Setter Property="Margin" Value="0,26,0,4"/>
+                        <Setter Property="TextWrapping" Value="Wrap"/>
+                    </Style>
+                    <Style x:Key="SettingsNote" TargetType="TextBlock">
+                        <Setter Property="FontSize" Value="12"/>
+                        <Setter Property="Foreground" Value="{DynamicResource TextSecondary}"/>
+                        <Setter Property="TextWrapping" Value="Wrap"/>
+                        <Setter Property="Margin" Value="0,6,0,0"/>
+                    </Style>
+                    <Style x:Key="SettingValue" TargetType="TextBlock">
+                        <Setter Property="Width" Value="64"/>
+                        <Setter Property="TextAlignment" Value="Right"/>
+                        <Setter Property="VerticalAlignment" Value="Center"/>
+                        <Setter Property="FontSize" Value="13"/>
+                        <Setter Property="Foreground" Value="{DynamicResource TextSecondary}"/>
+                    </Style>
+                    <Style x:Key="SettingToggle" TargetType="ToggleButton" BasedOn="{StaticResource ToggleSwitch}">
+                        <Setter Property="MinHeight" Value="40"/>
+                        <Setter Property="Margin" Value="0,2,0,2"/>
+                        <Style.Triggers><Trigger Property="IsEnabled" Value="False"><Setter Property="Opacity" Value="0.45"/></Trigger></Style.Triggers>
+                    </Style>
+                    <!-- Переключатель всего раздела: он же его заголовок -->
+                    <Style x:Key="SettingHead" TargetType="ToggleButton" BasedOn="{StaticResource SettingToggle}">
+                        <Setter Property="Margin" Value="0,22,0,2"/>
+                    </Style>
+                    <Style TargetType="local:SettingRow">
+                        <Setter Property="MinHeight" Value="40"/>
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="local:SettingRow">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                        <local:SettingText Title="{TemplateBinding Title}" Hint="{TemplateBinding Hint}" Margin="0,0,16,0"/>
+                                        <ContentPresenter Grid.Column="1" VerticalAlignment="Center"/>
+                                    </Grid>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                        <Style.Triggers><Trigger Property="IsEnabled" Value="False"><Setter Property="Opacity" Value="0.45"/></Trigger></Style.Triggers>
+                    </Style>
+                    <!-- Раздел слева: значок и слово; выбранный отмечает полоска, она переезжает (ShowSettingsPage) -->
+                    <Style x:Key="SettingsNav" TargetType="RadioButton">
+                        <Setter Property="Height" Value="36"/>
+                        <Setter Property="Margin" Value="0,0,0,2"/>
+                        <Setter Property="Cursor" Value="Hand"/>
+                        <Setter Property="Foreground" Value="{DynamicResource TextSecondary}"/>
+                        <Setter Property="FocusVisualStyle" Value="{StaticResource FocusRing}"/>
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="RadioButton">
+                                    <Grid Background="Transparent">
+                                        <Border x:Name="Bd" CornerRadius="6" Background="{DynamicResource SubtleHover}" Opacity="0"/>
+                                        <StackPanel Orientation="Horizontal" Margin="14,0,12,0" VerticalAlignment="Center">
+                                            <TextBlock x:Name="Glyph" Text="{TemplateBinding Tag}" FontFamily="{StaticResource IconFont}" FontSize="15" Width="28" VerticalAlignment="Center"/>
+                                            <ContentPresenter VerticalAlignment="Center"/>
+                                        </StackPanel>
+                                    </Grid>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter Property="Foreground" Value="{DynamicResource TextPrimary}"/>
+                                            <Trigger.EnterActions><BeginStoryboard><Storyboard><DoubleAnimation Storyboard.TargetName="Bd" Storyboard.TargetProperty="Opacity" To="1" Duration="0:0:0.09"/></Storyboard></BeginStoryboard></Trigger.EnterActions>
+                                            <Trigger.ExitActions><BeginStoryboard><Storyboard><DoubleAnimation Storyboard.TargetName="Bd" Storyboard.TargetProperty="Opacity" To="0" Duration="0:0:0.18"/></Storyboard></BeginStoryboard></Trigger.ExitActions>
+                                        </Trigger>
+                                        <Trigger Property="IsChecked" Value="True">
+                                            <Setter Property="Foreground" Value="{DynamicResource TextPrimary}"/>
+                                            <Setter TargetName="Glyph" Property="Foreground" Value="{DynamicResource Accent}"/>
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
                     </Style>
                 </Grid.Resources>
-                <Grid Margin="12,12,12,4">
-                    <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="*"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
-                    <Button x:Name="VisualSettingsTab" Content="{local:Loc Key=S9022BA3739723A99}" Style="{StaticResource AccentButton}" Margin="0,0,4,0"
-                            Click="ShowVisualSettings_Click" AutomationProperties.Name="{local:Loc Key=SFFB51957D4F9BB3A}"/>
-                    <Button x:Name="StorageSettingsTab" Grid.Column="1" Content="{local:Loc Key=S349065E9C4467894}" Style="{StaticResource StandardButton}"
-                            Margin="4,0,4,0" Click="ShowStorageSettings_Click" AutomationProperties.Name="{local:Loc Key=S4EBEB45A877CDD5E}"/>
-                    <Button x:Name="VfxSettingsTab" Grid.Column="2" Content="VFX" Style="{StaticResource StandardButton}"
-                            Margin="4,0,0,0" Click="ShowVfxSettings_Click" AutomationProperties.Name="{local:Loc Key=SFD1E6F563F5BACAD}"/>
-                </Grid>
-            <ScrollViewer x:Name="VisualSettingsView" Grid.Row="1" VerticalScrollBarVisibility="Auto" Focusable="False" Padding="16,8,6,8">
-                <Grid Margin="0,0,6,0">
-                    <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="12"/><ColumnDefinition/></Grid.ColumnDefinitions>
-                        <StackPanel>
-                            <Border Style="{StaticResource SettingsCard}"><StackPanel>
-                            <TextBlock Text="{local:Loc Key=S5BD57038DBADD651}" FontWeight="SemiBold" Margin="0,0,0,8"/>
-                            <UniformGrid x:Name="LanguageChoices" Columns="2" Margin="-4,0,-4,-6"/>
-                            </StackPanel></Border>
-                            <Border Style="{StaticResource SettingsCard}">
-                                <StackPanel>
-                                    <TextBlock Text="{local:Loc Key=S9F8AA1C788B92C6C}" FontWeight="SemiBold" TextWrapping="Wrap" Margin="0,0,0,8"/>
-                                    <DockPanel LastChildFill="True">
-                                        <TextBlock x:Name="BackgroundTransparencyValue" DockPanel.Dock="Right" Margin="8,0,0,0"
-                                                   FontSize="13" Foreground="{DynamicResource TextSecondary}"/>
-                                        <TextBlock Text="{local:Loc Key=S7F0D916BD1254F85}" TextWrapping="Wrap"/>
-                                    </DockPanel>
-                                    <Slider x:Name="BackgroundTransparencySlider" Maximum="75" TickFrequency="1" IsSnapToTickEnabled="True"
-                                            Margin="0,4,0,8" AutomationProperties.Name="{local:Loc Key=S7F0D916BD1254F85}"/>
-                                    <DockPanel LastChildFill="True">
-                                        <TextBlock x:Name="TextTransparencyValue" DockPanel.Dock="Right" Margin="8,0,0,0"
-                                                   FontSize="13" Foreground="{DynamicResource TextSecondary}"/>
-                                        <TextBlock Text="{local:Loc Key=S0C6E6816598FB539}" TextWrapping="Wrap"/>
-                                    </DockPanel>
-                                    <Slider x:Name="TextTransparencySlider" Maximum="75" TickFrequency="1" IsSnapToTickEnabled="True"
-                                            Margin="0,4,0,8" AutomationProperties.Name="{local:Loc Key=S0C6E6816598FB539}"/>
-                                    <ToggleButton x:Name="LinkTransparencyToggle" Style="{StaticResource ToggleSwitch}"
-                                                  ToolTip="{local:Loc Key=SE84F3F8325FB6AD1}" AutomationProperties.Name="{local:Loc Key=SE84F3F8325FB6AD1}">
-                                        <TextBlock Text="{local:Loc Key=S4C6F1D8EA8195DE6}" TextWrapping="Wrap"/>
-                                    </ToggleButton>
-                                </StackPanel>
-                            </Border>
-                            <Border Style="{StaticResource SettingsCard}"><StackPanel>
-                            <ToggleButton x:Name="AnimationsToggle" Style="{StaticResource ToggleSwitch}" IsChecked="True"
-                                          Checked="AnimationsToggle_Changed" Unchecked="AnimationsToggle_Changed"
-                                          AutomationProperties.Name="{local:Loc Key=SF3767704BA91CBFA}">
-                                <TextBlock Text="{local:Loc Key=SF3767704BA91CBFA}" FontWeight="SemiBold"/>
-                            </ToggleButton>
-                            <StackPanel Margin="0,10,0,0" IsEnabled="{Binding IsChecked, ElementName=AnimationsToggle}">
-                                <Grid>
-                                    <TextBlock Text="{local:Loc Key=S0F4D5C50A07B577B}"/>
-                                    <TextBlock x:Name="ShowTimingValue" HorizontalAlignment="Right" FontSize="13" Foreground="{DynamicResource TextSecondary}" Text="{local:Loc Key=S00E525F2D9657182}"/>
-                                </Grid>
-                                <Slider x:Name="ShowTiming" Minimum="0" Maximum="1000" Value="100" TickFrequency="10"
-                                        IsSnapToTickEnabled="True" Margin="0,4,0,10" ValueChanged="Timing_ValueChanged"
-                                        AutomationProperties.Name="{local:Loc Key=SDAAE57846A77A2E2}"/>
-                                <Grid>
-                                    <TextBlock Text="{local:Loc Key=SCBA41AECC4B74466}"/>
-                                    <TextBlock x:Name="HideTimingValue" HorizontalAlignment="Right" FontSize="13" Foreground="{DynamicResource TextSecondary}" Text="{local:Loc Key=S00E525F2D9657182}"/>
-                                </Grid>
-                                <Slider x:Name="HideTiming" Minimum="0" Maximum="1000" Value="100" TickFrequency="10"
-                                        IsSnapToTickEnabled="True" Margin="0,4,0,0" ValueChanged="Timing_ValueChanged"
-                                        AutomationProperties.Name="{local:Loc Key=S91C14BB346727ECC}"/>
-                            </StackPanel>
-                            </StackPanel></Border>
-                            <Border Style="{StaticResource SettingsCard}"><StackPanel>
-                            <TextBlock Text="{local:Loc Key=S455471DB0CFB8950}" FontSize="15" FontWeight="SemiBold" Margin="0,0,0,4"/>
-                            <TextBlock x:Name="UpdateVersion" Foreground="{DynamicResource TextSecondary}" FontSize="12" Margin="0,0,0,10"/>
-                            <ToggleButton x:Name="AutoUpdateToggle" Style="{StaticResource ToggleSwitch}" IsChecked="True"
-                                          Checked="AutoUpdateToggle_Changed" Unchecked="AutoUpdateToggle_Changed"
-                                          AutomationProperties.Name="{local:Loc Key=S44F2634FD416851A}">
-                                <TextBlock Text="{local:Loc Key=S44F2634FD416851A}" TextWrapping="Wrap"/>
-                            </ToggleButton>
-                            <TextBlock Text="{local:Loc Key=S7CD2C8973CFF782E}"
-                                       TextWrapping="Wrap" FontSize="11" Foreground="{DynamicResource TextSecondary}" Margin="0,6,0,10"/>
-                            <TextBlock x:Name="UpdateStatus" TextWrapping="Wrap" FontSize="12" Margin="0,0,0,10"/>
-                            <Button x:Name="UpdateButton" Content="{local:Loc Key=S93B08F7B14651B6D}" Style="{StaticResource StandardButton}"
-                                    HorizontalAlignment="Stretch" Click="UpdateButton_Click"/>
-                            </StackPanel></Border>
+                <Border CornerRadius="7,0,0,7" BorderThickness="0,0,1,0" BorderBrush="{DynamicResource WindowStroke}" Background="{DynamicResource WindowSurface}">
+                    <Grid Margin="8,14,8,12" MinWidth="160">
+                        <StackPanel x:Name="SettingsNavList">
+                            <RadioButton x:Name="GeneralSettingsTab" GroupName="Settings" Style="{StaticResource SettingsNav}" Tag="&#xE713;" Content="{local:Loc Key=S72E67FB326D967A8}" Click="ShowGeneralSettings_Click" IsChecked="True" AutomationProperties.Name="{local:Loc Key=S72E67FB326D967A8}"/>
+                            <RadioButton x:Name="LookSettingsTab" GroupName="Settings" Style="{StaticResource SettingsNav}" Tag="&#xE790;" Content="{local:Loc Key=S9022BA3739723A99}" Click="ShowLookSettings_Click" AutomationProperties.Name="{local:Loc Key=SFFB51957D4F9BB3A}"/>
+                            <RadioButton x:Name="WindowSettingsTab" GroupName="Settings" Style="{StaticResource SettingsNav}" Tag="&#xE737;" Content="{local:Loc Key=S9521194DF6637753}" Click="ShowWindowSettings_Click" AutomationProperties.Name="{local:Loc Key=S9521194DF6637753}"/>
+                            <RadioButton x:Name="EntriesSettingsTab" GroupName="Settings" Style="{StaticResource SettingsNav}" Tag="&#xE8FD;" Content="{local:Loc Key=S8A7DEA5194EB5DDF}" Click="ShowEntriesSettings_Click" AutomationProperties.Name="{local:Loc Key=S8A7DEA5194EB5DDF}"/>
+                            <RadioButton x:Name="StorageSettingsTab" GroupName="Settings" Style="{StaticResource SettingsNav}" Tag="&#xE81C;" Content="{local:Loc Key=S349065E9C4467894}" Click="ShowStorageSettings_Click" AutomationProperties.Name="{local:Loc Key=S4EBEB45A877CDD5E}"/>
+                            <RadioButton x:Name="VfxSettingsTab" GroupName="Settings" Style="{StaticResource SettingsNav}" Tag="&#xE945;" Content="{local:Loc Key=S4A767F2AA26A9A0D}" Click="ShowVfxSettings_Click" AutomationProperties.Name="{local:Loc Key=SFD1E6F563F5BACAD}"/>
                         </StackPanel>
-                        <StackPanel Grid.Column="2">
-                            <Border Style="{StaticResource SettingsCard}"><StackPanel>
-                            <TextBlock Text="{local:Loc Key=S6A20ADC3B99637AE}" FontWeight="SemiBold" Margin="0,0,0,10"/>
-                            <Grid>
-                                <TextBlock Text="{local:Loc Key=SB051F39468122ABD}"/>
-                                <TextBlock x:Name="ZoomDelayValue" HorizontalAlignment="Right" FontSize="13" Foreground="{DynamicResource TextSecondary}" Text="{local:Loc Key=S78EE5E545DA882DD}"/>
-                            </Grid>
-                            <Slider x:Name="ZoomDelaySlider" Minimum="100" Maximum="3000" Value="1000" TickFrequency="100"
-                                    IsSnapToTickEnabled="True" Margin="0,4,0,10" ValueChanged="ZoomDelay_ValueChanged"
-                                    AutomationProperties.Name="{local:Loc Key=SF07F805077291E8D}"/>
-                            <Grid>
-                                <TextBlock Text="{local:Loc Key=S602601E628CC43D0}"/>
-                                <TextBlock x:Name="ZoomScaleValue" HorizontalAlignment="Right" FontSize="13" Foreground="{DynamicResource TextSecondary}" Text="780 × 360"/>
-                            </Grid>
-                            <Slider x:Name="ZoomScaleSlider" Minimum="1" Maximum="5" Value="3" TickFrequency="1"
-                                    IsSnapToTickEnabled="True" Margin="0,4,0,0" ValueChanged="ZoomScale_ValueChanged"
-                                    AutomationProperties.Name="{local:Loc Key=SBF4D6267A5A07968}"/>
-                            </StackPanel></Border>
-                            <Border Style="{StaticResource SettingsCard}"><StackPanel>
-                            <ToggleButton x:Name="PasteReplacementToggle" Style="{StaticResource ToggleSwitch}"
-                                          Checked="PasteReplacement_Changed" Unchecked="PasteReplacement_Changed"
-                                          AutomationProperties.Name="{local:Loc Key=SEBD89AC17156AEF0}">
-                                <TextBlock Text="{local:Loc Key=SEBD89AC17156AEF0}" FontWeight="SemiBold" TextWrapping="Wrap"/>
-                            </ToggleButton>
-                            <StackPanel IsEnabled="{Binding IsChecked, ElementName=PasteReplacementToggle}">
-                                <TextBlock Text="{local:Loc Key=S34663EE4FE51BC25}" Margin="0,8,0,4"/>
-                                <TextBox x:Name="PasteReplacementFrom" Style="{StaticResource FieldBox}" MaxLength="256"
-                                         AutomationProperties.Name="{local:Loc Key=S34663EE4FE51BC25}" TextChanged="PasteReplacement_Changed"/>
-                                <TextBlock Text="{local:Loc Key=S44FF00B55F82A825}" Margin="0,8,0,4"/>
-                                <TextBox x:Name="PasteReplacementTo" Style="{StaticResource FieldBox}" MaxLength="256"
-                                         AutomationProperties.Name="{local:Loc Key=S44FF00B55F82A825}" TextChanged="PasteReplacement_Changed"/>
-                            </StackPanel>
-                            </StackPanel></Border>
-                            <Border Style="{StaticResource SettingsCard}"><StackPanel>
-                            <ToggleButton x:Name="TextPeekToggle" Style="{StaticResource ToggleSwitch}" IsChecked="True"
-                                          Checked="TextPeekToggle_Changed" Unchecked="TextPeekToggle_Changed"
-                                          AutomationProperties.Name="{local:Loc Key=S01C9518EFEFA5B99}">
-                                <TextBlock Text="{local:Loc Key=SF105708317E7FADB}" FontWeight="SemiBold" TextWrapping="Wrap"/>
-                            </ToggleButton>
-                            <StackPanel Margin="0,10,0,0" IsEnabled="{Binding IsChecked, ElementName=TextPeekToggle}">
-                                <Grid>
-                                    <TextBlock Text="{local:Loc Key=SB051F39468122ABD}"/>
-                                    <TextBlock x:Name="TextPeekDelayValue" HorizontalAlignment="Right" FontSize="13" Foreground="{DynamicResource TextSecondary}" Text="{local:Loc Key=S277FCF9DB1CC9840}"/>
-                                </Grid>
-                                <Slider x:Name="TextPeekDelaySlider" Minimum="100" Maximum="3000" Value="600" TickFrequency="100"
-                                        IsSnapToTickEnabled="True" Margin="0,4,0,10" ValueChanged="TextPeekDelay_ValueChanged"
-                                        AutomationProperties.Name="{local:Loc Key=S4A64D47B205EBD7F}"/>
-                                <Grid>
-                                    <TextBlock Text="{local:Loc Key=SC5ECD3BA97158C6B}"/>
-                                    <TextBlock x:Name="TextPeekWidthValue" HorizontalAlignment="Right" FontSize="13" Foreground="{DynamicResource TextSecondary}" Text="380 px"/>
-                                </Grid>
-                                <Slider x:Name="TextPeekWidthSlider" Minimum="300" Maximum="640" Value="380" TickFrequency="20"
-                                        IsSnapToTickEnabled="True" Margin="0,4,0,0" ValueChanged="TextPeekWidth_ValueChanged"
-                                        AutomationProperties.Name="{local:Loc Key=S5A3519B294992D05}"/>
-                            </StackPanel>
-                            </StackPanel></Border>
-                            <Border Style="{StaticResource SettingsCard}"><StackPanel>
-                            <ToggleButton x:Name="OutsideHideToggle" Style="{StaticResource ToggleSwitch}" IsChecked="True"
-                                          Checked="OutsideHideToggle_Changed" Unchecked="OutsideHideToggle_Changed"
-                                          AutomationProperties.Name="{local:Loc Key=SDF1C14A41E216714}">
-                                <TextBlock Text="{local:Loc Key=S344E3EC15B8BA3C3}" FontWeight="SemiBold" TextWrapping="Wrap"/>
-                            </ToggleButton>
-                            <Grid Margin="0,10,0,0">
-                                <TextBlock Text="{local:Loc Key=SC8D702A189B26FFC}"/>
-                                <TextBlock x:Name="OutsideHideValue" HorizontalAlignment="Right" FontSize="13" Foreground="{DynamicResource TextSecondary}" Text="{local:Loc Key=S034C71AC10A3A1FE}"/>
-                            </Grid>
-                            <Slider x:Name="OutsideHideSlider" Minimum="500" Maximum="10000" Value="3000" TickFrequency="500"
-                                    IsSnapToTickEnabled="True" Margin="0,4,0,0" ValueChanged="OutsideHideDelay_ValueChanged"
-                                    IsEnabled="{Binding IsChecked, ElementName=OutsideHideToggle}"
-                                    AutomationProperties.Name="{local:Loc Key=SBE300BBC861DE97D}"/>
-                            </StackPanel></Border>
-                            <Border Style="{StaticResource SettingsCard}"><StackPanel>
-                            <ToggleButton x:Name="KeyHintsToggle" Style="{StaticResource ToggleSwitch}" IsChecked="True"
-                                          Checked="KeyHintsToggle_Changed" Unchecked="KeyHintsToggle_Changed"
-                                          AutomationProperties.Name="{local:Loc Key=S317D2C78ED442353}">
-                                <TextBlock Text="{local:Loc Key=SA8F576F608D69D5E}" TextWrapping="Wrap"/>
-                            </ToggleButton>
-                            <ToggleButton x:Name="InlineEditHoldToggle" Style="{StaticResource ToggleSwitch}" Margin="0,10,0,0"
-                                          IsChecked="{Binding InlineEditOnHold, RelativeSource={RelativeSource AncestorType=Window}, Mode=TwoWay}"
-                                          AutomationProperties.Name="{local:Loc Key=S775FA80A5F1D8D8D}">
-                                <TextBlock Text="{local:Loc Key=S775FA80A5F1D8D8D}" TextWrapping="Wrap"/>
-                            </ToggleButton>
-                            </StackPanel></Border>
-                        </StackPanel>
-                </Grid>
-            </ScrollViewer>
-            <ScrollViewer x:Name="VfxSettingsView" Grid.Row="1" Visibility="Collapsed" VerticalScrollBarVisibility="Auto"
-                          Focusable="False" Padding="16,8,16,16">
-                <Grid Margin="0,0,6,0">
-                    <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="12"/><ColumnDefinition/></Grid.ColumnDefinitions>
-                        <StackPanel>
-                            <Border Style="{StaticResource SettingsCard}"><StackPanel>
-                            <ToggleButton x:Name="VfxToggle" Style="{StaticResource ToggleSwitch}" IsChecked="True"
-                                          Checked="Vfx_Changed" Unchecked="Vfx_Changed" AutomationProperties.Name="{local:Loc Key=S73D5A91D62E6A9B0}">
-                                <TextBlock Text="{local:Loc Key=S73D5A91D62E6A9B0}" FontWeight="SemiBold"/>
-                            </ToggleButton>
-                            <TextBlock Text="Nether" FontSize="15" FontWeight="SemiBold" Margin="0,16,0,2"/>
-                            <TextBlock Text="{local:Loc Key=S3E795DE749A1EA08}" FontSize="12" TextWrapping="Wrap"
-                                       Foreground="{DynamicResource TextSecondary}"/>
-                            <Grid Height="156" Margin="0,6,0,10" IsHitTestVisible="False">
-                                <Border Margin="32" CornerRadius="8" Background="{DynamicResource WindowSurface}"
-                                        BorderBrush="{DynamicResource WindowStroke}" BorderThickness="1">
-                                    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-                                        <TextBlock Text="{local:Loc Key=SEB31594AB4F133FA}" FontWeight="SemiBold" HorizontalAlignment="Center"/>
-                                        <TextBlock Text="{local:Loc Key=SB5A318BE6EC5C751}" FontSize="11" Foreground="{DynamicResource TextSecondary}"/>
+                        <Border x:Name="SettingsNavMark" Width="3" Height="16" CornerRadius="1.5" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,10,0,0"
+                                Background="{DynamicResource Accent}" IsHitTestVisible="False"/>
+                    </Grid>
+                </Border>
+                <Grid Grid.Column="1">
+                    <Grid.RowDefinitions><RowDefinition/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+                    <Grid x:Name="SettingsBody">
+                        <ScrollViewer x:Name="GeneralSettingsView" VerticalScrollBarVisibility="Auto" Focusable="False">
+                            <StackPanel Margin="24,18,20,20">
+                                <TextBlock Text="{local:Loc Key=S72E67FB326D967A8}" Style="{StaticResource SettingsTitle}"/>
+                                <TextBlock Text="{local:Loc Key=S1417B7792D57BBB7}" Style="{StaticResource SettingsHeading}"/>
+                                <ToggleButton x:Name="PauseToggle" Style="{StaticResource SettingToggle}" Checked="Pause_Changed" Unchecked="Pause_Changed" AutomationProperties.Name="{local:Loc Key=S7FF0AC825C58BEF9}">
+                                    <local:SettingText Title="{local:Loc Key=S7FF0AC825C58BEF9}" Hint="{local:Loc Key=SD366CED2842867D4}"/>
+                                </ToggleButton>
+                                <local:SettingRow Title="{local:Loc Key=S3F70F0AD6764EF96}" Hint="{local:Loc Key=SEA8C658F5BF11FD1}">
+                                    <Button x:Name="ClearHistoryButton" MinWidth="120" Content="{local:Loc Key=S8965271D3C97C79D}" Style="{StaticResource StandardButton}" Click="ClearHistory_Click"
+                                            AutomationProperties.Name="{local:Loc Key=S3F70F0AD6764EF96}"/>
+                                </local:SettingRow>
+                                <TextBlock Text="{local:Loc Key=S5BD57038DBADD651}" Style="{StaticResource SettingsHeading}"/>
+                                <WrapPanel x:Name="LanguageChoices" Margin="-4,4,-4,0"/>
+                                <TextBlock Text="{local:Loc Key=S455471DB0CFB8950}" Style="{StaticResource SettingsHeading}"/>
+                                <ToggleButton x:Name="AutoUpdateToggle" Style="{StaticResource SettingToggle}" IsChecked="True" Checked="AutoUpdateToggle_Changed" Unchecked="AutoUpdateToggle_Changed" AutomationProperties.Name="{local:Loc Key=S44F2634FD416851A}">
+                                    <local:SettingText Title="{local:Loc Key=S44F2634FD416851A}" Hint="{local:Loc Key=S7CD2C8973CFF782E}"/>
+                                </ToggleButton>
+                                <DockPanel Margin="0,10,0,0">
+                                    <Button x:Name="UpdateButton" DockPanel.Dock="Right" MinWidth="170" Margin="16,0,0,0" VerticalAlignment="Center" Content="{local:Loc Key=S93B08F7B14651B6D}" Style="{StaticResource StandardButton}" Click="UpdateButton_Click"/>
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock x:Name="UpdateVersion"/>
+                                        <TextBlock x:Name="UpdateStatus" TextWrapping="Wrap" FontSize="12" Foreground="{DynamicResource TextSecondary}" AutomationProperties.LiveSetting="Polite"/>
                                     </StackPanel>
-                                </Border>
-                                <local:NetherBorder x:Name="VfxPreview" Inset="32"/>
-                            </Grid>
-                            </StackPanel></Border>
-                        </StackPanel>
-                        <StackPanel Grid.Column="2">
-                            <Border Style="{StaticResource SettingsCard}"><StackPanel>
-                            <StackPanel IsEnabled="{Binding IsChecked, ElementName=VfxToggle}">
-                                <Grid><TextBlock Text="{local:Loc Key=SF195133BCEFB6A3B}"/>
-                                    <TextBlock x:Name="VfxOpacityValue" HorizontalAlignment="Right" Foreground="{DynamicResource TextSecondary}"/></Grid>
-                                <Slider x:Name="VfxOpacitySlider" Minimum="10" Maximum="100" Value="20" TickFrequency="5" IsSnapToTickEnabled="True"
-                                        Margin="0,4,0,12" ValueChanged="Vfx_ValueChanged" AutomationProperties.Name="{local:Loc Key=S05F86AE8582FFC3E}"/>
-                                <Grid><TextBlock Text="{local:Loc Key=S70E98E32147CF4EC}"/>
-                                    <TextBlock x:Name="VfxSpeedValue" HorizontalAlignment="Right" Foreground="{DynamicResource TextSecondary}"/></Grid>
-                                <Slider x:Name="VfxSpeedSlider" Minimum="25" Maximum="200" Value="100" TickFrequency="5" IsSnapToTickEnabled="True"
-                                        Margin="0,4,0,10" ValueChanged="Vfx_ValueChanged" AutomationProperties.Name="{local:Loc Key=S27410FC78B03DDB6}"/>
+                                </DockPanel>
                             </StackPanel>
-                            <TextBlock x:Name="VfxStatus" FontSize="12" TextWrapping="Wrap" Foreground="{DynamicResource TextSecondary}"
-                                       AutomationProperties.LiveSetting="Polite"/>
-                            <TextBlock Text="{local:Loc Key=SDD33660ECD470ABA}"
-                                       Margin="0,8,0,0" FontSize="11" TextWrapping="Wrap" Foreground="{DynamicResource TextSecondary}"/>
-                            </StackPanel></Border>
-                        </StackPanel>
-                </Grid>
-            </ScrollViewer>
-            <ScrollViewer x:Name="StorageSettingsView" Grid.Row="1" Visibility="Collapsed" VerticalScrollBarVisibility="Auto"
-                          Focusable="False" Padding="16,8,6,12">
-                <Grid Margin="0,0,6,0">
-                    <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="12"/><ColumnDefinition/></Grid.ColumnDefinitions>
-                        <StackPanel>
-                            <Border Style="{StaticResource SettingsCard}"><StackPanel>
-                            <TextBlock Text="{local:Loc Key=S1417B7792D57BBB7}" FontSize="15" FontWeight="SemiBold" Margin="0,0,0,4"/>
-                            <TextBlock Text="{local:Loc Key=S8EF99396D284012F}" TextWrapping="Wrap"
-                                       FontSize="11" Foreground="{DynamicResource TextSecondary}" Margin="0,0,0,10"/>
-                            <Grid><TextBlock Text="{local:Loc Key=SF9E6B4B56157141E}"/>
-                                <TextBlock x:Name="HistoryCountValue" HorizontalAlignment="Right" Foreground="{DynamicResource TextSecondary}"/></Grid>
-                            <Slider x:Name="HistoryCountSlider" Minimum="20" Maximum="1000" Value="100" TickFrequency="10" IsSnapToTickEnabled="True"
-                                    Margin="0,4,0,10" ValueChanged="Storage_ValueChanged" AutomationProperties.Name="{local:Loc Key=S95E1B243A48FD248}"/>
-                            <Grid><TextBlock Text="{local:Loc Key=S78B7A9E85FF0C74F}"/>
-                                <TextBlock x:Name="HistoryDaysValue" HorizontalAlignment="Right" Foreground="{DynamicResource TextSecondary}"/></Grid>
-                            <Slider x:Name="HistoryDaysSlider" Minimum="1" Maximum="90" Value="7" TickFrequency="1" IsSnapToTickEnabled="True"
-                                    Margin="0,4,0,10" ValueChanged="Storage_ValueChanged" AutomationProperties.Name="{local:Loc Key=SD57B977768600584}"/>
-                            <Grid><TextBlock Text="{local:Loc Key=S57AD92DE020B8C62}"/>
-                                <TextBlock x:Name="MediaDaysValue" HorizontalAlignment="Right" Foreground="{DynamicResource TextSecondary}"/></Grid>
-                            <Slider x:Name="MediaDaysSlider" Minimum="1" Maximum="30" Value="1" TickFrequency="1" IsSnapToTickEnabled="True"
-                                    Margin="0,4,0,0" ValueChanged="Storage_ValueChanged" AutomationProperties.Name="{local:Loc Key=S5BF473B2FD59A9AA}"/>
-                            </StackPanel></Border>
-                            <Border Style="{StaticResource SettingsCard}"><StackPanel>
-                            <TextBlock Text="{local:Loc Key=S14387E4467F2FCC7}" FontSize="15" FontWeight="SemiBold" Margin="0,0,0,4"/>
-                            <TextBlock Text="{local:Loc Key=SD06333F24005105F}" TextWrapping="Wrap"
-                                       FontSize="11" Foreground="{DynamicResource TextSecondary}" Margin="0,0,0,10"/>
-                            <Grid><TextBlock Text="{local:Loc Key=SED5A6EFB8543B58C}"/>
-                                <TextBlock x:Name="TempDaysValue" HorizontalAlignment="Right" Foreground="{DynamicResource TextSecondary}"/></Grid>
-                            <Slider x:Name="TempDaysSlider" Minimum="1" Maximum="7" Value="1" TickFrequency="1" IsSnapToTickEnabled="True"
-                                    Margin="0,4,0,0" ValueChanged="Storage_ValueChanged" AutomationProperties.Name="{local:Loc Key=S344A33BE4B76BFC0}"/>
-                            </StackPanel></Border>
-                            <Border Style="{StaticResource SettingsCard}"><StackPanel>
-                            <TextBlock Text="{local:Loc Key=SEEC6352B23682FBE}" FontSize="15" FontWeight="SemiBold" Margin="0,0,0,4"/>
-                            <TextBlock Text="{local:Loc Key=SAEF3A78E959942CE}"
-                                       TextWrapping="Wrap" FontSize="11" Foreground="{DynamicResource TextSecondary}" Margin="0,0,0,12"/>
-                            <TextBlock Text="{local:Loc Key=SCC03D7C4F928EC30}"
-                                       TextWrapping="Wrap" FontSize="11" Foreground="{DynamicResource TextSecondary}" Margin="0,0,0,10"/>
-                            <Button x:Name="StorageApplyButton" Content="{local:Loc Key=SE15F960D93EB4EE8}" Style="{StaticResource AccentButton}"
+                        </ScrollViewer>
+                        <ScrollViewer x:Name="LookSettingsView" Visibility="Collapsed" VerticalScrollBarVisibility="Auto" Focusable="False">
+                            <StackPanel Margin="24,18,20,20">
+                                <TextBlock Text="{local:Loc Key=S9022BA3739723A99}" Style="{StaticResource SettingsTitle}"/>
+                                <ToggleButton x:Name="SkinToggle" Style="{StaticResource SettingHead}" Checked="Skin_Changed" Unchecked="Skin_Changed" AutomationProperties.Name="{local:Loc Key=SB9319DC3ABB013D5}">
+                                    <local:SettingText Strong="True" Title="{local:Loc Key=SB9319DC3ABB013D5}" Hint="{local:Loc Key=SF7E0C0F7970E2E73}"/>
+                                </ToggleButton>
+                                <TextBlock Text="{local:Loc Key=S9F8AA1C788B92C6C}" Style="{StaticResource SettingsHeading}"/>
+                                <local:SettingRow Title="{local:Loc Key=S7F0D916BD1254F85}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Slider x:Name="BackgroundTransparencySlider" Width="190" Maximum="75" TickFrequency="1" IsSnapToTickEnabled="True" AutomationProperties.Name="{local:Loc Key=S7F0D916BD1254F85}"/>
+                                        <TextBlock x:Name="BackgroundTransparencyValue" Style="{StaticResource SettingValue}"/>
+                                    </StackPanel>
+                                </local:SettingRow>
+                                <local:SettingRow Title="{local:Loc Key=S0C6E6816598FB539}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Slider x:Name="TextTransparencySlider" Width="190" Maximum="75" TickFrequency="1" IsSnapToTickEnabled="True" AutomationProperties.Name="{local:Loc Key=S0C6E6816598FB539}"/>
+                                        <TextBlock x:Name="TextTransparencyValue" Style="{StaticResource SettingValue}"/>
+                                    </StackPanel>
+                                </local:SettingRow>
+                                <ToggleButton x:Name="LinkTransparencyToggle" Style="{StaticResource SettingToggle}"  AutomationProperties.Name="{local:Loc Key=SE84F3F8325FB6AD1}">
+                                    <local:SettingText Title="{local:Loc Key=S4C6F1D8EA8195DE6}"/>
+                                </ToggleButton>
+                                <ToggleButton x:Name="KeyHintsToggle" Style="{StaticResource SettingHead}" IsChecked="True" Checked="KeyHintsToggle_Changed" Unchecked="KeyHintsToggle_Changed" AutomationProperties.Name="{local:Loc Key=S317D2C78ED442353}">
+                                    <local:SettingText Strong="True" Title="{local:Loc Key=SA8F576F608D69D5E}" Hint="{local:Loc Key=SF4E985D39510C047}"/>
+                                </ToggleButton>
+                            </StackPanel>
+                        </ScrollViewer>
+                        <ScrollViewer x:Name="WindowSettingsView" Visibility="Collapsed" VerticalScrollBarVisibility="Auto" Focusable="False">
+                            <StackPanel Margin="24,18,20,20">
+                                <TextBlock Text="{local:Loc Key=S9521194DF6637753}" Style="{StaticResource SettingsTitle}"/>
+                                <ToggleButton x:Name="AnimationsToggle" Style="{StaticResource SettingHead}" IsChecked="True" Checked="AnimationsToggle_Changed" Unchecked="AnimationsToggle_Changed" AutomationProperties.Name="{local:Loc Key=SF3767704BA91CBFA}">
+                                    <local:SettingText Strong="True" Title="{local:Loc Key=SF3767704BA91CBFA}" Hint="{local:Loc Key=SDC13524FAC38464E}"/>
+                                </ToggleButton>
+                                <local:SettingRow Title="{local:Loc Key=S0F4D5C50A07B577B}" IsEnabled="{Binding IsChecked, ElementName=AnimationsToggle}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Slider x:Name="ShowTiming" Width="190" Minimum="0" Maximum="1000" Value="100" TickFrequency="10" IsSnapToTickEnabled="True" ValueChanged="Timing_ValueChanged" AutomationProperties.Name="{local:Loc Key=SDAAE57846A77A2E2}"/>
+                                        <TextBlock x:Name="ShowTimingValue" Style="{StaticResource SettingValue}" Text="{local:Loc Key=S00E525F2D9657182}"/>
+                                    </StackPanel>
+                                </local:SettingRow>
+                                <local:SettingRow Title="{local:Loc Key=SCBA41AECC4B74466}" IsEnabled="{Binding IsChecked, ElementName=AnimationsToggle}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Slider x:Name="HideTiming" Width="190" Minimum="0" Maximum="1000" Value="100" TickFrequency="10" IsSnapToTickEnabled="True" ValueChanged="Timing_ValueChanged" AutomationProperties.Name="{local:Loc Key=S91C14BB346727ECC}"/>
+                                        <TextBlock x:Name="HideTimingValue" Style="{StaticResource SettingValue}" Text="{local:Loc Key=S00E525F2D9657182}"/>
+                                    </StackPanel>
+                                </local:SettingRow>
+                                <ToggleButton x:Name="OutsideHideToggle" Style="{StaticResource SettingHead}" IsChecked="True" Checked="OutsideHideToggle_Changed" Unchecked="OutsideHideToggle_Changed" AutomationProperties.Name="{local:Loc Key=SDF1C14A41E216714}">
+                                    <local:SettingText Strong="True" Title="{local:Loc Key=S344E3EC15B8BA3C3}" Hint="{local:Loc Key=S9A40A2D431C7627E}"/>
+                                </ToggleButton>
+                                <local:SettingRow Title="{local:Loc Key=SC8D702A189B26FFC}" IsEnabled="{Binding IsChecked, ElementName=OutsideHideToggle}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Slider x:Name="OutsideHideSlider" Width="190" Minimum="500" Maximum="10000" Value="3000" TickFrequency="500" IsSnapToTickEnabled="True" ValueChanged="OutsideHideDelay_ValueChanged" AutomationProperties.Name="{local:Loc Key=SBE300BBC861DE97D}"/>
+                                        <TextBlock x:Name="OutsideHideValue" Style="{StaticResource SettingValue}" Text="{local:Loc Key=S034C71AC10A3A1FE}"/>
+                                    </StackPanel>
+                                </local:SettingRow>
+                            </StackPanel>
+                        </ScrollViewer>
+                        <ScrollViewer x:Name="EntriesSettingsView" Visibility="Collapsed" VerticalScrollBarVisibility="Auto" Focusable="False">
+                            <StackPanel Margin="24,18,20,20">
+                                <TextBlock Text="{local:Loc Key=S8A7DEA5194EB5DDF}" Style="{StaticResource SettingsTitle}"/>
+                                <ToggleButton x:Name="PinnedAsListToggle" Style="{StaticResource SettingToggle}" Checked="PinnedAsList_Changed" Unchecked="PinnedAsList_Changed" AutomationProperties.Name="{local:Loc Key=S4EDE614E24611507}">
+                                    <local:SettingText Title="{local:Loc Key=S4EDE614E24611507}"/>
+                                </ToggleButton>
+                                <ToggleButton x:Name="TextPeekToggle" Style="{StaticResource SettingHead}" IsChecked="True" Checked="TextPeekToggle_Changed" Unchecked="TextPeekToggle_Changed" AutomationProperties.Name="{local:Loc Key=S01C9518EFEFA5B99}">
+                                    <local:SettingText Strong="True" Title="{local:Loc Key=SF105708317E7FADB}" Hint="{local:Loc Key=S20BCB2527595C5E1}"/>
+                                </ToggleButton>
+                                <local:SettingRow Title="{local:Loc Key=SB051F39468122ABD}" IsEnabled="{Binding IsChecked, ElementName=TextPeekToggle}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Slider x:Name="TextPeekDelaySlider" Width="190" Minimum="100" Maximum="3000" Value="600" TickFrequency="100" IsSnapToTickEnabled="True" ValueChanged="TextPeekDelay_ValueChanged" AutomationProperties.Name="{local:Loc Key=S4A64D47B205EBD7F}"/>
+                                        <TextBlock x:Name="TextPeekDelayValue" Style="{StaticResource SettingValue}" Text="{local:Loc Key=S277FCF9DB1CC9840}"/>
+                                    </StackPanel>
+                                </local:SettingRow>
+                                <local:SettingRow Title="{local:Loc Key=SC5ECD3BA97158C6B}" IsEnabled="{Binding IsChecked, ElementName=TextPeekToggle}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Slider x:Name="TextPeekWidthSlider" Width="190" Minimum="300" Maximum="640" Value="380" TickFrequency="20" IsSnapToTickEnabled="True" ValueChanged="TextPeekWidth_ValueChanged" AutomationProperties.Name="{local:Loc Key=S5A3519B294992D05}"/>
+                                        <TextBlock x:Name="TextPeekWidthValue" Style="{StaticResource SettingValue}" Text="380 px"/>
+                                    </StackPanel>
+                                </local:SettingRow>
+                                <TextBlock Text="{local:Loc Key=S6A20ADC3B99637AE}" Style="{StaticResource SettingsHeading}"/>
+                                <TextBlock Text="{local:Loc Key=S9F318A3518378441}" Style="{StaticResource SettingsNote}" Margin="0"/>
+                                <local:SettingRow Title="{local:Loc Key=SB051F39468122ABD}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Slider x:Name="ZoomDelaySlider" Width="190" Minimum="100" Maximum="3000" Value="1000" TickFrequency="100" IsSnapToTickEnabled="True" ValueChanged="ZoomDelay_ValueChanged" AutomationProperties.Name="{local:Loc Key=SF07F805077291E8D}"/>
+                                        <TextBlock x:Name="ZoomDelayValue" Style="{StaticResource SettingValue}" Text="{local:Loc Key=S78EE5E545DA882DD}"/>
+                                    </StackPanel>
+                                </local:SettingRow>
+                                <local:SettingRow Title="{local:Loc Key=S602601E628CC43D0}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Slider x:Name="ZoomScaleSlider" Width="190" Minimum="1" Maximum="5" Value="3" TickFrequency="1" IsSnapToTickEnabled="True" ValueChanged="ZoomScale_ValueChanged" AutomationProperties.Name="{local:Loc Key=SBF4D6267A5A07968}"/>
+                                        <TextBlock x:Name="ZoomScaleValue" Style="{StaticResource SettingValue}" Text="780 × 360"/>
+                                    </StackPanel>
+                                </local:SettingRow>
+                                <ToggleButton x:Name="PasteReplacementToggle" Style="{StaticResource SettingHead}" Checked="PasteReplacement_Changed" Unchecked="PasteReplacement_Changed" AutomationProperties.Name="{local:Loc Key=SEBD89AC17156AEF0}">
+                                    <local:SettingText Strong="True" Title="{local:Loc Key=SEBD89AC17156AEF0}" Hint="{local:Loc Key=S98A59F474450F99C}"/>
+                                </ToggleButton>
+                                <local:SettingRow Title="{local:Loc Key=S34663EE4FE51BC25}" IsEnabled="{Binding IsChecked, ElementName=PasteReplacementToggle}">
+                                    <TextBox x:Name="PasteReplacementFrom" Width="254" Style="{StaticResource FieldBox}" MaxLength="256" AutomationProperties.Name="{local:Loc Key=S34663EE4FE51BC25}" TextChanged="PasteReplacement_Changed"/>
+                                </local:SettingRow>
+                                <local:SettingRow Title="{local:Loc Key=S44FF00B55F82A825}" IsEnabled="{Binding IsChecked, ElementName=PasteReplacementToggle}">
+                                    <TextBox x:Name="PasteReplacementTo" Width="254" Style="{StaticResource FieldBox}" MaxLength="256" AutomationProperties.Name="{local:Loc Key=S44FF00B55F82A825}" TextChanged="PasteReplacement_Changed"/>
+                                </local:SettingRow>
+                                <ToggleButton x:Name="InlineEditHoldToggle" Style="{StaticResource SettingHead}" IsChecked="{Binding InlineEditOnHold, RelativeSource={RelativeSource AncestorType=Window}, Mode=TwoWay}" AutomationProperties.Name="{local:Loc Key=S775FA80A5F1D8D8D}">
+                                    <local:SettingText Strong="True" Title="{local:Loc Key=S775FA80A5F1D8D8D}" Hint="{local:Loc Key=SA898B3F151B652B9}"/>
+                                </ToggleButton>
+                            </StackPanel>
+                        </ScrollViewer>
+                        <ScrollViewer x:Name="StorageSettingsView" Visibility="Collapsed" VerticalScrollBarVisibility="Auto" Focusable="False">
+                            <StackPanel Margin="24,18,20,20">
+                                <TextBlock Text="{local:Loc Key=S349065E9C4467894}" Style="{StaticResource SettingsTitle}"/>
+                                <TextBlock Text="{local:Loc Key=S1417B7792D57BBB7}" Style="{StaticResource SettingsHeading}"/>
+                                <local:SettingRow Title="{local:Loc Key=SF9E6B4B56157141E}" Hint="{local:Loc Key=S8EF99396D284012F}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Slider x:Name="HistoryCountSlider" Width="190" Minimum="20" Maximum="1000" Value="100" TickFrequency="10" IsSnapToTickEnabled="True" ValueChanged="Storage_ValueChanged" AutomationProperties.Name="{local:Loc Key=S95E1B243A48FD248}"/>
+                                        <TextBlock x:Name="HistoryCountValue" Style="{StaticResource SettingValue}"/>
+                                    </StackPanel>
+                                </local:SettingRow>
+                                <local:SettingRow Title="{local:Loc Key=S78B7A9E85FF0C74F}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Slider x:Name="HistoryDaysSlider" Width="190" Minimum="1" Maximum="90" Value="7" TickFrequency="1" IsSnapToTickEnabled="True" ValueChanged="Storage_ValueChanged" AutomationProperties.Name="{local:Loc Key=SD57B977768600584}"/>
+                                        <TextBlock x:Name="HistoryDaysValue" Style="{StaticResource SettingValue}"/>
+                                    </StackPanel>
+                                </local:SettingRow>
+                                <local:SettingRow Title="{local:Loc Key=S57AD92DE020B8C62}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Slider x:Name="MediaDaysSlider" Width="190" Minimum="1" Maximum="30" Value="1" TickFrequency="1" IsSnapToTickEnabled="True" ValueChanged="Storage_ValueChanged" AutomationProperties.Name="{local:Loc Key=S5BF473B2FD59A9AA}"/>
+                                        <TextBlock x:Name="MediaDaysValue" Style="{StaticResource SettingValue}"/>
+                                    </StackPanel>
+                                </local:SettingRow>
+                                <TextBlock Text="{local:Loc Key=S9AE3804BD96F4224}" Style="{StaticResource SettingsHeading}"/>
+                                <local:SettingRow Title="{local:Loc Key=SBB728E0D3FA62A9E}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Slider x:Name="TextLimitSlider" Width="190" Minimum="10" Maximum="2000" Value="1000" TickFrequency="10" IsSnapToTickEnabled="True" ValueChanged="Storage_ValueChanged" AutomationProperties.Name="{local:Loc Key=S8DBF01AE706F3996}"/>
+                                        <TextBlock x:Name="TextLimitValue" Style="{StaticResource SettingValue}"/>
+                                    </StackPanel>
+                                </local:SettingRow>
+                                <local:SettingRow Title="{local:Loc Key=SE5F534734C3678AF}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Slider x:Name="ImageLimitSlider" Width="190" Minimum="1" Maximum="80" Value="40" TickFrequency="1" IsSnapToTickEnabled="True" ValueChanged="Storage_ValueChanged" AutomationProperties.Name="{local:Loc Key=S8B97A912B02AE689}"/>
+                                        <TextBlock x:Name="ImageLimitValue" Style="{StaticResource SettingValue}"/>
+                                    </StackPanel>
+                                </local:SettingRow>
+                                <local:SettingRow Title="{local:Loc Key=S104FE8A2AA075597}" Hint="{local:Loc Key=S4401E13B4F44ECDA}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Slider x:Name="ThumbnailSlider" Width="190" Minimum="160" Maximum="640" Value="320" TickFrequency="16" IsSnapToTickEnabled="True" ValueChanged="Storage_ValueChanged" AutomationProperties.Name="{local:Loc Key=S29B06D0B60B7DCF6}"/>
+                                        <TextBlock x:Name="ThumbnailValue" Style="{StaticResource SettingValue}"/>
+                                    </StackPanel>
+                                </local:SettingRow>
+                                <local:SettingRow Title="{local:Loc Key=S2B2A9427D51075B7}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Slider x:Name="FileSizeSlider" Width="190" Minimum="10" Maximum="200" Value="100" TickFrequency="10" IsSnapToTickEnabled="True" ValueChanged="Storage_ValueChanged" AutomationProperties.Name="{local:Loc Key=S7A7D4120C3A5CBC3}"/>
+                                        <TextBlock x:Name="FileSizeValue" Style="{StaticResource SettingValue}"/>
+                                    </StackPanel>
+                                </local:SettingRow>
+                                <local:SettingRow Title="{local:Loc Key=SD67C6C95201096DD}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Slider x:Name="FileCountSlider" Width="190" Minimum="2" Maximum="100" Value="100" TickFrequency="1" IsSnapToTickEnabled="True" ValueChanged="Storage_ValueChanged" AutomationProperties.Name="{local:Loc Key=SA94D16AFE71C0322}"/>
+                                        <TextBlock x:Name="FileCountValue" Style="{StaticResource SettingValue}"/>
+                                    </StackPanel>
+                                </local:SettingRow>
+                                <TextBlock Text="{local:Loc Key=S14387E4467F2FCC7}" Style="{StaticResource SettingsHeading}"/>
+                                <local:SettingRow Title="{local:Loc Key=SED5A6EFB8543B58C}" Hint="{local:Loc Key=SD06333F24005105F}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Slider x:Name="TempDaysSlider" Width="190" Minimum="1" Maximum="7" Value="1" TickFrequency="1" IsSnapToTickEnabled="True" ValueChanged="Storage_ValueChanged" AutomationProperties.Name="{local:Loc Key=S344A33BE4B76BFC0}"/>
+                                        <TextBlock x:Name="TempDaysValue" Style="{StaticResource SettingValue}"/>
+                                    </StackPanel>
+                                </local:SettingRow>
+                                <TextBlock Text="{local:Loc Key=SEEC6352B23682FBE}" Style="{StaticResource SettingsHeading}"/>
+                                <TextBlock Text="{local:Loc Key=SAEF3A78E959942CE}" Style="{StaticResource SettingsNote}"/>
+                                <TextBlock Text="{local:Loc Key=SCC03D7C4F928EC30}" Style="{StaticResource SettingsNote}"/>
+                            </StackPanel>
+                        </ScrollViewer>
+                        <ScrollViewer x:Name="VfxSettingsView" Visibility="Collapsed" VerticalScrollBarVisibility="Auto" Focusable="False">
+                            <StackPanel Margin="24,18,20,20">
+                                <TextBlock Text="{local:Loc Key=S4A767F2AA26A9A0D}" Style="{StaticResource SettingsTitle}"/>
+                                <ToggleButton x:Name="VfxToggle" Style="{StaticResource SettingHead}" IsChecked="True" Checked="Vfx_Changed" Unchecked="Vfx_Changed" AutomationProperties.Name="{local:Loc Key=S73D5A91D62E6A9B0}">
+                                    <local:SettingText Strong="True" Title="{local:Loc Key=S73D5A91D62E6A9B0}" Hint="{local:Loc Key=S3E795DE749A1EA08}"/>
+                                </ToggleButton>
+                                <Grid Height="150" Margin="0,4,0,2" IsHitTestVisible="False" ClipToBounds="True">
+                                    <Border Margin="96,32" CornerRadius="8" Background="{DynamicResource WindowSurface}" BorderBrush="{DynamicResource WindowStroke}" BorderThickness="1">
+                                        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                                            <TextBlock Text="{local:Loc Key=SEB31594AB4F133FA}" FontWeight="SemiBold" HorizontalAlignment="Center"/>
+                                            <TextBlock Text="{local:Loc Key=SB5A318BE6EC5C751}" FontSize="12" Foreground="{DynamicResource TextSecondary}"/>
+                                        </StackPanel>
+                                    </Border>
+                                    <local:NetherBorder x:Name="VfxPreview" Inset="32" Margin="64,0"/>
+                                </Grid>
+                                <local:SettingRow Title="{local:Loc Key=SF195133BCEFB6A3B}" IsEnabled="{Binding IsChecked, ElementName=VfxToggle}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Slider x:Name="VfxOpacitySlider" Width="190" Minimum="10" Maximum="100" Value="20" TickFrequency="5" IsSnapToTickEnabled="True" ValueChanged="Vfx_ValueChanged" AutomationProperties.Name="{local:Loc Key=S05F86AE8582FFC3E}"/>
+                                        <TextBlock x:Name="VfxOpacityValue" Style="{StaticResource SettingValue}"/>
+                                    </StackPanel>
+                                </local:SettingRow>
+                                <local:SettingRow Title="{local:Loc Key=S70E98E32147CF4EC}" IsEnabled="{Binding IsChecked, ElementName=VfxToggle}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Slider x:Name="VfxSpeedSlider" Width="190" Minimum="25" Maximum="200" Value="70" TickFrequency="5" IsSnapToTickEnabled="True" ValueChanged="Vfx_ValueChanged" AutomationProperties.Name="{local:Loc Key=S27410FC78B03DDB6}"/>
+                                        <TextBlock x:Name="VfxSpeedValue" Style="{StaticResource SettingValue}"/>
+                                    </StackPanel>
+                                </local:SettingRow>
+                                <TextBlock x:Name="VfxStatus" Style="{StaticResource SettingsNote}" AutomationProperties.LiveSetting="Polite"/>
+                                <TextBlock Text="{local:Loc Key=SDD33660ECD470ABA}" Style="{StaticResource SettingsNote}"/>
+                                <TextBlock Text="{local:Loc Key=S731F34E25885ECCC}" Style="{StaticResource SettingsHeading}"/>
+                                <ToggleButton x:Name="ReactionToggle" Style="{StaticResource SettingToggle}" IsChecked="True" Checked="VfxExtras_Changed" Unchecked="VfxExtras_Changed" AutomationProperties.Name="{local:Loc Key=SB6F33BC23530A58D}">
+                                    <local:SettingText Title="{local:Loc Key=SB6F33BC23530A58D}" Hint="{local:Loc Key=SD9207D64DC446EFA}"/>
+                                </ToggleButton>
+                                <ToggleButton x:Name="ShardsToggle" Style="{StaticResource SettingToggle}" Checked="VfxExtras_Changed" Unchecked="VfxExtras_Changed" AutomationProperties.Name="{local:Loc Key=SF600EDB4DB611BC7}">
+                                    <local:SettingText Title="{local:Loc Key=SF600EDB4DB611BC7}" Hint="{local:Loc Key=SBE8B5FD6FFD8BBCA}"/>
+                                </ToggleButton>
+                            </StackPanel>
+                        </ScrollViewer>
+                    </Grid>
+                    <!-- Лимиты применяются кнопкой: сокращение удаляет лишние записи. Кнопка всегда на виду -->
+                    <Border Grid.Row="1" Padding="24,10,20,10" BorderThickness="0,1,0,0" BorderBrush="{DynamicResource WindowStroke}"
+                            Visibility="{Binding Visibility, ElementName=StorageSettingsView}">
+                        <DockPanel>
+                            <Button x:Name="StorageApplyButton" DockPanel.Dock="Right" MinWidth="120" Margin="16,0,0,0" Content="{local:Loc Key=SE15F960D93EB4EE8}" Style="{StaticResource AccentButton}"
                                     Click="StorageApply_Click" AutomationProperties.Name="{local:Loc Key=S8422C616A28F5F16}"/>
-                            <TextBlock x:Name="StorageStatus" Text="{local:Loc Key=SBABDB58139BE97EA}" TextWrapping="Wrap" FontSize="11"
-                                       Foreground="{DynamicResource TextSecondary}" Margin="0,8,0,0"/>
-                            </StackPanel></Border>
-                        </StackPanel>
-                        <StackPanel Grid.Column="2">
-                            <Border Style="{StaticResource SettingsCard}"><StackPanel>
-                            <TextBlock Text="{local:Loc Key=S9AE3804BD96F4224}" FontSize="15" FontWeight="SemiBold" Margin="0,0,0,10"/>
-                            <Grid><TextBlock Text="{local:Loc Key=SBB728E0D3FA62A9E}"/>
-                                <TextBlock x:Name="TextLimitValue" HorizontalAlignment="Right" Foreground="{DynamicResource TextSecondary}"/></Grid>
-                            <Slider x:Name="TextLimitSlider" Minimum="10" Maximum="2000" Value="1000" TickFrequency="10" IsSnapToTickEnabled="True"
-                                    Margin="0,4,0,10" ValueChanged="Storage_ValueChanged" AutomationProperties.Name="{local:Loc Key=S8DBF01AE706F3996}"/>
-                            <Grid><TextBlock Text="{local:Loc Key=SE5F534734C3678AF}"/>
-                                <TextBlock x:Name="ImageLimitValue" HorizontalAlignment="Right" Foreground="{DynamicResource TextSecondary}"/></Grid>
-                            <Slider x:Name="ImageLimitSlider" Minimum="1" Maximum="80" Value="40" TickFrequency="1" IsSnapToTickEnabled="True"
-                                    Margin="0,4,0,10" ValueChanged="Storage_ValueChanged" AutomationProperties.Name="{local:Loc Key=S8B97A912B02AE689}"/>
-                            <Grid><TextBlock Text="{local:Loc Key=S104FE8A2AA075597}"/>
-                                <TextBlock x:Name="ThumbnailValue" HorizontalAlignment="Right" Foreground="{DynamicResource TextSecondary}"/></Grid>
-                            <Slider x:Name="ThumbnailSlider" Minimum="160" Maximum="640" Value="320" TickFrequency="16" IsSnapToTickEnabled="True"
-                                    Margin="0,4,0,2" ValueChanged="Storage_ValueChanged" AutomationProperties.Name="{local:Loc Key=S29B06D0B60B7DCF6}"/>
-                            <TextBlock Text="{local:Loc Key=S4401E13B4F44ECDA}" FontSize="11" Foreground="{DynamicResource TextSecondary}" Margin="0,0,0,10"/>
-                            <Grid><TextBlock Text="{local:Loc Key=S2B2A9427D51075B7}"/>
-                                <TextBlock x:Name="FileSizeValue" HorizontalAlignment="Right" Foreground="{DynamicResource TextSecondary}"/></Grid>
-                            <Slider x:Name="FileSizeSlider" Minimum="10" Maximum="200" Value="100" TickFrequency="10" IsSnapToTickEnabled="True"
-                                    Margin="0,4,0,10" ValueChanged="Storage_ValueChanged" AutomationProperties.Name="{local:Loc Key=S7A7D4120C3A5CBC3}"/>
-                            <Grid><TextBlock Text="{local:Loc Key=SD67C6C95201096DD}"/>
-                                <TextBlock x:Name="FileCountValue" HorizontalAlignment="Right" Foreground="{DynamicResource TextSecondary}"/></Grid>
-                            <Slider x:Name="FileCountSlider" Minimum="2" Maximum="100" Value="100" TickFrequency="1" IsSnapToTickEnabled="True"
-                                    Margin="0,4,0,0" ValueChanged="Storage_ValueChanged" AutomationProperties.Name="{local:Loc Key=SA94D16AFE71C0322}"/>
-                            </StackPanel></Border>
-                        </StackPanel>
+                            <TextBlock x:Name="StorageStatus" Text="{local:Loc Key=SBABDB58139BE97EA}" TextWrapping="Wrap" FontSize="12" VerticalAlignment="Center"
+                                       Foreground="{DynamicResource TextSecondary}" AutomationProperties.LiveSetting="Polite"/>
+                        </DockPanel>
+                    </Border>
+                    <Button HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,12,14,0" Style="{StaticResource SubtleIconButton}" Width="32" Height="32" FontSize="12"
+                            Content="&#xE8BB;" Click="CloseSettings_Click" ToolTip="{local:Loc Key=S9903B13E9593C5CA}" AutomationProperties.Name="{local:Loc Key=S9903B13E9593C5CA}"/>
                 </Grid>
-            </ScrollViewer>
             </Grid>
             <Border x:Name="SettingsHistoryPicker" Visibility="Collapsed" Focusable="False"
                     KeyboardNavigation.TabNavigation="Cycle" CornerRadius="8"

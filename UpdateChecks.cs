@@ -108,20 +108,20 @@ internal static class UpdateChecks
             Motion.Enabled = false;
             panel.OpenSettings();
             panel.Root.Opacity = 1;
-            panel.Root.Measure(new Size(392, 492)); panel.Root.Arrange(new Rect(0, 0, 392, 492)); panel.Root.UpdateLayout();
+            panel.Root.Measure(new Size(792, 700)); panel.Root.Arrange(new Rect(0, 0, 792, 700)); panel.Root.UpdateLayout();
             check(panel.UpdateButton.IsEnabled && panel.UpdateButton.Content.ToString() == UiText.T("Обновить и перезапустить"), "ready update exposes one restart action");
             panel.AutoUpdate = true;
-            panel.VisualSettingsView.ScrollToEnd(); panel.Root.UpdateLayout();
+            panel.GeneralSettingsView.ScrollToEnd(); panel.Root.UpdateLayout();
             panel.Dispatcher.Invoke(() => { }, System.Windows.Threading.DispatcherPriority.ContextIdle);
             panel.Root.UpdateLayout();
-            panel.VisualSettingsView.ScrollToVerticalOffset(panel.VisualSettingsView.ExtentHeight);
+            panel.GeneralSettingsView.ScrollToVerticalOffset(panel.GeneralSettingsView.ExtentHeight);
             panel.Root.UpdateLayout();
-            var buttonTop = panel.UpdateButton.TranslatePoint(new Point(), panel.VisualSettingsView);
-            check(buttonTop.Y >= 0 && buttonTop.Y + panel.UpdateButton.ActualHeight <= panel.VisualSettingsView.ActualHeight + 1,
-                $"update action fits the scrolled settings viewport ({buttonTop.Y:0}/{panel.UpdateButton.ActualHeight:0}/{panel.VisualSettingsView.ActualHeight:0})");
+            var buttonTop = panel.UpdateButton.TranslatePoint(new Point(), panel.GeneralSettingsView);
+            check(buttonTop.Y >= 0 && buttonTop.Y + panel.UpdateButton.ActualHeight <= panel.GeneralSettingsView.ActualHeight + 1,
+                $"update action fits the scrolled settings viewport ({buttonTop.Y:0}/{panel.UpdateButton.ActualHeight:0}/{panel.GeneralSettingsView.ActualHeight:0})");
             check(panel.UpdateButton.TranslatePoint(new Point(), panel.Root).Y + panel.UpdateButton.ActualHeight <= panel.Root.ActualHeight,
                 "settings scrolling keeps the update action inside the panel bounds");
-            var bitmap = new System.Windows.Media.Imaging.RenderTargetBitmap(392, 492, 96, 96, System.Windows.Media.PixelFormats.Pbgra32);
+            var bitmap = new System.Windows.Media.Imaging.RenderTargetBitmap(792, 700, 96, 96, System.Windows.Media.PixelFormats.Pbgra32);
             bitmap.Render(panel.Root);
             var encoder = new System.Windows.Media.Imaging.PngBitmapEncoder(); encoder.Frames.Add(System.Windows.Media.Imaging.BitmapFrame.Create(bitmap));
             // Keep the offscreen review image outside the disposable synthetic history directory.

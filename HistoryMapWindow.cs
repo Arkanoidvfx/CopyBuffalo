@@ -28,6 +28,9 @@ internal sealed partial class HistoryMapWindow : Window
     readonly Image picture = new() { MaxHeight = 240, Stretch = Stretch.Uniform };
     readonly Button copy, home, refresh, datesToggle, previewToggle, dayOverview, zoomOut, zoomIn, mapBack, filtersToggle, clearFilters;
     readonly WrapPanel filterPanel = new();
+    readonly WrapPanel header = new() { HorizontalAlignment = HorizontalAlignment.Right, VerticalAlignment = VerticalAlignment.Center };
+    string appliedQuery = "";
+    readonly DispatcherTimer copyFeedback = new() { Interval = TimeSpan.FromSeconds(1.5) };
     readonly DispatcherTimer debounce = new() { Interval = TimeSpan.FromMilliseconds(160) };
     readonly DispatcherTimer reveal = new() { Interval = PanelWindow.SensitivePeekDelay };
     readonly HashSet<ClipItem> observed = [];
@@ -62,12 +65,20 @@ internal sealed partial class HistoryMapWindow : Window
         root.RowDefinitions.Add(new() { Height = GridLength.Auto });
         Content = root;
         var chrome = new StackPanel { Margin = new Thickness(0, 0, 0, 8) }; root.Children.Add(chrome);
-        var header = new WrapPanel(); chrome.Children.Add(header);
+        var headerRow = new DockPanel(); chrome.Children.Add(headerRow);
+        var tabs = new StackPanel { Orientation = Orientation.Horizontal, VerticalAlignment = VerticalAlignment.Top };
+        DockPanel.SetDock(tabs, Dock.Left); headerRow.Children.Add(tabs);
+        headerRow.Children.Add(header);
+        Resources.MergedDictionaries.Add(new ResourceDictionary { Source = new Uri("/ArkCopyBuffer;component/HistoryTimeline.xaml", UriKind.Relative) });
+        timelineTab = new RadioButton { Content = T("Хронология"), Style = (Style)FindResource("HistoryMode"), VerticalAlignment = VerticalAlignment.Center };
+        mapTab = new RadioButton { Content = T("Карта"), Style = timelineTab.Style, VerticalAlignment = VerticalAlignment.Center };
+        timelineTab.Click += (_, _) => SetTimeline(true); mapTab.Click += (_, _) => SetTimeline(false);
+        tabs.Children.Add(timelineTab); tabs.Children.Add(mapTab);
         var toolbar = filterPanel; toolbar.Margin = new Thickness(0, 6, 0, 0); toolbar.Visibility = Visibility.Collapsed; chrome.Children.Add(toolbar);
-        filtersToggle = Button("Поиск в истории", () => { toolbar.Visibility = toolbar.Visibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible; if (toolbar.Visibility == Visibility.Visible) { toolbar.UpdateLayout(); search.Focus(); } }); header.Children.Add(filtersToggle);
+        search.Width = 228; search.Margin = new Thickness(16, 4, 8, 4); search.Style = (Style)FindResource("SearchBox"); search.Tag = T("Поиск в истории");
+        AutomationProperties.SetName(search, T("Поиск в истории")); header.Children.Add(search);
+        filtersToggle = Button("Фильтры", () => { toolbar.Visibility = toolbar.Visibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible; }); header.Children.Add(filtersToggle);
         clearFilters = Button("Сбросить фильтры", () => { groupHistory.Clear(); overview = false; updating = true; search.Clear(); calendar.SelectedDates.Clear(); sources.SelectedIndex = kinds.SelectedIndex = 0; updating = false; Schedule(); }); clearFilters.Visibility = Visibility.Collapsed; header.Children.Add(clearFilters);
-        search.Width = 230; search.Style = (Style)FindResource("SearchBox"); search.Tag = T("Поиск в истории");
-        AutomationProperties.SetName(search, T("Поиск в истории")); toolbar.Children.Add(search);
         toolbar.Children.Add(SelectorButton(sources, "Последний источник"));
         toolbar.Children.Add(SelectorButton(kinds, "Тип"));
         toolbar.Children.Add(SelectorButton(mode, "Дата записи"));
@@ -96,9 +107,12 @@ internal sealed partial class HistoryMapWindow : Window
         preview.MouseLeave += (_, _) => MaskPreview(); preview.LostKeyboardFocus += (_, _) => MaskPreview(); Deactivated += (_, _) => MaskPreview();
         VirtualizingPanel.SetIsVirtualizing(results, true); VirtualizingPanel.SetVirtualizationMode(results, VirtualizationMode.Recycling);
         ScrollViewer.SetCanContentScroll(results, true);
-        canvas.SetResourceReference(BackgroundProperty, "CardFill"); Grid.SetColumn(canvas, 1); body.Children.Add(canvas);
-        var mapHost = new Grid(); mapHost.RowDefinitions.Add(new() { Height = GridLength.Auto }); mapHost.RowDefinitions.Add(new());
-        body.Children.Remove(canvas); Grid.SetColumn(mapHost, 1); body.Children.Add(mapHost); Grid.SetColumn(canvas, 0); Grid.SetRow(canvas, 1); mapHost.Children.Add(canvas);
+        canvas.SetResourceReference(BackgroundProperty, "CardFill");
+        mapHost.RowDefinitions.Add(new()); mapHost.RowDefinitions.Add(new() { Height = GridLength.Auto });
+        mapHost.ColumnDefinitions.Add(new()); mapHost.ColumnDefinitions.Add(new() { Width = new GridLength(0) });
+        Grid.SetColumn(mapHost, 1); body.Children.Add(mapHost); mapHost.Children.Add(canvas);
+        BuildReader(mapHost);
+        BuildTimeline();
         var mapTools = new WrapPanel { HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center };
         zoomOut = Button("−", () => Zoom(scale / 1.25, Center)); zoomOut.ToolTip = T("Уменьшить масштаб"); AutomationProperties.SetName(zoomOut, (string)zoomOut.ToolTip); mapTools.Children.Add(zoomOut);
         zoomLabel.VerticalAlignment = VerticalAlignment.Center; zoomLabel.MinWidth = 46; zoomLabel.TextAlignment = TextAlignment.Center; mapTools.Children.Add(zoomLabel);
@@ -106,13 +120,21 @@ internal sealed partial class HistoryMapWindow : Window
         mapTools.Children.Add(Button("Вписать карту", Fit));
         dayOverview = Button("Обзор дней", ShowOverview); mapTools.Children.Add(dayOverview);
         mapBack = Button("Назад к обзору", BackToOverview); mapBack.Visibility = Visibility.Collapsed; header.Children.Add(mapBack);
-        toolSurface.Child = mapTools; toolSurface.HorizontalAlignment = HorizontalAlignment.Center; toolSurface.VerticalAlignment = VerticalAlignment.Center; toolSurface.Margin = new Thickness(4, 0, 0, 0); toolSurface.CornerRadius = new CornerRadius(6); toolSurface.SetResourceReference(Border.BackgroundProperty, "WindowSurface"); header.Children.Add(toolSurface);
+        toolSurface.Child = mapTools;
+        var navigation = new DockPanel { Margin = new Thickness(0, 6, 0, 0) };
+        var steps = new StackPanel { Orientation = Orientation.Horizontal, VerticalAlignment = VerticalAlignment.Center };
+        previousEntry = StepButton(-1); nextEntry = StepButton(1);
+        steps.Children.Add(previousEntry); steps.Children.Add(positionLabel); steps.Children.Add(nextEntry);
+        DockPanel.SetDock(steps, Dock.Left); navigation.Children.Add(steps);
+        toolSurface.HorizontalAlignment = HorizontalAlignment.Right; navigation.Children.Add(toolSurface);
+        root.RowDefinitions.Add(new() { Height = GridLength.Auto }); Grid.SetRow(navigation, 3); root.Children.Add(navigation);
         AutomationProperties.SetName(canvas, T("Карта истории")); AutomationProperties.SetName(results, T("Результаты поиска"));
         inspector.Margin = new Thickness(18, 0, 0, 0); var inspectorScroll = new ScrollViewer { Content = inspector, VerticalScrollBarVisibility = ScrollBarVisibility.Auto, HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled }; Grid.SetColumn(inspectorScroll, 2); body.Children.Add(inspectorScroll);
         heading.FontSize = 20; heading.FontWeight = FontWeights.SemiBold; heading.TextWrapping = TextWrapping.Wrap;
         inspector.Children.Add(heading); inspector.Children.Add(picture); inspector.Children.Add(preview);
         metadata.TextWrapping = TextWrapping.Wrap; metadata.Margin = new Thickness(0, 16, 0, 16); inspector.Children.Add(metadata);
-        copy = Button("Копировать", async () => await Copy()); header.Children.Add(copy);
+        copy = Button("Копировать", async () => await CopyDisplayed()); copy.Style = (Style)FindResource("AccentButton"); header.Children.Add(copy);
+        copyFeedback.Tick += (_, _) => ResetCopyFeedback();
         inspector.Children.Add(Button("Центрировать здесь", () => CenterOn(selected)));
         status.Margin = new Thickness(4, 4, 0, 0); status.TextWrapping = TextWrapping.Wrap; status.ToolTip = T("Текущие сохранённые записи, а не прошлые версии содержимого."); status.Visibility = Visibility.Collapsed; Grid.SetRow(status, 2); root.Children.Add(status);
         search.TextChanged += (_, _) => Schedule();
@@ -133,15 +155,21 @@ internal sealed partial class HistoryMapWindow : Window
         canvas.MouseLeftButtonUp += (_, _) => canvas.ReleaseMouseCapture();
         PreviewKeyDown += (_, e) =>
         {
-            if (e.Key == Key.F && Keyboard.Modifiers == ModifierKeys.Control) { filterPanel.Visibility = Visibility.Visible; filterPanel.UpdateLayout(); search.Focus(); search.SelectAll(); e.Handled = true; }
+            if (e.Key == Key.F && Keyboard.Modifiers == ModifierKeys.Control) { search.Focus(); search.SelectAll(); e.Handled = true; }
+            else if (e.Key == Key.Down && Keyboard.Modifiers == ModifierKeys.None && timelineMode && search.IsKeyboardFocusWithin) { e.Handled = true; FocusSearchResult(); }
             else if (e.SystemKey == Key.Left && Keyboard.Modifiers == ModifierKeys.Alt && groupHistory.Count > 0) { BackToOverview(); e.Handled = true; }
             else if (e.Key == Key.F5) { RefreshSnapshot(); e.Handled = true; }
             else if (e.Key == Key.Escape) { if (search.Text.Length > 0) search.Clear(); else if (filterPanel.Visibility == Visibility.Visible) { filterPanel.Visibility = Visibility.Collapsed; canvas.Focus(); } else Close(); e.Handled = true; }
             else if (e.Key == Key.Enter && Keyboard.FocusedElement is not ButtonBase && (canvas.IsKeyboardFocused || results.IsKeyboardFocusWithin)) { CenterOn(selected); e.Handled = true; }
+            else if (e.Key == Key.C && Keyboard.Modifiers == ModifierKeys.Control && (timeline.IsKeyboardFocusWithin || canvas.IsKeyboardFocusWithin || results.IsKeyboardFocusWithin) && copy.IsEnabled) { ShowReading(pinnedEntry); _ = Copy(); e.Handled = true; }
+            else if (canvas.IsKeyboardFocusWithin && !overview && Keyboard.Modifiers == ModifierKeys.None && e.Key is Key.Left or Key.Right) { StepEntry(e.Key == Key.Left ? -1 : 1); e.Handled = true; }
             else if (canvas.IsKeyboardFocused && !overview && e.Key is Key.Left or Key.Right or Key.Up or Key.Down) { offset += e.Key switch { Key.Left => new Vector(80, 0), Key.Right => new Vector(-80, 0), Key.Up => new Vector(0, 80), _ => new Vector(0, -80) }; Draw(); e.Handled = true; }
             else if (canvas.IsKeyboardFocused && e.Key is Key.Add or Key.OemPlus or Key.Subtract or Key.OemMinus) { Zoom(scale * (e.Key is Key.Add or Key.OemPlus ? 1.25 : .8), Center); e.Handled = true; }
         };
         store.Items.CollectionChanged += CollectionChanged; store.Changed += StoreChanged; Observe();
+        mapHost.SizeChanged += (_, _) => TimelineLayout();
+        TimelineLayout();
+        Closed += (_, _) => { readingLoad?.Cancel(); copyFeedback.Stop(); };
         Closed += (_, _) => { closed = true; ClearMapThumbnails(); queryVersion++; copyVersion++; previewVersion++; filtering?.Cancel(); filtering?.Dispose(); debounce.Stop(); reveal.Stop(); store.Items.CollectionChanged -= CollectionChanged; store.Changed -= StoreChanged; foreach (var i in observed) i.PropertyChanged -= ItemChanged; observed.Clear(); };
     }
 
@@ -171,6 +199,11 @@ internal sealed partial class HistoryMapWindow : Window
     void ResizePanes()
     {
         narrow = ActualWidth < 1100;
+        bool compactTools = ActualWidth < 800;
+        search.Width = compactTools ? 150 : 228;
+        CompactToolbar(filtersToggle, "\uE71C", compactTools);
+        CompactToolbar(datesToggle, "\uE787", compactTools);
+        CompactToolbar(previewToggle, "\uE946", compactTools);
         bool showRail = railOpen && (!narrow || railChosen);
         rail.Visibility = showRail ? Visibility.Visible : Visibility.Collapsed;
         railHost.Visibility = rail.Visibility;
@@ -252,10 +285,11 @@ internal sealed partial class HistoryMapWindow : Window
         try { layout = await Task.Run(() => HistoryMap.Layout(data.Where(e => { token.ThrowIfCancellationRequested(); return e.Matches(query, source, kind, from, to, first); }), first), token); }
         catch (OperationCanceledException) { return; }
         if (closed || version != queryVersion) return;
+        appliedQuery = query;
         nodes = layout.Where(n => !invalid.Contains(n.Entry.Id)).ToArray();
         updating = true; results.ItemsSource = nodes.Select(n => n.Entry).ToArray(); results.SelectedItem = nodes.FirstOrDefault(n => n.Entry.Id == selected)?.Entry; updating = false;
         UpdateCounts();
-        if (!nodes.Any(n => n.Entry.Id == selected)) selected = nodes.FirstOrDefault()?.Entry.Id ?? Guid.Empty;
+        if (!nodes.Any(n => n.Entry.Id == selected)) selected = (timelineMode ? nodes.LastOrDefault() : nodes.FirstOrDefault())?.Entry.Id ?? Guid.Empty;
         Select(selected);
         if (overview) ShowOverview(); else if (center || nodes.Length > 0) CenterOn(selected); else Draw();
     }
@@ -287,13 +321,30 @@ internal sealed partial class HistoryMapWindow : Window
             catch (Exception ex) when (ex is IOException or System.Security.Cryptography.CryptographicException or NotSupportedException) { if (version == previewVersion) SetStatus("Просмотр недоступен"); }
         }
     }
+    Task CopyDisplayed()
+    {
+        if (reader.IsVisible && readingEntry is { } shown && shown.Id != selected) Select(shown.Id);
+        return Copy();
+    }
+    void ResetCopyFeedback()
+    {
+        copyFeedback.Stop(); copy.Content = T("Копировать");
+    }
     async Task Copy()
     {
         var entry = snapshot.FirstOrDefault(e => e.Id == selected); var item = store.Items.FirstOrDefault(i => i.Id == selected);
         if (entry == null || item == null || invalid.Contains(selected) || !entry.ContentMatches(item)) { ClearPreview(); return; }
         int version = ++copyVersion; copy.IsEnabled = false;
         bool Current() => !closed && version == copyVersion && store.Items.Contains(item) && !invalid.Contains(item.Id) && entry.ContentMatches(item);
-        try { await Paster.SetClipboardAsync(item, false, store.ImagesDir, Current); if (Current()) SetStatus("Скопировано"); }
+        try
+        {
+            await Paster.SetClipboardAsync(item, false, store.ImagesDir, Current);
+            if (Current() && (overview || readingEntry?.Id == item.Id))
+            {
+                status.Visibility = Visibility.Collapsed;
+                copy.Content = T("Скопировано"); copyFeedback.Stop(); copyFeedback.Start();
+            }
+        }
         catch (OperationCanceledException) { }
         catch (Exception ex) { if (!closed) { App.Log(ex); SetStatus("Не удалось скопировать. Повторите попытку."); } }
         finally { if (Current()) copy.IsEnabled = true; }

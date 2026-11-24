@@ -240,6 +240,22 @@ static class OcrChecks
         if (!pasted.ContainsImage() || !pasted.GetDataPresent("PNG") || pasted.ContainsText()) throw new Exception("Clipboard format is not an image.");
         string compressed=await model.CompressAsync("Please report version 42 and preserve the URL https://example.com/help. Do not change version 42 or https://example.com/help.");
         if (!compressed.Contains("42") || !compressed.Contains("https://example.com/help")) throw new Exception("Shared runtime broke prompt compression.");
+        string grammar=await model.FixGrammarAsync("can you check why version 42 fail's on https://example.com/help ? it work locally",timeout.Token);
+        if (!grammar.Contains("fails") || !grammar.Contains("works") || !grammar.Contains("42") || !grammar.Contains("https://example.com/help")) throw new Exception("Grammar fix lost a correction, number or URL: "+grammar);
+        // Ручная оценка качества: блоки через строку «-----» в prompt-eval.txt → prompt-eval.json с ответами обеих функций.
+        var evalPath=Path.Combine(dir,"prompt-eval.txt");
+        if (File.Exists(evalPath))
+        {
+            var results=new List<object>();
+            foreach (var sample in (await File.ReadAllTextAsync(evalPath)).ReplaceLineEndings("\n").Split("\n-----\n").Select(s=>s.Trim()).Where(s=>s.Length>0))
+            {
+                var started=System.Diagnostics.Stopwatch.StartNew();
+                string c=await model.CompressAsync(sample); long compressMs=started.ElapsedMilliseconds; started.Restart();
+                string g=await model.FixGrammarAsync(sample,timeout.Token);
+                results.Add(new {sample,compressed=c,ratio=Math.Round((double)c.Length/sample.Length,2),compressMs,grammar=g,grammarMs=started.ElapsedMilliseconds});
+            }
+            await File.WriteAllTextAsync(Path.Combine(dir,"prompt-eval.json"),JsonSerializer.Serialize(results,new JsonSerializerOptions {WriteIndented=true,Encoder=System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping}));
+        }
         string russian=(await model.TranslateRegionsAsync(new[] {Label("Версия 42 готова.")},timeout.Token))[0];
         if (russian!="Версия 42 готова.") throw new Exception("Russian source was changed: "+russian);
         using (var small=new System.Drawing.Bitmap(200,72))
@@ -264,7 +280,7 @@ static class OcrChecks
             await File.WriteAllTextAsync(Path.Combine(dir,"small-labels.json"),JsonSerializer.Serialize(new {regions=smallOcr.Regions,translations=smallLabels}));
         }
         await File.WriteAllTextAsync(Path.Combine(dir,"translation-result.json"),JsonSerializer.Serialize(new {source,recognized=recognized.Text,translations,result,compressed,russian,elapsed_ms=watch.Elapsed.TotalMilliseconds}));
-        await File.WriteAllTextAsync(Path.Combine(dir,"translation-checks.log"),"PASS: cancellation, retry, encrypted image -> positioned OCR -> live local translation -> image rendering -> encrypted image history -> PNG/bitmap clipboard payload; original retained, number/URL retained, prompt compression regression; no real history, clipboard or input.");
+        await File.WriteAllTextAsync(Path.Combine(dir,"translation-checks.log"),"PASS: cancellation, retry, encrypted image -> positioned OCR -> live local translation -> image rendering -> encrypted image history -> PNG/bitmap clipboard payload; original retained, number/URL retained, prompt compression and grammar fix regression; no real history, clipboard or input.");
     }
 
     static IEnumerable<DependencyObject> Descendants(DependencyObject parent)

@@ -29,7 +29,8 @@ partial class PanelWindow
 
     void Kind_Click(object sender, RoutedEventArgs e)
     {
-        var menu = new ContextMenu { PlacementTarget = KindButton, Placement = PlacementMode.MousePoint };
+        if (_listClosedByPress == KindButton) return;
+        var menu = DropDown(KindButton);
         foreach (var kind in KindFilters)
         {
             var entry = Entry(kind.Key == null ? UiText.T("Все — без фильтра") : kind.Label, kind.Glyph, () => SetKindFilter(kind.Key));
@@ -37,7 +38,7 @@ partial class PanelWindow
             menu.Items.Add(entry);
         }
         menu.Closed += (_, _) => Search.Focus();
-        OpenMenu(menu);
+        OpenMenu(menu, dropDown: true);
     }
 
     void SetKindFilter(string? kind)

@@ -166,6 +166,16 @@ partial class PanelWindow
             LocalizationChecks.Require(editMenu != null && editMenu.Items.OfType<MenuItem>().Any(m => m.Header?.ToString() == UiText.T("Вырезать"))
                 && editMenu.Items.OfType<MenuItem>().Any(m => m.Header?.ToString() == UiText.T("Выделить всё")), "Standard editing menu is localized");
             panel.OpenSettings();
+            int asked = 0, kept = store.Items.Count, clips = store.Items.Count(i => !i.Pinned);
+            panel.ConfirmClear = count => { asked = count; return false; };
+            panel.ClearHistoryButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+            LocalizationChecks.Require(clips > 0 && asked == clips && store.Items.Count == kept, "Clear history asks first and keeps everything on Cancel");
+            bool? pause = null;
+            panel.PauseToggleRequested += on => { pause = on; panel.SetPaused(on); };
+            panel.PauseToggle.IsChecked = true;
+            LocalizationChecks.Require(pause == true && panel.InfoBar.Visibility == Visibility.Visible, "Settings pause recording");
+            panel.SetPaused(false);
+            LocalizationChecks.Require(panel.PauseToggle.IsChecked == false && pause == true, "Resuming elsewhere updates the setting without asking back");
             string? chosen = null;
             panel.LanguageChanged += language => { chosen = language; panel.SetLanguagePreference(language); };
             panel.ConfirmLanguageRestart = () => true;
@@ -175,7 +185,7 @@ partial class PanelWindow
             target.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
             LocalizationChecks.Require(chosen == other, "Language selection emits preference without restarting");
             panel.SetLanguagePreference(UiText.Language);
-            LocalizationChecks.Save(panel.Root, 392, 492, Path.Combine(directory, "language.png"));
+            LocalizationChecks.Save(panel.Root, 792, 700, Path.Combine(directory, "language.png"));
             var rule = new PasteReplacement(true, "-", "вн");
             panel.PasteReplacementRule = rule;
             PasteReplacement? changedRule = null;
@@ -188,16 +198,16 @@ partial class PanelWindow
             panel.AutoUpdate = true;
             panel.SetUpdateStatus(UiText.T("У вас последняя версия."), false, false);
             LocalizationChecks.Require(panel.UpdateVersion.Text == $"CopyBuffalo {AppUpdater.VersionText}", "Update section uses the product name");
-            panel.VisualSettingsView.ScrollToEnd(); panel.Root.UpdateLayout();
+            panel.GeneralSettingsView.ScrollToEnd(); panel.Root.UpdateLayout();
             panel.Dispatcher.Invoke(() => { }, System.Windows.Threading.DispatcherPriority.ContextIdle);
-            panel.VisualSettingsView.ScrollToVerticalOffset(panel.VisualSettingsView.ExtentHeight); panel.Root.UpdateLayout();
-            LocalizationChecks.Save(panel.Root, 392, 492, Path.Combine(directory, "updates.png"));
+            panel.GeneralSettingsView.ScrollToVerticalOffset(panel.GeneralSettingsView.ExtentHeight); panel.Root.UpdateLayout();
+            LocalizationChecks.Save(panel.Root, 792, 700, Path.Combine(directory, "updates.png"));
             var button = panel.UpdateButton.TranslatePoint(new Point(), panel.Root);
             LocalizationChecks.Require(button.Y >= 0 && button.Y + panel.UpdateButton.ActualHeight <= panel.Root.ActualHeight, "Update button fits");
             panel.ShowStorageSettings_Click(panel.StorageSettingsTab, new RoutedEventArgs());
-            LocalizationChecks.Save(panel.Root, 392, 492, Path.Combine(directory, "storage.png"));
+            LocalizationChecks.Save(panel.Root, 792, 700, Path.Combine(directory, "storage.png"));
             panel.ShowVfxSettings_Click(panel.VfxSettingsTab, new RoutedEventArgs());
-            LocalizationChecks.Save(panel.Root, 392, 492, Path.Combine(directory, "vfx.png"));
+            LocalizationChecks.Save(panel.Root, 792, 700, Path.Combine(directory, "vfx.png"));
         }
         finally { panel.Close(); }
     }

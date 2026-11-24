@@ -157,7 +157,7 @@ partial class PanelWindow
         return (Math.Max(1, (int)(width * scale)), Math.Max(1, (int)(height * scale)));
     }
 
-    static Task<BitmapSource?> LoadPreviewImage(ClipItem item, Size bounds, CancellationToken token = default)
+    internal static Task<BitmapSource?> LoadPreviewImage(ClipItem item, Size bounds, CancellationToken token = default)
     {
         var (width, height) = PreviewDecodeSize(item.ImageWidth, item.ImageHeight, bounds);
         if (item.ImageDir == null || item.ImageHash == null || (width == 0 && height == 0)) return Task.FromResult<BitmapSource?>(null);

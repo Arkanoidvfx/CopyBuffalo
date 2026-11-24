@@ -21,7 +21,7 @@ partial class PanelWindow
         if (PickingSettingsHistory) { CloseSettingsHistory(); return true; }
 
         _settingsHistoryReturnFocus = Keyboard.FocusedElement is UIElement focused && focused.IsWithin(SettingsPages)
-            ? focused : VisualSettingsTab;
+            ? focused : GeneralSettingsTab;
         if (_settingsHistoryReturnFocus is TextBox field)
             _settingsHistorySelection = (field.SelectionStart, field.SelectionLength);
         _outsideTimer.Stop();
@@ -54,7 +54,7 @@ partial class PanelWindow
         var focused = _settingsHistoryReturnFocus;
         _settingsHistoryReturnFocus = null;
         if (!restoreFocus || focused == null) return;
-        if (!focused.Focus()) VisualSettingsTab.Focus();
+        if (!focused.Focus()) GeneralSettingsTab.Focus();
         if (focused is TextBox field) field.Select(_settingsHistorySelection.Start, _settingsHistorySelection.Length);
     }
 

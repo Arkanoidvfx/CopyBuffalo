@@ -63,6 +63,9 @@ partial class PanelWindow
         double text = 1 - TextTransparencySlider.Value / 100;
         PanelShadow.Opacity = background;
         SetBrush("PanelSurface", "WindowSurface", background);
+        SetBrush("PanelTexture", "SkinTexture", background);
+        SetBrush("PanelSheen", "SkinSheen", background);
+        SetBrush("PanelInner", "SkinInner", background);
         SetBrush("PanelCardFill", "CardFill", background);
         SetBrush("PanelCardHover", "CardHover", background);
         SetBrush("PanelCardSubtleHover", "SubtleHover", background);
@@ -72,9 +75,10 @@ partial class PanelWindow
 
         void SetBrush(string key, string themeKey, double opacity)
         {
-            if (TryFindResource(themeKey) is not SolidColorBrush theme) return;
-            if (Resources[key] is SolidColorBrush current && current.Color == theme.Color && current.Opacity == opacity) return;
-            var brush = new SolidColorBrush(theme.Color) { Opacity = opacity };
+            if (TryFindResource(themeKey) is not Brush theme) return;
+            if (theme is SolidColorBrush solid && Resources[key] is SolidColorBrush current && current.Color == solid.Color && current.Opacity == opacity) return;
+            var brush = theme.Clone();
+            brush.Opacity = opacity;
             brush.Freeze();
             Resources[key] = brush;
         }

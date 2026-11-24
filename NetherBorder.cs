@@ -99,6 +99,9 @@ sealed class NetherBorder : FrameworkElement
 sealed class VfxWindow : Window
 {
     internal const double ExtraInset = NetherBorder.OuterInset - 16;
+    readonly Grid _root = new() { Margin = new Thickness(NetherBorder.OuterInset) };
+    (double X, double Y, double Scale)? _grown; // панель тянут за край: окно выросло вместе с её окном
+    internal readonly ShardFrame Shards = new();
     internal readonly NetherBorder Flame = new() { Margin = new Thickness(-NetherBorder.OuterInset) };
     internal IntPtr Handle => new WindowInteropHelper(this).Handle;
 
@@ -116,11 +119,12 @@ sealed class VfxWindow : Window
         Width = 392 + ExtraInset * 2;
         Height = 492 + ExtraInset * 2;
         WindowStartupLocation = WindowStartupLocation.Manual;
-        var root = new Grid { Margin = new Thickness(NetherBorder.OuterInset) };
-        root.Children.Add(Flame);
+        _root.Children.Add(new System.Windows.Shapes.Rectangle { Margin = new Thickness(-NetherBorder.OuterInset), Fill = Brushes.Transparent }); // область шейдера не зависит от того, что показано
+        _root.Children.Add(Flame);
+        _root.Children.Add(Shards);
         foreach (var property in new[] { OpacityProperty, RenderTransformProperty, RenderTransformOriginProperty })
-            BindingOperations.SetBinding(root, property, new Binding(property.Name) { Source = panelRoot });
-        Content = root;
+            BindingOperations.SetBinding(_root, property, new Binding(property.Name) { Source = panelRoot });
+        Content = _root;
         SourceInitialized += (_, _) =>
         {
             const long transparent = 0x20, noActivate = 0x08000000;
@@ -130,13 +134,60 @@ sealed class VfxWindow : Window
         };
     }
 
-    internal void Align(Window panel)
+    /// <summary>
+    /// Менять размер окна на каждом шаге нельзя: вместе с панелью это 21 кадр/с вместо 64. Поэтому оно, как и окно панели, растёт один раз,
+    /// а пламя двигается внутри. Прозрачная картинка — чтобы старое пламя не показалось на кадр в новом месте.
+    /// </summary>
+    internal void Grow(Native.RECT canvas, Native.RECT panel, double scale)
     {
-        var origin = panel.PointToScreen(new Point());
-        var end = panel.PointToScreen(new Point(panel.ActualWidth, panel.ActualHeight));
-        var dpi = VisualTreeHelper.GetDpi(panel);
-        double padX = ExtraInset * dpi.DpiScaleX, padY = ExtraInset * dpi.DpiScaleY;
-        Native.SetWindowPos(Handle, Native.HWND_TOPMOST, (int)Math.Round(origin.X - padX), (int)Math.Round(origin.Y - padY),
-            (int)Math.Round(end.X - origin.X + padX * 2), (int)Math.Round(end.Y - origin.Y + padY * 2), Native.SWP_NOACTIVATE);
+        int pad = (int)Math.Round(ExtraInset * scale);
+        var window = new Native.RECT { Left = canvas.Left - pad, Top = canvas.Top - pad, Right = canvas.Right + pad, Bottom = canvas.Bottom + pad };
+        _grown = (window.Left, window.Top, scale);
+        Follow(panel);
+        Resize(window);
+    }
+
+    internal void Follow(Native.RECT panel)
+    {
+        if (_grown is not { } at) return;
+        _root.HorizontalAlignment = HorizontalAlignment.Left;
+        _root.VerticalAlignment = VerticalAlignment.Top;
+        _root.Margin = new Thickness((panel.Left - at.X) / at.Scale, (panel.Top - at.Y) / at.Scale, 0, 0);
+        _root.Width = (panel.Right - panel.Left) / at.Scale;
+        _root.Height = (panel.Bottom - panel.Top) / at.Scale;
+    }
+
+    internal void Shrink(Native.RECT panel, double scale)
+    {
+        if (_grown == null) return;
+        _grown = null;
+        _root.ClearValue(HorizontalAlignmentProperty);
+        _root.ClearValue(VerticalAlignmentProperty);
+        _root.ClearValue(WidthProperty);
+        _root.ClearValue(HeightProperty);
+        _root.Margin = new Thickness(NetherBorder.OuterInset);
+        Resize(Place(panel, scale));
+    }
+
+    /// <summary>Панель разом сменит место и размер: прежнее пламя не должно лечь поверх неё, следующий кадр нарисует новое.</summary>
+    internal void Blank() { if (IsVisible && Native.GetWindowRect(Handle, out var here)) Native.UpdateLayered(Handle, here, null, 0, 0); }
+
+    void Resize(Native.RECT window)
+    {
+        if (Native.UpdateLayered(Handle, window, null, 0, 0)) Native.SendWindowPosChanged(Handle, window);
+        else Native.SetWindowPos(Handle, Native.HWND_TOPMOST, window.Left, window.Top, window.Right - window.Left, window.Bottom - window.Top, Native.SWP_NOACTIVATE);
+    }
+
+    internal void Align(Native.RECT panel, double scale)
+    {
+        if (_grown != null) return;
+        var window = Place(panel, scale);
+        Native.SetWindowPos(Handle, Native.HWND_TOPMOST, window.Left, window.Top, window.Right - window.Left, window.Bottom - window.Top, Native.SWP_NOACTIVATE);
+    }
+
+    static Native.RECT Place(Native.RECT panel, double scale)
+    {
+        int pad = (int)Math.Round(NetherBorder.OuterInset * scale);
+        return new Native.RECT { Left = panel.Left - pad, Top = panel.Top - pad, Right = panel.Right + pad, Bottom = panel.Bottom + pad };
     }
 }

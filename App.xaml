@@ -10,6 +10,9 @@
         Движение (длительности, кривые) — в Motion.cs: анимации запускаются из кода, чтобы их выключала одна настройка.
     -->
     <Application.Resources>
+        <!-- Меню открывает и закрывает Motion.AnimateOpen: системное проявление поверх него мигало -->
+        <PopupAnimation x:Key="{x:Static SystemParameters.MenuPopupAnimationKey}">None</PopupAnimation>
+
         <FontFamily x:Key="IconFont">Segoe Fluent Icons, Segoe MDL2 Assets</FontFamily>
         <!-- Статические Plex имеют общие метрики Sans/Mono и не зависят от установленных шрифтов. -->
         <local:UiFont x:Key="TextFont"/>
@@ -159,7 +162,7 @@
                 <Setter.Value>
                     <ControlTemplate TargetType="TextBox">
                         <Grid>
-                            <Border x:Name="Bd" CornerRadius="4" Background="{DynamicResource ControlFill}"
+                            <Border x:Name="Bd" CornerRadius="4" Background="{DynamicResource FieldFill}"
                                     BorderBrush="{DynamicResource ControlStroke}" BorderThickness="1"/>
                             <Border x:Name="Underline" CornerRadius="0,0,4,4" BorderThickness="0,0,0,1"
                                     BorderBrush="{DynamicResource ControlStrongStroke}"/>
@@ -186,7 +189,7 @@
                                 <Setter TargetName="PART_Clear" Property="Visibility" Value="Collapsed"/>
                             </Trigger>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource ControlFillHover}"/>
+                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource FieldFillHover}"/>
                             </Trigger>
                             <Trigger Property="IsKeyboardFocused" Value="True">
                                 <Setter TargetName="Bd" Property="Background" Value="{DynamicResource ControlFillFocused}"/>
@@ -211,7 +214,7 @@
                 <Setter.Value>
                     <ControlTemplate TargetType="TextBox">
                         <Grid>
-                            <Border x:Name="Bd" CornerRadius="4" Background="{DynamicResource ControlFill}"
+                            <Border x:Name="Bd" CornerRadius="4" Background="{DynamicResource FieldFill}"
                                     BorderBrush="{DynamicResource ControlStroke}" BorderThickness="1"/>
                             <Border x:Name="Underline" CornerRadius="0,0,4,4" BorderThickness="0,0,0,1"
                                     BorderBrush="{DynamicResource ControlStrongStroke}"/>
@@ -220,7 +223,7 @@
                         </Grid>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource ControlFillHover}"/>
+                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource FieldFillHover}"/>
                             </Trigger>
                             <Trigger Property="IsKeyboardFocused" Value="True">
                                 <Setter TargetName="Bd" Property="Background" Value="{DynamicResource ControlFillFocused}"/>
@@ -901,35 +904,69 @@
             </Setter>
         </Style>
 
-        <!-- Пункт меню: значок (Tag), текст, справа сочетание клавиш (InputGestureText); у отмеченного — галочка -->
+        <!-- Пункт меню: значок (Icon — картинка программы, иначе глиф из Tag), текст, справа сочетание или число (InputGestureText).
+             У отмеченного с глифом галочка вместо глифа, с картинкой — справа. Подсветка не мигает, а проявляется -->
         <Style TargetType="MenuItem">
             <Setter Property="Foreground" Value="{DynamicResource TextPrimary}"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="MenuItem">
-                        <Border x:Name="Bd" CornerRadius="4" Margin="4,1" Padding="10,7,12,7" Background="Transparent">
-                            <Grid>
+                        <Grid Margin="4,1" Background="Transparent">
+                            <Border x:Name="Bd" CornerRadius="4" Background="{DynamicResource SubtleHover}" Opacity="0"/>
+                            <Grid Margin="10,7,12,7">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="28"/>
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
                                 <TextBlock x:Name="Glyph" Text="{TemplateBinding Tag}" FontFamily="{StaticResource IconFont}" FontSize="14"
                                            VerticalAlignment="Center"/>
+                                <ContentPresenter x:Name="IconHost" ContentSource="Icon" Width="18" Height="18" HorizontalAlignment="Left" VerticalAlignment="Center"
+                                                  Visibility="Collapsed" RenderTransformOrigin="0.5,0.5">
+                                    <ContentPresenter.RenderTransform><ScaleTransform/></ContentPresenter.RenderTransform>
+                                </ContentPresenter>
                                 <ContentPresenter Grid.Column="1" ContentSource="Header" VerticalAlignment="Center" RecognizesAccessKey="True"/>
                                 <TextBlock x:Name="Gesture" Grid.Column="2" Text="{TemplateBinding InputGestureText}" Margin="24,0,0,0"
                                            FontSize="12" Foreground="{DynamicResource TextSecondary}" VerticalAlignment="Center"/>
+                                <TextBlock x:Name="Check" Grid.Column="3" Text="&#xE73E;" FontFamily="{StaticResource IconFont}" FontSize="12" Margin="10,0,0,0"
+                                           Foreground="{DynamicResource Accent}" VerticalAlignment="Center" Visibility="Collapsed"/>
                             </Grid>
-                        </Border>
+                        </Grid>
                         <ControlTemplate.Triggers>
                             <Trigger Property="InputGestureText" Value="">
                                 <Setter TargetName="Gesture" Property="Visibility" Value="Collapsed"/>
                             </Trigger>
+                            <Trigger Property="HasItems" Value="False">
+                                <Setter TargetName="IconHost" Property="Visibility" Value="Visible"/>
+                            </Trigger>
                             <Trigger Property="IsChecked" Value="True">
                                 <Setter TargetName="Glyph" Property="Text" Value="&#xE73E;"/>
+                                <Setter TargetName="Glyph" Property="Foreground" Value="{DynamicResource Accent}"/>
                             </Trigger>
+                            <MultiTrigger>
+                                <MultiTrigger.Conditions>
+                                    <Condition Property="IsChecked" Value="True"/>
+                                    <Condition Property="Tag" Value=""/>
+                                </MultiTrigger.Conditions>
+                                <Setter TargetName="Glyph" Property="Text" Value=""/>
+                                <Setter TargetName="Check" Property="Visibility" Value="Visible"/>
+                            </MultiTrigger>
                             <Trigger Property="IsHighlighted" Value="True">
-                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource SubtleHover}"/>
+                                <Trigger.EnterActions>
+                                    <BeginStoryboard><Storyboard>
+                                        <DoubleAnimation Storyboard.TargetName="Bd" Storyboard.TargetProperty="Opacity" To="1" Duration="0:0:0.09"/>
+                                        <DoubleAnimation Storyboard.TargetName="IconHost" Storyboard.TargetProperty="RenderTransform.ScaleX" To="1.14" Duration="0:0:0.18"><DoubleAnimation.EasingFunction><CubicEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction></DoubleAnimation>
+                                        <DoubleAnimation Storyboard.TargetName="IconHost" Storyboard.TargetProperty="RenderTransform.ScaleY" To="1.14" Duration="0:0:0.18"><DoubleAnimation.EasingFunction><CubicEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction></DoubleAnimation>
+                                    </Storyboard></BeginStoryboard>
+                                </Trigger.EnterActions>
+                                <Trigger.ExitActions>
+                                    <BeginStoryboard><Storyboard>
+                                        <DoubleAnimation Storyboard.TargetName="Bd" Storyboard.TargetProperty="Opacity" To="0" Duration="0:0:0.2"/>
+                                        <DoubleAnimation Storyboard.TargetName="IconHost" Storyboard.TargetProperty="RenderTransform.ScaleX" To="1" Duration="0:0:0.2"/>
+                                        <DoubleAnimation Storyboard.TargetName="IconHost" Storyboard.TargetProperty="RenderTransform.ScaleY" To="1" Duration="0:0:0.2"/>
+                                    </Storyboard></BeginStoryboard>
+                                </Trigger.ExitActions>
                             </Trigger>
                             <Trigger Property="IsEnabled" Value="False">
                                 <Setter Property="Foreground" Value="{DynamicResource TextDisabled}"/>

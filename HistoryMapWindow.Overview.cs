@@ -79,6 +79,7 @@ internal sealed partial class HistoryMapWindow
             var button = new Button { Tag = group.Entries[0].Id, Content = content, Style = (Style)FindResource("StandardButton"), Padding = new Thickness(height < 120 ? 8 : 12), HorizontalContentAlignment = HorizontalAlignment.Stretch, VerticalContentAlignment = VerticalAlignment.Top, Background = Brush("WindowSurface"), Foreground = Brush("TextPrimary"), BorderBrush = Brush(group.Entries.Any(e => e.Id == selected) ? "Accent" : "ControlStroke"), BorderThickness = new Thickness(group.Entries.Any(e => e.Id == selected) ? 2 : 1), Focusable = true, Cursor = Cursors.Hand };
             string description = title + "\n" + countText + "\n" + sourceText + "\n" + sample;
             button.ToolTip = new TextBlock { Text = description, MaxWidth = 360, TextWrapping = TextWrapping.Wrap };
+            ToolTipService.SetInitialShowDelay(button, 0);
             AutomationProperties.SetName(button, description);
             button.Click += (_, _) => OpenGroup(group);
             summaryCards.Add((new Rect(at, new Size(width, height)), group));
